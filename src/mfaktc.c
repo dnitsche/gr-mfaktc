@@ -551,37 +551,38 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
         mystuff->bit_max_assignment = mystuff->bit_min + 1;
         mystuff->bit_max_stage      = mystuff->bit_max_assignment;
         if(mystuff->verbosity >= 1)printf("got selftest: base=%d exp=%u bit_min=%d bit_max=%d (%.2f GHz-days)\n", mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_assignment, primenet_ghzdays(mystuff->exponent, mystuff->bit_min, mystuff->bit_max_assignment));
+
+        printf("########## testcase %u ##########\n", ++i);
+        f_class = (int)(k % NUM_CLASSES);
+
+  /* create a list which kernels can handle this testcase */
+        j = 0;
+        if(kernel_possible(_95BIT_MUL32,       mystuff)) kernels[j++] = _95BIT_MUL32;
+        if(kernel_possible(_75BIT_MUL32,       mystuff)) kernels[j++] = _75BIT_MUL32;
+        if(kernel_possible(_64BIT_MUL32,       mystuff)) kernels[j++] = _64BIT_MUL32;
+        if(kernel_possible(_95BIT_MUL32_GS,    mystuff)) kernels[j++] = _95BIT_MUL32_GS;
+        if(kernel_possible(_75BIT_MUL32_GS,    mystuff)) kernels[j++] = _75BIT_MUL32_GS;
+        if(kernel_possible(_64BIT_MUL32_GS,    mystuff)) kernels[j++] = _64BIT_MUL32_GS;
+
+        do
+        {
+          num_selftests++;
+          tf_res=tf(mystuff, f_class, k, kernels[--j]);
+              if(tf_res == 0)st_success++;
+          else if(tf_res == 1)st_nofactor++;
+          else if(tf_res == 2)st_wrongfactor++;
+          else if(tf_res == RET_CUDA_ERROR)return RET_CUDA_ERROR; /* bail out, we might have a serios problem (detected by cudaGetLastError())... */
+          else           st_unknown++;
+
+          if(tf_res == 0)kernel_success[kernels[j]]++;
+          else           kernel_fail[kernels[j]]++;
+        }
+        while(j>0);
       }
-      else if(parse_ret == CANT_OPEN_FILE)             printf("ERROR: get_next_assignment(): can't open \"%s\"\n", mystuff->selftestfile);
-      else if(parse_ret == VALID_SELFTEST_NOT_FOUND) printf("ERROR: get_next_selftest(): no valid selftest found in \"%s\"\n", mystuff->selftestfile);
-      else if(parse_ret != OK)                         printf("ERROR: get_next_assignment(): Unknown error (%d)\n", parse_ret);
-
-      printf("########## testcase %u ##########\n", ++i);
-      f_class = (int)(k % NUM_CLASSES);
-
-/* create a list which kernels can handle this testcase */
-      j = 0;
-      if(kernel_possible(_95BIT_MUL32,       mystuff)) kernels[j++] = _95BIT_MUL32;
-      if(kernel_possible(_75BIT_MUL32,       mystuff)) kernels[j++] = _75BIT_MUL32;
-      if(kernel_possible(_64BIT_MUL32,       mystuff)) kernels[j++] = _64BIT_MUL32;
-      if(kernel_possible(_95BIT_MUL32_GS,    mystuff)) kernels[j++] = _95BIT_MUL32_GS;
-      if(kernel_possible(_75BIT_MUL32_GS,    mystuff)) kernels[j++] = _75BIT_MUL32_GS;
-      if(kernel_possible(_64BIT_MUL32_GS,    mystuff)) kernels[j++] = _64BIT_MUL32_GS;
-
-      do
-      {
-        num_selftests++;
-        tf_res=tf(mystuff, f_class, k, kernels[--j]);
-             if(tf_res == 0)st_success++;
-        else if(tf_res == 1)st_nofactor++;
-        else if(tf_res == 2)st_wrongfactor++;
-        else if(tf_res == RET_CUDA_ERROR)return RET_CUDA_ERROR; /* bail out, we might have a serios problem (detected by cudaGetLastError())... */
-        else           st_unknown++;
-
-        if(tf_res == 0)kernel_success[kernels[j]]++;
-        else           kernel_fail[kernels[j]]++;
-      }
-      while(j>0);
+      else if(parse_ret == CANT_OPEN_FILE)             {printf("ERROR: get_next_selftest(): can't open \"%s\"\n", mystuff->selftestfile);}
+      else if(parse_ret == VALID_SELFTEST_NOT_FOUND)   {printf("ERROR: get_next_selftest(): no valid selftest found in \"%s\"\n", mystuff->selftestfile);}
+      else if(parse_ret == END_OF_ASSIGNMENT_FILE)     { if (num_selftests==0) {printf("ERROR: get_next_selftest(): no valid selftest found in \"%s\"\n", mystuff->selftestfile);}}
+      else if(parse_ret != OK)                         {printf("ERROR: get_next_selftest(): Unknown error (%d)\n", parse_ret);}
     }
     while(parse_ret == OK && !mystuff->quit);
     fclose(f_in);

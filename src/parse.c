@@ -336,7 +336,7 @@ enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, int *base, unsigned i
     }
 
     if (END_OF_FILE == value)
-      break;
+      return END_OF_ASSIGNMENT_FILE;
     if(verbosity >= 1)
     {
       printf("WARNING: ignoring line %u in \"%s\"! Reason: ", linecount, filename);
@@ -701,20 +701,20 @@ output
 }
 
 /************************************************************************************************************
- * Function name : get_next_selftest                                                                      *
- *                                *
- *     INPUT  : 
- *    FILE* f_in
- *    char *filename                        *
- *    int *base                     *
- *    unsigned int *exponent                      *
- *    int *bit_min                        *
- *    unsigned long long *k                        *
- *     OUTPUT :                                                         *
+ * Function name : get_next_selftest                                                                        *
  *                                                                                                          *
- *     0 - OK                           *
-// *     1 - get_next_selftest : cannot open file                 *
- *     2 - get_next_selftest : no valid selftest found                *
+ *     INPUT  :                                                                                             *
+ *    FILE* f_in                                                                                            *
+ *    char *filename                                                                                        *
+ *    int *base                                                                                             *
+ *    unsigned int *exponent                                                                                *
+ *    int *bit_min                                                                                          *
+ *    unsigned long long *k                                                                                 *
+ *     OUTPUT :                                                                                             *
+ *                                                                                                          *
+ *     0 - OK                                                                                               *
+ *     1 - get_next_selftest : cannot open file                                                             *
+ *     2 - get_next_selftest : no valid selftest found (EOF)                                                *
  ************************************************************************************************************/
 enum ASSIGNMENT_ERRORS get_next_selftest(FILE * f_in, char *filename, int *base, unsigned int *exponent, int *bit_min, unsigned long long *k, int verbosity)
 {
@@ -737,7 +737,7 @@ enum ASSIGNMENT_ERRORS get_next_selftest(FILE * f_in, char *filename, int *base,
     }
 
     if (END_OF_FILE == value)
-      break;
+      return END_OF_ASSIGNMENT_FILE;
     if(verbosity >= 1)
     {
       printf("WARNING: ignoring line %u in \"%s\"! Reason: ", linecount, filename);
