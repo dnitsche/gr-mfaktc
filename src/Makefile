@@ -39,9 +39,9 @@ CUOBJS = $(CUSRC:.cu=.o) tf_75bit.o tf_64bit.o
 
 ##############################################################################
 
-all: ../mfaktc.exe
+all: ../gr-mfaktc.exe
 
-../mfaktc.exe : $(COBJS) $(CUOBJS)
+../gr-mfaktc.exe : $(COBJS) $(CUOBJS)
 	$(LD) $^ -o $@ $(LDFLAGS)
 
 clean :
