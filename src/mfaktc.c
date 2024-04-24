@@ -115,20 +115,19 @@ inline int no_small_factor(unsigned int exp, unsigned long long int k_min_plus_c
   return 0;
 }
 
+unsigned int gcd(unsigned int a, unsigned int b) {
+  if (a == 0) {
+    return b;
+  }
+  return gcd(b % a, a);
+}
+
+unsigned int lcm(unsigned int a, unsigned int b) {
+  return (a*b)/gcd(a, b);
+}
+
 int both_tests_possible(unsigned int mod) {
-  return
-    mod == 2 || mod == 3 || mod == 4 || mod == 5 || mod == 6 || mod == 7 || mod == 8 || mod == 10
-    || mod == 12 || mod == 14 || mod == 15 || mod == 20 || mod == 21 || mod == 24 || mod == 28 || mod == 30
-    || mod == 35 || mod == 40 || mod == 42 || mod == 56 || mod == 60 || mod == 70 || mod == 84 || mod == 105
-    || mod == 120 || mod == 140 || mod == 168 || mod == 210 || mod == 280 || mod == 420 || mod == 840
-#ifdef MORE_CLASSES
-     || mod == 11 || mod == 22 || mod == 33 || mod == 44 || mod == 55 || mod == 66 || mod == 77 || mod == 88
-     || mod == 110 || mod == 132 || mod == 154 || mod == 165 || mod == 220 || mod == 231 || mod == 264
-     || mod == 308 || mod == 330 || mod == 385 || mod == 440 || mod == 462 || mod == 616 || mod == 660
-     || mod == 770 || mod == 924 || mod == 1155 || mod == 1320 || mod == 1540 || mod == 1848 || mod == 2310
-     || mod == 3080 || mod == 4620 || mod == 9240
-#endif
-     ;
+  return lcm(mod, NUM_CLASSES) == 2 * NUM_CLASSES;
 }
 
 /*
