@@ -1,3 +1,9 @@
+version 0.21-generalized-repunit-edition (2024-04-17)
+- contributors: Danilo Nitsche (danilo.nitsche@gmx.de)
+  - extracted test cases to text file (selftest.txt)
+  - extracted some constants
+  - updated makefiles to support newer CUDA versions
+
 version 0.21-generalized-repunit-edition (2020-09-20)
 - contributors: Fan Ming, Danilo Nitsche (danilo.nitsche@gmx.de)
   - fixed issue on Geforce 1660 cards
