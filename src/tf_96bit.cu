@@ -55,7 +55,7 @@ __device__ static void mod_192_96(int96 *res, int192 q, int96 n, float nf, bool 
 the 75 bit kernel has only one difference: the first iteration of the
 division will be skipped
 */
-#ifndef SHORTCUT_75BIT
+#if !defined(SHORTCUT_75BIT) && !defined(SHORTCUT_64BIT)
   qf= __uint2float_rn(q.d5);
   qf= qf * 4294967296.0f + __uint2float_rn(q.d4);
   qf= qf * 4294967296.0f + __uint2float_rn(q.d3);
@@ -83,9 +83,9 @@ division will be skipped
   q.d3 = __subc_cc(q.d3, nn.d3);
   q.d4 = __subc_cc(q.d4, nn.d4);
   q.d5 = __subc   (q.d5, nn.d5);
-#endif // SHORTCUT_75BIT
+#endif // SHORTCUT_75BIT SHORTCUT_64BIT
 /********** Step 2, Offset 2^55 (1*32 + 23) **********/
-#ifndef SHORTCUT_75BIT
+#if !defined(SHORTCUT_75BIT) && !defined(SHORTCUT_64BIT)
   qf= __uint2float_rn(q.d5);
   qf= qf * 4294967296.0f + __uint2float_rn(q.d4);
 #else
