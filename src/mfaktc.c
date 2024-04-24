@@ -242,6 +242,17 @@ int class_needed_11(unsigned int exp, unsigned long long int k_min, int c)
   return 0;
 }
 
+int class_needed_12(unsigned int exp, unsigned long long int k_min, int c)
+{
+  unsigned long long int k_min_plus_c = k_min+c;
+  int tmp = (2 * (exp% 12) * (k_min_plus_c% 12)) % 12;
+  if( ((tmp==0) || (tmp==10)) && no_small_factor(exp, k_min_plus_c))
+  {
+    return 1;
+  }
+  return 0;
+}
+
 int class_needed(unsigned int base, unsigned int exp, unsigned long long int k_min, int c) {
   switch(base) {
   case 2: return class_needed_2(exp, k_min, c); break;
@@ -252,6 +263,7 @@ int class_needed(unsigned int base, unsigned int exp, unsigned long long int k_m
   case 8: return class_needed_8(exp, k_min, c); break;
   case 10: return class_needed_10(exp, k_min, c); break;
   case 11: return class_needed_11(exp, k_min, c); break;
+  case 12: return class_needed_12(exp, k_min, c); break;
   default: return class_needed_default(exp, k_min, c); break;
   }
 }
