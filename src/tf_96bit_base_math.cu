@@ -252,27 +252,27 @@ extern "C" __host__ void mul75(int192 *res, int192 a, int b)
 extern "C" __host__ void mul96(int192 *res, int192 a, int b)
 #endif
 {
-  long long int full;
-  full = (long long int)a.d0*(long long int)b;
-  res->d0 = (int)full;
-  res->d1 = (int)(full>>32);
+  unsigned long long int full;
+  full = (unsigned long long int)a.d0*(unsigned long long int)b;
+  res->d0 = (unsigned int)full;
+  res->d1 = (unsigned int)(full>>32);
 
-  full = (long long int)a.d1*(long long int)b;
-  res->d1 += (int)full;
-  res->d2  = (int)(full>>32);
+  full = (unsigned long long int)a.d1*(unsigned long long int)b;
+  res->d1 += (unsigned int)full;
+  res->d2  = (unsigned int)(full>>32);
 
-  full = (long long int)a.d2*(long long int)b;
-  res->d2 += (int)full;
-  res->d3  = (int)(full>>32);
+  full = (unsigned long long int)a.d2*(unsigned long long int)b;
+  res->d2 += (unsigned int)full;
+  res->d3  = (unsigned int)(full>>32);
 
-  full = (long long int)a.d3*(long long int)b;
-  res->d3 += (int)full;
-  res->d4  = (int)(full>>32);
+  full = (unsigned long long int)a.d3*(unsigned long long int)b;
+  res->d3 += (unsigned int)full;
+  res->d4  = (unsigned int)(full>>32);
 
-  full = (long long int)a.d4*(long long int)b;
-  res->d4 += (int)full;
+  full = (unsigned long long int)a.d4*(unsigned long long int)b;
+  res->d4 += (unsigned int)full;
   #if !defined(SHORTCUT_75BIT) && !defined(SHORTCUT_64BIT)
-  res->d5  = (int)(full>>32);
+  res->d5  = (unsigned int)(full>>32);
   res->d5 += a.d5*b;
   #endif
 }
