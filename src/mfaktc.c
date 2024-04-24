@@ -590,8 +590,10 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
 {
   int i, j, tf_res, st_success=0, st_nofactor=0, st_wrongfactor=0, st_unknown=0;
 
-  #define NUM_SELFTESTS 3022
-  unsigned int exp[NUM_SELFTESTS], base[NUM_SELFTESTS], index[9];
+  #define NUM_SELFTESTS_2 2867
+  #define NUM_SELFTESTS_10 3022
+  #define NUM_SELFTESTS (NUM_SELFTESTS_2+NUM_SELFTESTS_10)
+  unsigned int exp[NUM_SELFTESTS], base[NUM_SELFTESTS], index[18];
   int num_selftests=0;
   int bit_min[NUM_SELFTESTS], f_class;
   unsigned long long int k[NUM_SELFTESTS];
@@ -601,6 +603,9 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
   int kernels[NUM_KERNEL+1]; // currently there are <NUM_KERNEL> different kernels, kernel numbers start at 1!
   int kernel_success[NUM_KERNEL+1], kernel_fail[NUM_KERNEL+1];
 
+  int offset = 0;
+  #include "selftest-data-mersenne.c"
+  offset = NUM_SELFTESTS_2;
   #include "selftest-data-repunit.c"
 
   for(i = 0; i <= NUM_KERNEL; i++)
@@ -649,15 +654,19 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
   }
   else if(type == 1)
   {
-    index[0]=   0; index[1]=2893; index[2]=3017; /* some factors below 2^64 (test 64 bit kernel) */
-    index[3]=3020; index[4]=3021; index[5]=1500; /* some factors below 2^75 (test 75 bit kernel) */
-    index[6]=1508; index[7]=1518; index[8]=1521; /* some factors below 2^95 (test 95 bit kernel) */
-
-    for(i = 0; i < 9; i++)
+    int offset = 0;
+    index[offset+ 0]=   2; index[offset+ 1]=  25; index[offset+ 2]=  57; /* some factors below 2^71 (test the 71/75 bit kernel depending on compute capability) */
+    index[offset+ 3]=  70; index[offset+ 4]=  88; index[offset+ 5]= 106; /* some factors below 2^75 (test 75 bit kernel) */
+    index[offset+ 6]=1547; index[offset+ 7]=1552; index[offset+ 8]=1556; /* some factors below 2^95 (test 95 bit kernel) */
+    offset = NUM_SELFTESTS_2;
+    index[offset+ 9]=   0; index[offset+10]=2893; index[offset+11]=3017; /* some factors below 2^64 (test 64 bit kernel) */
+    index[offset+12]=3020; index[offset+13]=3021; index[offset+14]=1500; /* some factors below 2^75 (test 75 bit kernel) */
+    index[offset+15]=1508; index[offset+16]=1518; index[offset+17]=1521; /* some factors below 2^95 (test 95 bit kernel) */
+    for(i = 0; i < 18; i++)
     {
       f_class = (int)(k[index[i]] % NUM_CLASSES);
 
-      mystuff->base           = base[index[i]];
+      mystuff->base               = base[index[i]];
       mystuff->exponent           = exp[index[i]];
       mystuff->bit_min            = bit_min[index[i]];
       mystuff->bit_max_assignment = bit_min[index[i]] + 1;
