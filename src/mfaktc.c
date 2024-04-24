@@ -108,8 +108,9 @@ Legendre(5,p) = (-1)^Floor((p+2)/5) = |
 
 Product must be +1, so either both products of (-1)(-1) and (+1)(+1) are possible.
 Filtering the possible values mod 40 gives the following allowed values:
-{1,3,9,13,27,31,37,39} for 2kp+1.
+{1,3,9,13,27,31,37,39} or {±1, ±3, ±9, ±13} for 2kp+1.
 Thus allowed values for 2kp are: {0,2,8,12,26,30,36,38}
+See also: https://math.stackexchange.com/questions/1767306/find-all-prime-p-such-that-legendre-symbol-of-left-frac10p-right-1
 
 k_min *MUST* be aligned in that way that k_min is in class 0!
 */
