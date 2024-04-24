@@ -174,6 +174,24 @@ int class_needed_5(unsigned int exp, unsigned long long int k_min, int c)
   return 0;
 }
 
+int class_needed_6(unsigned int exp, unsigned long long int k_min, int c)
+{
+  int tmp;
+  tmp = (2 * (exp% 24) * ((k_min+c)% 24)) % 24;
+  if( ((tmp==0) || (tmp==4) || (tmp==18) || (tmp==22)) && \
+  ((2 * (exp% 3) * ((k_min+c)% 3)) % 3 !=  2) && \
+  ((2 * (exp% 5) * ((k_min+c)% 5)) % 5 !=  4) && \
+  ((2 * (exp% 7) * ((k_min+c)% 7)) % 7 !=  6))
+#ifdef MORE_CLASSES
+  if  ((2 * (exp % 11) * ((k_min + c) % 11)) % 11 != 10 )
+#endif
+  {
+    return 1;
+  }
+
+  return 0;
+}
+
 // got results from some experimental math
 int class_needed_8(unsigned int exp, unsigned long long int k_min, int c)
 {
@@ -237,6 +255,7 @@ int class_needed(unsigned int base, unsigned int exp, unsigned long long int k_m
   case 2: return class_needed_2(exp, k_min, c); break;
   case 3: return class_needed_3(exp, k_min, c); break;
   case 5: return class_needed_5(exp, k_min, c); break;
+  case 6: return class_needed_6(exp, k_min, c); break;
   case 8: return class_needed_8(exp, k_min, c); break;
   case 10: return class_needed_10(exp, k_min, c); break;
   default: return class_needed_default(exp, k_min, c); break;
