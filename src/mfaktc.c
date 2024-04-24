@@ -440,12 +440,12 @@ see benchmarks in src/kernel_benchmarks.txt */
       }
       else
       {
-	if(kernel != _64BIT_MUL32_GS &&
-	   kernel != _75BIT_MUL32_GS &&
-	   kernel != _95BIT_MUL32_GS)
-	{
-	  sieve_init_class(mystuff->exponent, k_min+cur_class, mystuff->sieve_primes);
-	}
+        if(kernel != _64BIT_MUL32_GS &&
+           kernel != _75BIT_MUL32_GS &&
+           kernel != _95BIT_MUL32_GS)
+        {
+          sieve_init_class(mystuff->exponent, k_min+cur_class, mystuff->sieve_primes);
+        }
         mystuff->stats.class_counter++;
 
              if(kernel == _64BIT_MUL32)       numfactors = tf_class_64          (k_min+cur_class, k_max, mystuff);
