@@ -1,4 +1,4 @@
-CUDA_DIR = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v6.5"
+CUDA_DIR = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.1"
 
 CC = cl
 CFLAGS = /Ox /Oy /GL /W2 /fp:fast /I$(CUDA_DIR)\include /I$(CUDA_DIR)\include\cudart /nologo
@@ -7,11 +7,14 @@ NVCCFLAGS = -m32 --ptxas-options=-v
 CUFLAGS = -ccbin="C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin" -Xcompiler /EHsc,/W3,/nologo,/Ox,/GL $(NVCCFLAGS)
 
 # generate code for various compute capabilities
-NVCCFLAGS += --generate-code arch=compute_20,code=sm_20 # CC 2.x GPUs will use this code, one code fits all!
-NVCCFLAGS += --generate-code arch=compute_30,code=sm_30 # all CC 3.x GPUs _COULD_ use this code
-NVCCFLAGS += --generate-code arch=compute_35,code=sm_35 # but CC 3.5 (3.2?) _CAN_ use funnel shift which is useful for mfaktc
+#NVCCFLAGS += --generate-code arch=compute_20,code=sm_20 # CC 2.x GPUs will use this code, one code fits all!
+#NVCCFLAGS += --generate-code arch=compute_30,code=sm_30 # all CC 3.x GPUs _COULD_ use this code
+#NVCCFLAGS += --generate-code arch=compute_35,code=sm_35 # but CC 3.5 (3.2?) _CAN_ use funnel shift which is useful for mfaktc
 NVCCFLAGS += --generate-code arch=compute_50,code=sm_50 # CC 5.x GPUs will use this code
-#NVCCFLAGS += --generate-code arch=compute_61,code=sm_61 # CC 6.x GPUs will use this code
+NVCCFLAGS += --generate-code arch=compute_60,code=sm_60 # CC 6.0 GPUs will use this code
+NVCCFLAGS += --generate-code arch=compute_61,code=sm_61 # CC 6.1 GPUs will use this code
+NVCCFLAGS += --generate-code arch=compute_70,code=sm_70 # CC 7.x GPUs will use this code
+NVCCFLAGS += --generate-code arch=compute_75,code=sm_75 # CC 7.5 GPUs will use this code
 
 LINK = link
 LFLAGS = /nologo /LTCG #/ltcg:pgo
