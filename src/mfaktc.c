@@ -251,7 +251,7 @@ int class_needed_12(unsigned int exp, unsigned long long int k_min, int c)
   return 0;
 }
 
-int class_needed(unsigned int base, unsigned int exp, unsigned long long int k_min, int c) {
+int class_needed(int base, unsigned int exp, unsigned long long int k_min, int c) {
   switch(base) {
   case 2: return class_needed_2(exp, k_min, c); break;
   case 3: return class_needed_3(exp, k_min, c); break;
@@ -773,7 +773,7 @@ void print_last_CUDA_error()
 
 int main(int argc, char **argv)
 {
-  unsigned int base = 1;
+  int base = 1;
   unsigned int exponent = 1;
   int bit_min = -1, bit_max = -1;
   int parse_ret = -1;

@@ -17,12 +17,20 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-__device__ static void check_factor96(int96 f, int96 a, unsigned int *RES)
+__device__ static void check_factor96(int96 f, int96 a, bool negativeBase, unsigned int *RES)
 /* Check whether f is a factor or not. If f != 1 and a == 1 then f is a factor,
 in this case f is written into the RES array. */
 {
   int index;
-  if((a.d2|a.d1) == 0 && a.d0 == 1)
+  bool isFactor;
+  if (negativeBase)
+  {
+    isFactor = a.d2 == f.d2 && a.d1 == f.d1 && a.d0 == (f.d0 - 1);
+  } else
+  {
+    isFactor = (a.d2|a.d1) == 0 && a.d0 == 1;
+  }
+  if(isFactor)
   {
     if(f.d2 != 0 || f.d1 != 0 || f.d0 != 1)	/* 1 isn't really a factor ;) */
     {

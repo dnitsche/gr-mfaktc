@@ -54,7 +54,7 @@ typedef struct
   unsigned int *h_RES;
   unsigned int *d_RES;
 
-  unsigned int base;                   /* the repunit base we're currently working on */
+  int base;                            /* the repunit base we're currently working on */
   unsigned int exponent;               /* the exponent we're currently working on */
   int bit_min;                         /* where do we start TFing */
   int bit_max_assignment;              /* the upper size of factors we're searching for */
