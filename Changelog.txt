@@ -1,3 +1,16 @@
+version 0.21-Repunit-edition (2016-04-03)
+- contributors: Danilo Nitsche (danilo.nitsche@gmx.de)
+  - Removed Barrett and 72 bit kernels
+  - Removed Wagstaff related stuff
+  - Added 64 bit kernels
+  - Implemented repunit factorization (hardcoded)
+  - Improved performance compared to older version (0.18-repunit)
+- Notes
+  - Compiling with more-classes flag seem to be slightly faster, but ETA does not work properly
+  - Not tested on Windows yet
+  - GPU sieving utilizes 100% of the GPU, so 1 mfaktc instance is enough
+  - GPU sieving makes the system response slow (tested on Ubuntu 14.04 64 bit with Geforce 460 GTS)
+
 version 0.21 (2015-02-17)
 - contributors
   - Jerry Hallett (Windows compability, binaries and lots of testing)
