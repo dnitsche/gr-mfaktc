@@ -606,6 +606,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
     {
       f_class = (int)(k[index[i]] % NUM_CLASSES);
 
+      mystuff->base           = base[index[i]];
       mystuff->exponent           = exp[index[i]];
       mystuff->bit_min            = bit_min[index[i]];
       mystuff->bit_max_assignment = bit_min[index[i]] + 1;
