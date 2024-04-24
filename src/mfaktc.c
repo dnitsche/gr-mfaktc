@@ -425,7 +425,7 @@ k_max and k_min are used as 64bit temporary integers here...
 
 int selftest(mystuff_t *mystuff, int type)
 /*
-type = 0: full selftest (1557 testcases)
+type = 0: full selftest (1522 testcases)
 type = 1: full selftest (all testcases)
 type = 1: small selftest (this is executed EACH time mfaktc is started)
 
@@ -437,7 +437,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
 {
   int i, j, tf_res, st_success=0, st_nofactor=0, st_wrongfactor=0, st_unknown=0;
 
-  #define NUM_SELFTESTS 2867
+  #define NUM_SELFTESTS 3022
   unsigned int exp[NUM_SELFTESTS], index[9];
   int num_selftests=0;
   int bit_min[NUM_SELFTESTS], f_class;
@@ -448,7 +448,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
   int kernels[NUM_KERNEL+1]; // currently there are <NUM_KERNEL> different kernels, kernel numbers start at 1!
   int kernel_success[NUM_KERNEL+1], kernel_fail[NUM_KERNEL+1];
 
-  #include "selftest-data-mersenne.c"
+  #include "selftest-data-repunit.c"
 
   for(i = 0; i <= NUM_KERNEL; i++)
   {
@@ -495,9 +495,9 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
   }
   else if(type == 1)
   {
-    index[0]=   2; index[1]=  25; index[2]=  57; /* some factors below 2^71 (test the 71/75 bit kernel depending on compute capability) */
-    index[3]=  70; index[4]=  88; index[5]= 106; /* some factors below 2^75 (test 75 bit kernel) */
-    index[6]=1547; index[7]=1552; index[8]=1556; /* some factors below 2^95 (test 95 bit kernel) */
+    index[0]=   0; index[1]=2893; index[2]=3017; /* some factors below 2^64 (test 64 bit kernel) */
+    index[3]=3020; index[4]=3021; index[5]=1500; /* some factors below 2^75 (test 75 bit kernel) */
+    index[6]=1508; index[7]=1518; index[8]=1521; /* some factors below 2^95 (test 95 bit kernel) */
 
     for(i = 0; i < 9; i++)
     {
