@@ -228,22 +228,32 @@ division will be skipped
 // should only be used for f<2^64 !!!!!!!!!!!
   if (optionalmul) // optional multiply by base modulo n
   {
+    unsigned int carry = 0, carry2 = 0;
 	// multiply by base
+	carry  = __umul32hi(q.d0, base);
+	q.d0   = __umul32  (q.d0, base);
+
+	carry2 = __umul32hi(q.d1, base);
+	q.d1   = __add_cc  (__umul32(q.d1, base), carry);
+	carry2 = __addc    (0, carry2);
+	carry  = carry2;
+
+	carry2 = __umul32hi(q.d2, base);
+	q.d2   = __add_cc  (__umul32(q.d2, base), carry);
+	carry2 = __addc    (0, carry2);
+	carry  = carry2;
+
+	carry2 = __umul32hi(q.d3, base);
+	q.d3   = __add_cc  (__umul32(q.d3, base), carry);
+	carry  = __addc    (0, carry2);
+	//carry  = carry2; // not needed
+
 #ifndef SHORTCUT_64BIT
-	q.d4  = __umul32  (q.d4, base);
-
-	q.d4 += __umul32hi(q.d3, base);
+	//carry2 = __umul32hi(q.d4, base);
+	q.d4   = __add_cc  (__umul32(q.d4, base), carry);
+	//carry2 = __addc    (0, carry2);
+	//carry  = carry2;
 #endif
-	q.d3  = __umul32  (q.d3, base);
-
-	q.d3 += __umul32hi(q.d2, base);
-	q.d2  = __umul32  (q.d2, base);
-
-	q.d2 += __umul32hi(q.d1, base);
-	q.d1  = __umul32  (q.d1, base);
-
-	q.d1 += __umul32hi(q.d0, base);
-	q.d0  = __umul32  (q.d0, base);
   }
   MODBASECASE_NONZERO_ERROR(q.d5, 5, 5, 6);
   MODBASECASE_NONZERO_ERROR(q.d4, 5, 4, 7);
