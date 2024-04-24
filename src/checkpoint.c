@@ -23,6 +23,7 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 #include "params.h"
 
 #define FILENAMELENGTH 20
+#define BUFFERLENGTH 100
 
 unsigned int checkpoint_checksum(char *string, int chars)
 /* generates a CRC-32 like checksum of the string */
@@ -53,7 +54,7 @@ checkpoint_write() writes the checkpoint file.
 */
 {
   FILE *f;
-  char buffer[100], filename[FILENAMELENGTH];
+  char buffer[BUFFERLENGTH], filename[FILENAMELENGTH];
   unsigned int i;
 
   sprintf(filename, "%s_%d_%u.ckp", NAME_NUMBERS, base, exp);
@@ -86,9 +87,9 @@ returns 0 otherwise
 {
   FILE *f;
   int ret=0,i,chksum;
-  char buffer[100], buffer2[100], *ptr, filename[FILENAMELENGTH];
+  char buffer[BUFFERLENGTH], buffer2[BUFFERLENGTH], *ptr, filename[FILENAMELENGTH];
 
-  for(i=0;i<100;i++)buffer[i]=0;
+  for(i=0;i<BUFFERLENGTH;i++)buffer[i]=0;
 
   *cur_class=-1;
   *num_factors=0;
@@ -100,13 +101,13 @@ returns 0 otherwise
   {
     return 0;
   }
-  i=fread(buffer,sizeof(char),99,f);
+  i=fread(buffer,sizeof(char),BUFFERLENGTH-1,f);
   sprintf(buffer2,"%s base=%d %u %d %d %d %s: ", NAME_NUMBERS, base, exp, bit_min, bit_max, NUM_CLASSES, MFAKTC_VERSION);
   ptr=strstr(buffer, buffer2);
   if(ptr==buffer)
   {
     i=strlen(buffer2);
-    if(i<70)
+    if(i<BUFFERLENGTH-30)
     {
       ptr=&(buffer[i]);
       sscanf(ptr,"%d %d", cur_class, num_factors);
