@@ -68,7 +68,6 @@ extern "C" __host__ int tf_class_95_gs(unsigned long long int k_min, unsigned lo
   if (maxlogb>20) maxlogb=20; // maximum preprocessing which is possible
 #endif
   while(logb<maxlogb || 10*logb<mystuff->bit_min*3)	// how much preprocessing is possible
-//  while(logb<maxlogb)	// how much preprocessing is possible
   {
     shiftcount--;
     logb<<=1; // log(x^2)
@@ -77,7 +76,7 @@ extern "C" __host__ int tf_class_95_gs(unsigned long long int k_min, unsigned lo
 //  printf("shiftcount = %d\n",shiftcount);
 //  printf("logb = %d\n",logb);
 b_preinit.d5=0;b_preinit.d4=0;b_preinit.d3=0;b_preinit.d2=0;b_preinit.d1=0;b_preinit.d0=1;
-// can probably be done better, just calculate base^logb
+// just calculate base^logb
 #ifdef SHORTCUT_64BIT
   for(i=0; i<logb; i++) mul64(&b_preinit, b_preinit, base);
 #elif defined (SHORTCUT_75BIT)
