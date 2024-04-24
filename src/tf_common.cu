@@ -17,14 +17,12 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-#ifdef TF_96BIT
-  #ifdef SHORTCUT_75BIT
+#ifdef SHORTCUT_75BIT
 extern "C" __host__ int tf_class_75(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff)
 #define MFAKTC_FUNC mfaktc_75
-  #else
+#else
 extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff)
 #define MFAKTC_FUNC mfaktc_95
-  #endif
 #endif
 {
   size_t size = mystuff->threads_per_grid * sizeof(int);
@@ -33,10 +31,8 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
   timeval timer;
   timeval timer2;
   unsigned long long int twait = 0;
-#if defined(TF_96BIT)
   int96 factor,k_base;
   int192 b_preinit;
-#endif
   int shiftcount, ln2b, count = 0;
   unsigned long long int k_diff;
   char string[50];
@@ -74,14 +70,12 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
 //  printf("shiftcount = %d\n",shiftcount);
 //  printf("ln2b = %d\n",ln2b);
   b_preinit.d5=0;b_preinit.d4=0;b_preinit.d3=0;b_preinit.d2=0;b_preinit.d1=0;b_preinit.d0=0;
-#if defined(TF_96BIT)
   if     (ln2b<32 )b_preinit.d0=1<< ln2b;
   else if(ln2b<64 )b_preinit.d1=1<<(ln2b-32);
   else if(ln2b<96 )b_preinit.d2=1<<(ln2b-64);
   else if(ln2b<128)b_preinit.d3=1<<(ln2b-96);
   else if(ln2b<160)b_preinit.d4=1<<(ln2b-128);
   else             b_preinit.d5=1<<(ln2b-160);	// b_preinit = 2^ln2b
-#endif
 
 
 /* set result array to 0 */
@@ -153,11 +147,9 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
 
         cudaMemcpyAsync(mystuff->d_ktab[stream], mystuff->h_ktab[h_ktab_inuse[stream]], size, cudaMemcpyHostToDevice, mystuff->stream[stream]);
 
-#ifdef TF_96BIT
         k_base.d0 =  k_min_grid[h_ktab_index] & 0xFFFFFFFF;
         k_base.d1 =  k_min_grid[h_ktab_index] >> 32;
         k_base.d2 = 0;
-#endif
 
         MFAKTC_FUNC<<<blocksPerGrid, threadsPerBlock, 0, mystuff->stream[stream]>>>(mystuff->exponent, k_base, mystuff->d_ktab[stream], shiftcount, b_preinit, mystuff->d_RES
 #ifdef DEBUG_GPU_MATH
@@ -241,9 +233,7 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
     factor.d2=mystuff->h_RES[i*3 + 1];
     factor.d1=mystuff->h_RES[i*3 + 2];
     factor.d0=mystuff->h_RES[i*3 + 3];
-#if defined(TF_96BIT)
     print_dez96(factor,string);
-#endif
     print_factor(mystuff, i, string);
   }
   if(factorsfound>=10)
