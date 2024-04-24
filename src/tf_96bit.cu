@@ -47,7 +47,7 @@ __device__ static void mod_192_96(int96 *res, int192 q, int96 n, float nf, bool 
 {
   float qf;
   unsigned int qi;
-  int192 nn, tmp;
+  int192 nn;
   int fac = 10;
 
 /********** Step 1, Offset 2^75 (2*32 + 11) **********/
@@ -229,29 +229,22 @@ division will be skipped
 // should only be used for f<2^64 !!!!!!!!!!!
   if (optionalmul) // optional multiply by fac modulo n
   {
-    // multiply by fac
-    tmp.d0 = __umul32  (q.d0, fac);
-    tmp.d1 = __umul32hi(q.d0, fac);
-
-    tmp.d1 += __umul32  (q.d1, fac);
-    tmp.d2  = __umul32hi(q.d1, fac);
-
-    tmp.d2 += __umul32  (q.d2, fac);
-    tmp.d3  = __umul32hi(q.d2, fac);
-
-    tmp.d3 += __umul32  (q.d3, fac);
+	// multiply by fac
 #ifndef SHORTCUT_64BIT
-    tmp.d4  = __umul32hi(q.d3, fac);
+	q.d4  = __umul32  (q.d4, fac);
 
-    tmp.d4 += __umul32  (q.d4, fac);
+	q.d4 += __umul32hi(q.d3, fac);
 #endif
-    q.d0 = tmp.d0;
-    q.d1 = tmp.d1;
-    q.d2 = tmp.d2;
-    q.d3 = tmp.d3;
-#ifndef SHORTCUT_64BIT
-    q.d4 = tmp.d4;
-#endif
+	q.d3  = __umul32  (q.d3, fac);
+
+	q.d3 += __umul32hi(q.d2, fac);
+	q.d2  = __umul32  (q.d2, fac);
+
+	q.d2 += __umul32hi(q.d1, fac);
+	q.d1  = __umul32  (q.d1, fac);
+
+	q.d1 += __umul32hi(q.d0, fac);
+	q.d0  = __umul32  (q.d0, fac);
   }
   MODBASECASE_NONZERO_ERROR(q.d5, 5, 5, 6);
   MODBASECASE_NONZERO_ERROR(q.d4, 5, 4, 7);
