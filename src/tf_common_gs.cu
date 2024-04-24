@@ -36,7 +36,7 @@ extern "C" __host__ int tf_class_95_gs(unsigned long long int k_min, unsigned lo
   timeval timer;
   int96 factor,k_base;
   int192 b_preinit;
-  int base = 10;
+  int base = mystuff->base;
   int shiftcount, logb, maxlogb, count = 0; // logarithm to base ´base´
   int numblocks;
   unsigned long long k_remaining;
