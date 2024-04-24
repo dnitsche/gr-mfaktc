@@ -451,3 +451,36 @@ For correct results a must be less than 2^80 (a.d2 less than 2^16) */
       : "r"(a.d0), "r"(a.d1), "r"(a.d2));
 #endif
 }
+
+#ifdef SHORTCUT_64BIT
+extern "C" __host__ void mul64(int192 *res, int192 a, int b)
+#elif defined (SHORTCUT_75BIT)
+extern "C" __host__ void mul75(int192 *res, int192 a, int b)
+#else
+extern "C" __host__ void mul96(int192 *res, int192 a, int b)
+#endif
+{
+  long long int full;
+  full = (long long int)a.d0*(long long int)b;
+  res->d0 = (int)full;
+  res->d1 = (int)(full>>32);
+
+  full = (long long int)a.d1*(long long int)b;
+  res->d1 += (int)full;
+  res->d2  = (int)(full>>32);
+
+  full = (long long int)a.d2*(long long int)b;
+  res->d2 += (int)full;
+  res->d3  = (int)(full>>32);
+
+  full = (long long int)a.d3*(long long int)b;
+  res->d3 += (int)full;
+  res->d4  = (int)(full>>32);
+
+  full = (long long int)a.d4*(long long int)b;
+  res->d4 += (int)full;
+  #if !defined(SHORTCUT_75BIT) && !defined(SHORTCUT_64BIT)
+  res->d5  = (int)(full>>32);
+  res->d5 += a.d5*b;
+  #endif
+}
