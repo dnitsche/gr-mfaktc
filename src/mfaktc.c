@@ -104,13 +104,7 @@ inline int no_small_factor(unsigned int exp, unsigned long long int k_min_plus_c
 
 int class_needed_default(unsigned int exp, unsigned long long int k_min, int c)
 {
-  unsigned long long int k_min_plus_c = k_min+c;
-  int tmp = (2 * (exp% 8) * (k_min_plus_c% 8)) % 8;
-  if( ((tmp==0) || (tmp==2) || (tmp==4) || (tmp==6)) && no_small_factor(exp, k_min_plus_c))
-  {
-    return 1;
-  }
-  return 0;
+  return no_small_factor(exp, k_min+c);
 }
 
 int class_needed_2(unsigned int exp, unsigned long long int k_min, int c)
