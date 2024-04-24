@@ -36,7 +36,8 @@ extern "C" __host__ int tf_class_95_gs(unsigned long long int k_min, unsigned lo
   timeval timer;
   int96 factor,k_base;
   int192 b_preinit;
-  int shiftcount, ln2b, maxln2b, count = 0;
+  int base = 10;
+  int shiftcount, logb, maxlogb, count = 0; // logarithm to base ´base´
   int numblocks;
   unsigned long long k_remaining;
   char string[50];
@@ -55,30 +56,34 @@ extern "C" __host__ int tf_class_95_gs(unsigned long long int k_min, unsigned lo
   // Pre-calculate some values
 
   shiftcount=0;
+  // shiftcount = (int)log2(exponent), how many bits are there to process
   while((1ULL<<shiftcount) < (unsigned long long int)mystuff->exponent)shiftcount++;
 //  printf("\n\nshiftcount = %d\n",shiftcount);
-  shiftcount-=1;ln2b=1;
-  maxln2b = shiftcount-3;
+  shiftcount-=1;logb=1;
+  maxlogb = shiftcount-3;
+  // TODO: find maximum working numbers
 #if defined (SHORTCUT_75BIT) || defined (SHORTCUT_64BIT)
-  if (maxln2b>9) maxln2b=9; // maximum preprocessing which is possible for 64 bit
+  if (maxlogb>9) maxlogb=9; // maximum preprocessing which is possible for 64 bit
 #else
-  if (maxln2b>20) maxln2b=20; // maximum preprocessing which is possible
+  if (maxlogb>20) maxlogb=20; // maximum preprocessing which is possible
 #endif
-  while(ln2b<maxln2b || (unsigned long long int)(10*ln2b)<k_min*3)	// how much preprocessing is possible
+  while(logb<maxlogb || 10*logb<mystuff->bit_min*3)	// how much preprocessing is possible
+//  while(logb<maxlogb)	// how much preprocessing is possible
   {
     shiftcount--;
-    ln2b<<=1;
-    if(mystuff->exponent&(1<<(shiftcount)))ln2b++;
+    logb<<=1; // log(x^2)
+    if(mystuff->exponent&(1<<(shiftcount)))logb++; // optional mul with base
   }
 //  printf("shiftcount = %d\n",shiftcount);
-//  printf("ln2b = %d\n",ln2b);
+//  printf("logb = %d\n",logb);
 b_preinit.d5=0;b_preinit.d4=0;b_preinit.d3=0;b_preinit.d2=0;b_preinit.d1=0;b_preinit.d0=1;
+// can probably be done better, just calculate base^logb
 #ifdef SHORTCUT_64BIT
-  for(i=0; i<ln2b; i++) mul64(&b_preinit, b_preinit, 10);
+  for(i=0; i<logb; i++) mul64(&b_preinit, b_preinit, base);
 #elif defined (SHORTCUT_75BIT)
-  for(i=0; i<ln2b; i++) mul75(&b_preinit, b_preinit, 10);
+  for(i=0; i<logb; i++) mul75(&b_preinit, b_preinit, base);
 #else
-  for(i=0; i<ln2b; i++) mul96(&b_preinit, b_preinit, 10);
+  for(i=0; i<logb; i++) mul96(&b_preinit, b_preinit, base);
 #endif
 
 /* set result array to 0 */
