@@ -1,3 +1,92 @@
+/**
+
+  This file fills the remainder lookup table. The bit mask is a short way of encoding
+  the allowed remainders for a given base modulo some value. The basic derivation
+  can be described with the example of base 10 repunits:
+
+  Similar to Mersenne factors we find for base 10 repunits that Legendre(10,p)===1 (10 is a quadratic residue mod p)
+  Legendre(10,p) = Legendre(2,p)*Legendre(5,p)
+                                     / +1 if p = 1 or 7 mod 8
+  Legendre(2,p) = (-1)^((p^2-1)/8) = |
+                                     \ -1 if p = 3 or 5 mod 8
+
+                                        / +1 if p = 1 or 4 mod 5
+  Legendre(5,p) = (-1)^Floor((p+2)/5) = |
+                                        \ -1 if p = 2 or 3 mod 5
+
+  The product must be +1, so either both products of (-1)(-1) and (+1)(+1) are possible.
+  Filtering the possible values mod 40=gcd(8,5) gives the following allowed values:
+  {1,3,9,13,27,31,37,39} or {±1, ±3, ±9, ±13} for 2kp+1.
+  See also: https://math.stackexchange.com/questions/1767306/find-all-prime-p-such-that-legendre-symbol-of-left-frac10p-right-1
+
+  Encoding this as a bit map gives 2^1+2^2+2^9+2^13+2^27+2^31+2^37+2^39 = 689476477446.
+  In base 2 this is 1010000010001000000000000010001000000110 (each 1 marks the allowed remainder)
+  or in hex 0xa088002206. Splitting this into 32 bit blocks we get 0xa0 0x88002206. Storing these in increasing
+  block order this is then [0x882a82,0x20] as defined for remainders_pos[10].
+
+  The Mathematica program to generate this file:
+  Some note: This program is certainly not optimal (code wise), although it larger range much faster.
+
+    mapCR[n_, a_, r_] := ChineseRemainder[{a, #}, {4, n}] & /@ r;
+    mapCRJoin[n_, r_, s_] := Sort[mapCR[n, 1, r[s]]~Join~mapCR[n, 3, r[-s]]];
+    (* Return remainders for prime parameters plus special case of -1 *)
+
+    remainders[n_] := remainders[n] = Block[{r},
+        If[n > 2,
+          If[PrimeQ[n],
+            r = GroupBy[Range[n - 1], JacobiSymbol[#, n] &];
+            If[Mod[n, 4] == 1, Return[{#, n} & /@ r]];
+            If[Mod[n, 4] == 3, Return[{#, LCM[4, n]} & /@ AssociationMap[mapCRJoin[n, r, #] &, {1, -1}]]];
+            ];
+          ];
+        If[n == 2, Return[{#, 8} & /@ AssociationThread[{1, -1} -> {{1, 7}, {3, 5}}]]];
+        If[n == -1, Return[{#, 4} & /@ AssociationThread[{1, -1} -> {{1}, {3}}]]];
+        Abort[];
+        ];
+    lazyOrMod[mod_, list_] := lazyOrMod[mod, list] = With[{m = mod, l = list}, Apply[Or, m == # & /@ l]]
+    lazyAnd[l_, q_] := Hold[Apply[And, lazyOrMod[Mod[l, #[[2]]], #[[1]]] & /@ q]];
+    lazyOr[l_, p_] := Apply[Or, lazyAnd[l, #] & /@ p];
+
+    (* Combine remainder classes *)
+    combineRemainders[rel__] := With[{lcm = Fold[LCM, 1, Apply[LCM, #] & /@ ((#\[Transpose][[2]]) & /@ {rel})]},
+       {Select[Table[i, {i, lcm}], ReleaseHold[lazyOr[#, {rel}]] &], lcm}
+       ];
+    createTuples[n_] := createTuples[n] = Select[Tuples[{-1, 1}, n], Fold[Times, 1, #] == 1 &];
+    findSolutions[n_] := findSolutions[n] = With[
+        (* Split into prime factors, also -1 is here a factor *)
+        {factors = Flatten[ConstantArray @@@ FactorInteger[n]]},
+        (* Create possible tuples *)
+        Map[Inner[remainders[#1][#2] &, factors, #, {##} &] &, createTuples[Length[factors]]]
+        ];
+
+    (* Entry point to calculate the remainder classes for a general \
+    repunit of base n, all numbers except 0 and 1 are allowed *)
+
+    calcRemainders[n_] := calcRemainders[n] = If[n == 0 || n == 1, Return[{}], combineRemainders @@ findSolutions[n]];
+
+    (* Create the file needed for gr-mfaktc *)
+    limit = 1000;
+    convertToHexList[r_] := {Total /@ Map[2^Mod[#, 32] &, SplitBy[r[[1]], Floor[#/32] &]], r[[2]]}
+    Monitor[remaindersPositiveBases = Reap[Do[Sow[i -> convertToHexList[calcRemainders[i]]], {i, 2, limit}]][[2]][[1]];, i];
+    Monitor[remaindersNegativeBases = Reap[Do[Sow[-i -> convertToHexList[calcRemainders[-i]]], {i, 2, limit}]][[2]][[1]];, i];
+    arpos = Association[remaindersPositiveBases];
+    arneg = Association[remaindersNegativeBases];
+    keyspos = Keys[arpos];
+    keysneg = Keys[arneg];
+    valuespos = Values[arpos];
+    valuesneg = Values[arneg];
+    writeRemainderLine[posNegString_, values_, stream_] := Module[{r},
+      r = "remainders_" <> posNegString <> "[" <> ToString[Abs[keyspos[[i - 1]]]] <> "]";
+      WriteLine[stream, r <> ".modulo_value=" <> ToString[values[[2]]] <> "; " <> r <> ".bit_mask=create_bit_mask(" <> ToString[Length[values[[1]]]] <> "," <> ToString[Row["0x" <> IntegerString[#, 16] & /@ values[[1]], ","]] <> ");"];
+      ]
+    stream = OpenWrite["allowed-remainders-data.c"];
+    For[i = 2, i <= limit, i++,
+      writeRemainderLine["pos", valuespos[[i - 1]], stream];
+      writeRemainderLine["neg", valuesneg[[i - 1]], stream]
+    ];
+    Close[stream];
+*/
+
 remainders_pos[2].modulo_value=8; remainders_pos[2].bit_mask=create_bit_mask(1,0x82);
 remainders_neg[2].modulo_value=8; remainders_neg[2].bit_mask=create_bit_mask(1,0xa);
 remainders_pos[3].modulo_value=12; remainders_pos[3].bit_mask=create_bit_mask(1,0x802);
