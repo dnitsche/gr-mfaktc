@@ -54,7 +54,7 @@ checkpoint_write() writes the checkpoint file.
   char buffer[100], filename[20];
   unsigned int i;
 
-  sprintf(filename, "%s%u_%u.ckp", NAME_NUMBERS, exp, base);
+  sprintf(filename, "%s_%u_%u.ckp", NAME_NUMBERS, base, exp);
 
   f=fopen(filename, "w");
   if(f==NULL)
@@ -63,9 +63,9 @@ checkpoint_write() writes the checkpoint file.
   }
   else
   {
-    sprintf(buffer,"%s(%u)%u %d %d %d %s: %d %d", NAME_NUMBERS, base, exp, bit_min, bit_max, NUM_CLASSES, MFAKTC_VERSION, cur_class, num_factors);
+    sprintf(buffer,"%s base=%u %u %d %d %d %s: %d %d", NAME_NUMBERS, base, exp, bit_min, bit_max, NUM_CLASSES, MFAKTC_VERSION, cur_class, num_factors);
     i=checkpoint_checksum(buffer,strlen(buffer));
-    fprintf(f,"%s(%u)%u %d %d %d %s: %d %d %08X", NAME_NUMBERS, base, exp, bit_min, bit_max, NUM_CLASSES, MFAKTC_VERSION, cur_class, num_factors, i);
+    fprintf(f,"%s base=%u %u %d %d %d %s: %d %d %08X", NAME_NUMBERS, base, exp, bit_min, bit_max, NUM_CLASSES, MFAKTC_VERSION, cur_class, num_factors, i);
     fclose(f);
   }
 }
@@ -91,7 +91,7 @@ returns 0 otherwise
   *cur_class=-1;
   *num_factors=0;
 
-  sprintf(filename, "%s%u_%u.ckp", NAME_NUMBERS, exp, base);
+  sprintf(filename, "%s_%u_%u.ckp", NAME_NUMBERS, base, exp);
 
   f=fopen(filename, "r");
   if(f==NULL)
@@ -99,7 +99,7 @@ returns 0 otherwise
     return 0;
   }
   i=fread(buffer,sizeof(char),99,f);
-  sprintf(buffer2,"%s(%u)%u %d %d %d %s: ", NAME_NUMBERS, base, exp, bit_min, bit_max, NUM_CLASSES, MFAKTC_VERSION);
+  sprintf(buffer2,"%s base=%u %u %d %d %d %s: ", NAME_NUMBERS, base, exp, bit_min, bit_max, NUM_CLASSES, MFAKTC_VERSION);
   ptr=strstr(buffer, buffer2);
   if(ptr==buffer)
   {
@@ -108,9 +108,9 @@ returns 0 otherwise
     {
       ptr=&(buffer[i]);
       sscanf(ptr,"%d %d", cur_class, num_factors);
-      sprintf(buffer2,"%s(%u)%u %d %d %d %s: %d %d", NAME_NUMBERS, base, exp, bit_min, bit_max, NUM_CLASSES, MFAKTC_VERSION, *cur_class, *num_factors);
+      sprintf(buffer2,"%s base=%u %u %d %d %d %s: %d %d", NAME_NUMBERS, base, exp, bit_min, bit_max, NUM_CLASSES, MFAKTC_VERSION, *cur_class, *num_factors);
       chksum=checkpoint_checksum(buffer2,strlen(buffer2));
-      sprintf(buffer2,"%s(%u)%u %d %d %d %s: %d %d %08X", NAME_NUMBERS, base, exp, bit_min, bit_max, NUM_CLASSES, MFAKTC_VERSION, *cur_class, *num_factors, chksum);
+      sprintf(buffer2,"%s base=%u %u %d %d %d %s: %d %d %08X", NAME_NUMBERS, base, exp, bit_min, bit_max, NUM_CLASSES, MFAKTC_VERSION, *cur_class, *num_factors, chksum);
       if(*cur_class >= 0 && \
          *cur_class < NUM_CLASSES && \
          *num_factors >= 0 && \
@@ -132,7 +132,7 @@ tries to delete the checkpoint file
 */
 {
   char filename[20];
-  sprintf(filename, "%s%u_%u.ckp", NAME_NUMBERS, exp, base);
+  sprintf(filename, "%s_%u_%u.ckp", NAME_NUMBERS, base, exp);
 
   if(remove(filename))
   {

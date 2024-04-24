@@ -115,6 +115,7 @@ enum PARSE_WARNINGS
   END_OF_FILE,
   LONG_LINE,
   NO_FACTOR_EQUAL,
+  NO_BASE_EQUAL,
   INVALID_FORMAT,
   INVALID_DATA,
   BLANK_LINE,
@@ -189,16 +190,33 @@ output
     if ((ptr[scanpos] == '/') && (ptr[scanpos+1] == '/'))
       break;	// //comment delimiter
   }
-  if ((2!=number_of_commas) && (3!=number_of_commas))	// must have 2 or 3 commas...
-    return INVALID_FORMAT;
-
+  // must have 2, 3 or 4 commas...
   if(2==number_of_commas)
+  {
     assignment->assignment_key[0] = '\0';
-  else
+    proposed_base = 10;
+  } else if(3==number_of_commas)
+  {
+    if (strncasecmp("Base=", ptr, 5) == 0) // starts with "Base="? (case-insensitive)
+    {
+      assignment->assignment_key[0] = '\0';
+    } else
+    {
+      strncpy(assignment->assignment_key,ptr,1+(strstr(ptr,",")-ptr) );	// copy the comma..
+      *strstr(assignment->assignment_key,",") = '\0';	// null-terminate key
+      ptr=1 + strstr(ptr,",");
+    }
+  } else if(4==number_of_commas)
   {
     strncpy(assignment->assignment_key,ptr,1+(strstr(ptr,",")-ptr) );	// copy the comma..
     *strstr(assignment->assignment_key,",") = '\0';	// null-terminate key
     ptr=1 + strstr(ptr,",");
+    if (strncasecmp("Base=", ptr, 5) != 0) // starts with "Base="? (case-insensitive)
+    {
+      return NO_BASE_EQUAL;
+    }
+  } else {
+    return INVALID_FORMAT;
   }
   // ptr now points at exponent...in the future, the expression....
   ptr_start = ptr;
@@ -318,6 +336,7 @@ enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, unsigned int *base, u
       {
         case LONG_LINE:           printf("line is too long\n"); break;
         case NO_FACTOR_EQUAL:     printf("doesn't begin with Factor=\n");break;
+        case NO_BASE_EQUAL:       printf("column doesn't begin with Base=\n");break;
         case INVALID_FORMAT:      printf("invalid format\n");break;
         case INVALID_DATA:        printf("invalid data\n");break;
         default:                  printf("unknown error on >%s<",line); break;
