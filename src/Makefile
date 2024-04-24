@@ -13,7 +13,6 @@ NVCC = /usr/local/cuda-7.5/bin/nvcc
 NVCCFLAGS = $(CUDA_INCLUDE) --ptxas-options=-v
 
 # generate code for various compute capabilities
-#NVCCFLAGS += --generate-code arch=compute_11,code=sm_11 # CC 1.1, 1.2 and 1.3 GPUs will use this code (1.0 is not possible for mfaktc)
 NVCCFLAGS += --generate-code arch=compute_20,code=sm_20 # CC 2.x GPUs will use this code, one code fits all!
 NVCCFLAGS += --generate-code arch=compute_30,code=sm_30 # all CC 3.x GPUs _COULD_ use this code
 NVCCFLAGS += --generate-code arch=compute_35,code=sm_35 # but CC 3.5 (3.2?) _CAN_ use funnel shift which is useful for mfaktc
@@ -30,7 +29,7 @@ LDFLAGS = -fPIC $(CUDA_LIB) -lcudart -lm -lstdc++
 
 CSRC  = sieve.c timer.c parse.c read_config.c mfaktc.c checkpoint.c \
 	signal_handler.c output.c
-CUSRC = tf_72bit.cu tf_96bit.cu gpusieve.cu
+CUSRC = tf_96bit.cu gpusieve.cu
 
 COBJS  = $(CSRC:.c=.o)
 CUOBJS = $(CUSRC:.cu=.o) tf_75bit.o
@@ -63,7 +62,7 @@ tf_75bit.o : tf_96bit.cu
 checkpoint.o: checkpoint.c params.h
 
 mfaktc.o: mfaktc.c params.h my_types.h compatibility.h sieve.h \
- read_config.h parse.h timer.h tf_72bit.h tf_96bit.h \
+ read_config.h parse.h timer.h tf_96bit.h \
  checkpoint.h signal_handler.h output.h gpusieve.h \
  selftest-data-mersenne.c
 
@@ -78,9 +77,6 @@ sieve.o: sieve.c params.h compatibility.h
 signal_handler.o: signal_handler.c params.h my_types.h compatibility.h
 
 timer.o: timer.c timer.h compatibility.h
-
-tf_72bit.o: tf_72bit.cu params.h my_types.h compatibility.h \
- my_intrinsics.h sieve.h timer.h output.h tf_debug.h tf_common.cu
 
 tf_96bit.o: tf_96bit.cu params.h my_types.h compatibility.h \
  my_intrinsics.h sieve.h timer.h output.h tf_debug.h \

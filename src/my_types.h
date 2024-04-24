@@ -16,25 +16,6 @@ You should have received a copy of the GNU General Public License
 along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/* 72bit (3x 24bit) integer
-D=d0 + d1*(2^24) + d2*(2^48) */
-typedef struct
-{
-  unsigned int d0,d1,d2;
-}int72;
-
-/* 144bit (6x 24bit) integer
-D=d0 + d1*(2^24) + d2*(2^48) + ... */
-typedef struct
-{
-  unsigned int d0,d1,d2,d3,d4,d5;
-}int144;
-
-
-/* int72 and int96 are the same but this way the compiler warns
-when an int96 is passed to a function designed to handle 72 bit int.
-The applies to int144 and int192, too. */
-
 /* 96bit (3x 32bit) integer
 D= d0 + d1*(2^32) + d2*(2^64) */
 typedef struct
@@ -136,7 +117,6 @@ typedef struct
 enum GPUKernels
 {
   AUTOSELECT_KERNEL,
-  _71BIT_MUL24,
   _75BIT_MUL32,
   _95BIT_MUL32,
   _75BIT_MUL32_GS,

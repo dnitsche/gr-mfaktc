@@ -17,10 +17,6 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-#ifdef TF_72BIT
-extern "C" __host__ int tf_class_71(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff)
-#define MFAKTC_FUNC mfaktc_71
-#endif
 #ifdef TF_96BIT
   #ifdef SHORTCUT_75BIT
 extern "C" __host__ int tf_class_75(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff)
@@ -37,10 +33,6 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
   timeval timer;
   timeval timer2;
   unsigned long long int twait = 0;
-#ifdef TF_72BIT
-  int72 factor,k_base;
-  int144 b_preinit;
-#endif
 #if defined(TF_96BIT)
   int96 factor,k_base;
   int192 b_preinit;
@@ -82,14 +74,6 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
 //  printf("shiftcount = %d\n",shiftcount);
 //  printf("ln2b = %d\n",ln2b);
   b_preinit.d5=0;b_preinit.d4=0;b_preinit.d3=0;b_preinit.d2=0;b_preinit.d1=0;b_preinit.d0=0;
-#ifdef TF_72BIT
-  if     (ln2b<24 )b_preinit.d0=1<< ln2b;
-  else if(ln2b<48 )b_preinit.d1=1<<(ln2b-24);
-  else if(ln2b<72 )b_preinit.d2=1<<(ln2b-48);
-  else if(ln2b<96 )b_preinit.d3=1<<(ln2b-72);
-  else if(ln2b<120)b_preinit.d4=1<<(ln2b-96);
-  else             b_preinit.d5=1<<(ln2b-120);	// b_preinit = 2^ln2b
-#endif
 #if defined(TF_96BIT)
   if     (ln2b<32 )b_preinit.d0=1<< ln2b;
   else if(ln2b<64 )b_preinit.d1=1<<(ln2b-32);
@@ -169,11 +153,7 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
 
         cudaMemcpyAsync(mystuff->d_ktab[stream], mystuff->h_ktab[h_ktab_inuse[stream]], size, cudaMemcpyHostToDevice, mystuff->stream[stream]);
 
-#ifdef TF_72BIT
-        k_base.d0 =  k_min_grid[h_ktab_index] & 0xFFFFFF;
-        k_base.d1 = (k_min_grid[h_ktab_index] >> 24) & 0xFFFFFF;
-        k_base.d2 =  k_min_grid[h_ktab_index] >> 48;
-#elif defined(TF_96BIT)
+#ifdef TF_96BIT
         k_base.d0 =  k_min_grid[h_ktab_index] & 0xFFFFFFFF;
         k_base.d1 =  k_min_grid[h_ktab_index] >> 32;
         k_base.d2 = 0;
@@ -261,9 +241,6 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
     factor.d2=mystuff->h_RES[i*3 + 1];
     factor.d1=mystuff->h_RES[i*3 + 2];
     factor.d0=mystuff->h_RES[i*3 + 3];
-#ifdef TF_72BIT
-    print_dez72(factor,string);
-#endif
 #if defined(TF_96BIT)
     print_dez96(factor,string);
 #endif

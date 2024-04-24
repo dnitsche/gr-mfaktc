@@ -11,7 +11,7 @@ mfaktc is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-                                
+
 You should have received a copy of the GNU General Public License
 along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -22,8 +22,6 @@ extern "C" {
 #endif
 void print_help(char *string);
 
-void print_dez72(int72 a, char *buf);
-void print_dez144(int144 a, char *buf);
 void print_dez96(int96 a, char *buf);
 void print_dez192(int192 a, char *buf);
 

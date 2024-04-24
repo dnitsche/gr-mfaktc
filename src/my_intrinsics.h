@@ -11,18 +11,10 @@ mfaktc is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-                                
+
 You should have received a copy of the GNU General Public License
 along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-__device__ static unsigned int __umul24hi(unsigned int a, unsigned int b)
-{
-  unsigned int r;
-  asm("mul24.hi.u32 %0, %1, %2;" : "=r" (r) : "r" (a) , "r" (b));
-  return r;
-}
-
 
 __device__ static unsigned int __umul32(unsigned int a, unsigned int b)
 {

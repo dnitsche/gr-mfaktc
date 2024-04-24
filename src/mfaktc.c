@@ -36,7 +36,6 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 #include "read_config.h"
 #include "parse.h"
 #include "timer.h"
-#include "tf_72bit.h"
 #include "tf_96bit.h"
 #include "checkpoint.h"
 #include "signal_handler.h"
@@ -80,8 +79,6 @@ Because all currently available kernels can handle the full supported range
 of exponents this isn't used here for now. */
 {
   int ret = 0;
-
-  if( kernel == _71BIT_MUL24                                                                                                    && mystuff->bit_max_stage <= 71) ret = 1;
 
   if((kernel == _75BIT_MUL32    || (mystuff->gpu_sieving && mystuff->exponent >= mystuff->gpu_sieve_min_exp && kernel == _75BIT_MUL32_GS))    && mystuff->bit_max_stage <= 75) ret = 1;
   if((kernel == _95BIT_MUL32    || (mystuff->gpu_sieving && mystuff->exponent >= mystuff->gpu_sieve_min_exp && kernel == _95BIT_MUL32_GS))    && mystuff->bit_max_stage <= 95) ret = 1;
@@ -206,7 +203,6 @@ see benchmarks in src/kernel_benchmarks.txt */
            if(kernel_possible(_75BIT_MUL32_GS,    mystuff)) kernel = _75BIT_MUL32_GS;
       else if(kernel_possible(_95BIT_MUL32_GS,    mystuff)) kernel = _95BIT_MUL32_GS;
 
-      else if(kernel_possible(_71BIT_MUL24,       mystuff)) kernel = _71BIT_MUL24;
       else if(kernel_possible(_75BIT_MUL32,       mystuff)) kernel = _75BIT_MUL32;
       else if(kernel_possible(_95BIT_MUL32,       mystuff)) kernel = _95BIT_MUL32;
     }
@@ -220,8 +216,7 @@ see benchmarks in src/kernel_benchmarks.txt */
     }
   }
 
-       if(kernel == _71BIT_MUL24)       sprintf(mystuff->stats.kernelname, "71bit_mul24");
-  else if(kernel == _75BIT_MUL32)       sprintf(mystuff->stats.kernelname, "75bit_mul32");
+       if(kernel == _75BIT_MUL32)       sprintf(mystuff->stats.kernelname, "75bit_mul32");
   else if(kernel == _95BIT_MUL32)       sprintf(mystuff->stats.kernelname, "95bit_mul32");
 
   else if(kernel == _75BIT_MUL32_GS)    sprintf(mystuff->stats.kernelname, "75bit_mul32_gs");
@@ -282,8 +277,7 @@ see benchmarks in src/kernel_benchmarks.txt */
 	}
         mystuff->stats.class_counter++;
 
-             if(kernel == _71BIT_MUL24)       numfactors = tf_class_71          (k_min+cur_class, k_max, mystuff);
-        else if(kernel == _75BIT_MUL32)       numfactors = tf_class_75          (k_min+cur_class, k_max, mystuff);
+             if(kernel == _75BIT_MUL32)       numfactors = tf_class_75          (k_min+cur_class, k_max, mystuff);
         else if(kernel == _95BIT_MUL32)       numfactors = tf_class_95          (k_min+cur_class, k_max, mystuff);
 
         else if(kernel == _75BIT_MUL32_GS)    numfactors = tf_class_75_gs       (k_min+cur_class, k_max, mystuff);
@@ -364,17 +358,6 @@ k_max and k_min are used as 64bit temporary integers here...
 
       f_hi  = k_min + (mystuff->exponent * f_hi); /* f_{hi|med|low} = 2 * k_hint * mystuff->exponent +1 */
 
-      if(kernel == _71BIT_MUL24) /* 71bit kernel uses only 24bit per int */
-      {
-        f_hi  <<= 16;
-        f_hi   += f_med >> 16;
-
-        f_med <<= 8;
-        f_med  += f_low >> 24;
-        f_med  &= 0x00FFFFFF;
-
-        f_low  &= 0x00FFFFFF;
-      }
       k_min=0; /* using k_min for counting number of matches here */
       for(i=0; ((unsigned int)i < mystuff->h_RES[0]) && (i < 10); i++)
       {
@@ -451,7 +434,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
   unsigned long long int k[NUM_SELFTESTS];
   int retval=1;
 
-  #define NUM_KERNEL 5
+  #define NUM_KERNEL 4
   int kernels[NUM_KERNEL+1]; // currently there are <NUM_KERNEL> different kernels, kernel numbers start at 1!
   int kernel_success[NUM_KERNEL+1], kernel_fail[NUM_KERNEL+1];
 
@@ -479,7 +462,6 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
       j = 0;
       if(kernel_possible(_95BIT_MUL32,       mystuff)) kernels[j++] = _95BIT_MUL32;
       if(kernel_possible(_75BIT_MUL32,       mystuff)) kernels[j++] = _75BIT_MUL32;
-      if(kernel_possible(_71BIT_MUL24,       mystuff)) kernels[j++] = _71BIT_MUL24;
       if(kernel_possible(_95BIT_MUL32_GS,    mystuff)) kernels[j++] = _95BIT_MUL32_GS;
       if(kernel_possible(_75BIT_MUL32_GS,    mystuff)) kernels[j++] = _75BIT_MUL32_GS;
 
@@ -517,7 +499,6 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
       j = 0;
       if(kernel_possible(_95BIT_MUL32,       mystuff)) kernels[j++] = _95BIT_MUL32;
       if(kernel_possible(_75BIT_MUL32,       mystuff)) kernels[j++] = _75BIT_MUL32;
-      if(kernel_possible(_71BIT_MUL24,       mystuff)) kernels[j++] = _71BIT_MUL24;
       if(kernel_possible(_95BIT_MUL32_GS,    mystuff)) kernels[j++] = _95BIT_MUL32_GS;
       if(kernel_possible(_75BIT_MUL32_GS,    mystuff)) kernels[j++] = _75BIT_MUL32_GS;
 
@@ -548,8 +529,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
     printf("  -------------------+---------+-------\n");
     for(i = 0; i <= NUM_KERNEL; i++)
     {
-           if(i == _71BIT_MUL24)       printf("  71bit_mul24        | %6d  | %6d\n", kernel_success[i], kernel_fail[i]);
-      else if(i == _75BIT_MUL32)       printf("  75bit_mul32        | %6d  | %6d\n", kernel_success[i], kernel_fail[i]);
+           if(i == _75BIT_MUL32)       printf("  75bit_mul32        | %6d  | %6d\n", kernel_success[i], kernel_fail[i]);
       else if(i == _95BIT_MUL32)       printf("  95bit_mul32        | %6d  | %6d\n", kernel_success[i], kernel_fail[i]);
 
       else if(i == _75BIT_MUL32_GS)    printf("  75bit_mul32_gs     | %6d  | %6d\n", kernel_success[i], kernel_fail[i]);
@@ -980,7 +960,6 @@ int main(int argc, char **argv)
         while(mystuff.bit_max_stage <= mystuff.bit_max_assignment && !mystuff.quit)
         {
           tmp = tf(&mystuff, 0, 0, AUTOSELECT_KERNEL);
-//          tmp = tf(&mystuff, 0, 0, _71BIT_MUL24);
 //          tmp = tf(&mystuff, 0, 0, _75BIT_MUL32);
 //          tmp = tf(&mystuff, 0, 0, _75BIT_MUL32_GS);
 //          tmp = tf(&mystuff, 0, 0, _95BIT_MUL32);
