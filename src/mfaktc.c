@@ -590,7 +590,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
 {
   int i, j, tf_res, st_success=0, st_nofactor=0, st_wrongfactor=0, st_unknown=0;
 
-  #define NUM_SELFTESTS_GENERALIZED 25
+  #define NUM_SELFTESTS_GENERALIZED 29
   #define NUM_SELFTESTS_2 2867
   #define NUM_SELFTESTS_10 3022
   #define NUM_SELFTESTS (NUM_SELFTESTS_GENERALIZED+NUM_SELFTESTS_2+NUM_SELFTESTS_10)
@@ -657,15 +657,15 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
   {
     j = 0;
     int offset = 0;
-    index[j++]=offset+   0;
-    index[j++]=offset+   1;
     index[j++]=offset+   2;
-    index[j++]=offset+   3;
     index[j++]=offset+   4;
-    index[j++]=offset+   5;
     index[j++]=offset+   6;
-    index[j++]=offset+   7;
-    index[j++]=offset+   8;
+    index[j++]=offset+   11;
+    index[j++]=offset+   14;
+    index[j++]=offset+   15;
+    index[j++]=offset+   18;
+    index[j++]=offset+   20;
+    index[j++]=offset+   22;
     offset += NUM_SELFTESTS_GENERALIZED;
     index[j++]=offset+   2;
     index[j++]=offset+  25;
