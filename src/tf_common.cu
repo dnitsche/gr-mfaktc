@@ -71,7 +71,7 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
 #else
   if (maxln2b>20) maxln2b=20; // maximum preprocessing which is possible
 #endif
-  while(ln2b<maxln2b || (unsigned long long int)(10*ln2b)<k_min*3)	// how much preprocessing is possible
+  while(ln2b<maxln2b || 10*ln2b<mystuff->bit_min*3)	// how much preprocessing is possible
   {
     shiftcount--;
     ln2b<<=1;
