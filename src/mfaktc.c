@@ -480,16 +480,16 @@ k_max and k_min are used as 64bit temporary integers here...
 /*  restart == 0 ==> time_est = time_run */
     time_est = (time_run * max_classes_needed  ) / (unsigned long long int)(max_classes_needed -restart);
 
-    if(time_est > 86400000ULL)printf("%" PRIu64 "d ",   time_run / 86400000ULL);
-    if(time_est > 3600000ULL) printf("%2" PRIu64 "h ", (time_run /  3600000ULL) % 24ULL);
-    if(time_est > 60000ULL)   printf("%2" PRIu64 "m ", (time_run /    60000ULL) % 60ULL);
+    if(time_est > 86400000ULL){printf("%" PRIu64 "d ",   time_run / 86400000ULL);}
+    if(time_est > 3600000ULL) {printf("%2" PRIu64 "h ", (time_run /  3600000ULL) % 24ULL);}
+    if(time_est > 60000ULL)   {printf("%2" PRIu64 "m ", (time_run /    60000ULL) % 60ULL);}
                               printf("%2" PRIu64 ".%03" PRIu64 "s\n", (time_run / 1000ULL) % 60ULL, time_run % 1000ULL);
     if(restart != 0)
     {
       printf("      estimated total time spent: ");
-      if(time_est > 86400000ULL)printf("%" PRIu64 "d ",   time_est / 86400000ULL);
-      if(time_est > 3600000ULL) printf("%2" PRIu64 "h ", (time_est /  3600000ULL) % 24ULL);
-      if(time_est > 60000ULL)   printf("%2" PRIu64 "m ", (time_est /    60000ULL) % 60ULL);
+      if(time_est > 86400000ULL){printf("%" PRIu64 "d ",   time_est / 86400000ULL);}
+      if(time_est > 3600000ULL) {printf("%2" PRIu64 "h ", (time_est /  3600000ULL) % 24ULL);}
+      if(time_est > 60000ULL)   {printf("%2" PRIu64 "m ", (time_est /    60000ULL) % 60ULL);}
                                 printf("%2" PRIu64 ".%03" PRIu64 "s\n", (time_est / 1000ULL) % 60ULL, time_est % 1000ULL);
     }
     printf("\n");
