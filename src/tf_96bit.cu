@@ -321,7 +321,7 @@ Precalculated here since it is the same for all steps in the following loop */
   ff= ff * 4294967296.0f + __uint2float_rn(f.d1);
   ff= ff * 4294967296.0f + __uint2float_rn(f.d0);
 
-  ff=__int_as_float(0x3f7ffffb) / ff;	// just a little bit below 1.0f so we allways underestimate the quotient
+  ff=__int_as_float(0x3f7ffffb) / ff;	// just a little bit below 1.0f so we always underestimate the quotient
 
 #ifndef DEBUG_GPU_MATH
   mod_192_96(&a,b,f,ff,false);			// a = b mod f
