@@ -913,7 +913,8 @@ int main(int argc, char **argv)
     i++;
   }
 
-  printf("mfaktc (generalized repunit edition) v%s (%dbit built)\n\n", MFAKTC_VERSION, (int)(sizeof(void*)*8));
+  printf("mfaktc (generalized repunit edition) v%s (%dbit built)\n", MFAKTC_VERSION, (int)(sizeof(void*)*8));
+  printf("Compiled on %s\n\n", __DATE__);
 
 /* print current configuration */
 
