@@ -127,7 +127,7 @@ unsigned int lcm(unsigned int a, unsigned int b) {
 }
 
 int both_tests_possible(unsigned int mod) {
-  return lcm(mod, NUM_CLASSES) == 2 * NUM_CLASSES;
+  return lcm(mod, NUM_CLASSES) <= 2 * NUM_CLASSES;
 }
 
 /*
