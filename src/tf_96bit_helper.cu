@@ -21,7 +21,7 @@ __device__ static void check_factor96(int96 f, int96 a, bool negativeBase, unsig
 /* Check whether f is a factor or not. If f != 1 and a == 1 then f is a factor,
 in this case f is written into the RES array. */
 {
-  int index;
+  unsigned int index;
   bool isFactor;
   if (negativeBase)
   {

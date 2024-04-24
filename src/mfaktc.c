@@ -1024,13 +1024,13 @@ int main(int argc, char **argv)
       return 1;
     }
   }
-  if( cudaHostAlloc((void**)&(mystuff.h_RES),32 * sizeof(int), 0) != cudaSuccess )
+  if( cudaHostAlloc((void**)&(mystuff.h_RES),32 * sizeof(unsigned int), 0) != cudaSuccess )
   {
     printf("ERROR: cudaHostAlloc(h_RES) failed\n");
     print_last_CUDA_error();
     return 1;
   }
-  if( cudaMalloc((void**)&(mystuff.d_RES), 32 * sizeof(int)) != cudaSuccess )
+  if( cudaMalloc((void**)&(mystuff.d_RES), 32 * sizeof(unsigned int)) != cudaSuccess )
   {
     printf("ERROR: cudaMalloc(d_RES) failed\n");
     print_last_CUDA_error();

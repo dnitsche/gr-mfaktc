@@ -95,7 +95,7 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
 #endif
 
 /* set result array to 0 */
-  cudaMemsetAsync(mystuff->d_RES, 0, 1*sizeof(int)); //first int of result array contains the number of factors found
+  cudaMemsetAsync(mystuff->d_RES, 0, 1*sizeof(unsigned int)); //first int of result array contains the number of factors found
 
 #ifdef DEBUG_GPU_MATH
   cudaMemset(mystuff->d_modbasecase_debug, 0, 32*sizeof(int));
@@ -204,7 +204,7 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
   if(cuda_ret != cudaSuccess)printf("per class final cudaDeviceSynchronize failed!\n");
 
 /* download results from GPU */
-  cudaMemcpy(mystuff->h_RES, mystuff->d_RES, 32*sizeof(int), cudaMemcpyDeviceToHost);
+  cudaMemcpy(mystuff->h_RES, mystuff->d_RES, 32*sizeof(unsigned int), cudaMemcpyDeviceToHost);
 
 #ifdef DEBUG_GPU_MATH
   cudaMemcpy(mystuff->h_modbasecase_debug, mystuff->d_modbasecase_debug, 32*sizeof(int), cudaMemcpyDeviceToHost);
