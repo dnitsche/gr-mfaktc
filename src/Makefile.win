@@ -54,7 +54,7 @@ checkpoint.obj: checkpoint.c params.h
 mfaktc.obj: mfaktc.c params.h my_types.h compatibility.h sieve.h \
  read_config.h parse.h timer.h tf_72bit.h tf_96bit.h \
  checkpoint.h signal_handler.h output.h gpusieve.h \
- selftest-data-mersenne.c selftest-data-wagstaff.c
+ selftest-data-mersenne.c
 
 output.obj: output.c params.h my_types.h output.h compatibility.h
 

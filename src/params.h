@@ -11,7 +11,7 @@ mfaktc is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-                                
+
 You should have received a copy of the GNU General Public License
 along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -41,13 +41,6 @@ This starts to become usefull on my system for e.g. TF M66xxxxxx from 2^66 to
 */
 
 #define MORE_CLASSES
-
-
-/* use WAGSTAFF to build mfaktc doing TF on Wagstaff numbers instead of
-Mersenne numbers */
-
-//#define WAGSTAFF
-
 
 
 /******************
@@ -92,7 +85,7 @@ code path */
 
 /*
 THREADS_PER_BLOCK has a hardware limit, 512 on GPUs with compute capability
-1.x and 1024 on GPUs with compute capability 2.0. 
+1.x and 1024 on GPUs with compute capability 2.0.
 256 should be OK for most cases. Anyway there is usually no need to increase
 THREADS_PER_BLOCK above 256 because if enough resources are available
 (e.g. registers, shared memory) multiple blocks are launched at the same
@@ -182,9 +175,4 @@ The following lines define the min, default and max value.
 #define GPU_SIEVE_PROCESS_SIZE_MAX          32 /* Upper limit is 64K, since we store k values as "short". */
 
 
-
-#ifdef WAGSTAFF
-  #define NAME_NUMBERS "W"
-#else /* Mersennes */
-  #define NAME_NUMBERS "M"
-#endif
+#define NAME_NUMBERS "M"

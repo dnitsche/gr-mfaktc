@@ -95,15 +95,11 @@ int class_needed(unsigned int exp, unsigned long long int k_min, int c)
 /*
 checks whether the class c must be processed or can be ignored at all because
 all factor candidates within the class c are a multiple of 3, 5, 7 or 11 (11
-only if MORE_CLASSES is definied) or are 3 or 5 mod 8 (Mersenne) or are 5 or 7 mod 8 (Wagstaff)
+only if MORE_CLASSES is definied) or are 3 or 5 mod 8 (Mersenne)
 
 k_min *MUST* be aligned in that way that k_min is in class 0!
 */
-#ifdef WAGSTAFF
-  if  ((2 * (exp %  8) * ((k_min + c) %  8)) %  8 !=  6)
-#else /* Mersennes */
   if  ((2 * (exp %  8) * ((k_min + c) %  8)) %  8 !=  2)
-#endif
   if( ((2 * (exp %  8) * ((k_min + c) %  8)) %  8 !=  4) && \
       ((2 * (exp %  3) * ((k_min + c) %  3)) %  3 !=  2) && \
       ((2 * (exp %  5) * ((k_min + c) %  5)) %  5 !=  4) && \
@@ -448,11 +444,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
 {
   int i, j, tf_res, st_success=0, st_nofactor=0, st_wrongfactor=0, st_unknown=0;
 
-#ifdef WAGSTAFF
-  #define NUM_SELFTESTS 1591
-#else /* Mersennes */
   #define NUM_SELFTESTS 2867
-#endif
   unsigned int exp[NUM_SELFTESTS], index[9];
   int num_selftests=0;
   int bit_min[NUM_SELFTESTS], f_class;
@@ -463,11 +455,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
   int kernels[NUM_KERNEL+1]; // currently there are <NUM_KERNEL> different kernels, kernel numbers start at 1!
   int kernel_success[NUM_KERNEL+1], kernel_fail[NUM_KERNEL+1];
 
-#ifdef WAGSTAFF
-  #include "selftest-data-wagstaff.c"
-#else /* Mersennes */
   #include "selftest-data-mersenne.c"
-#endif
 
   for(i = 0; i <= NUM_KERNEL; i++)
   {
@@ -513,15 +501,9 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
   }
   else if(type == 1)
   {
-#ifdef WAGSTAFF
-    index[0]=  26; index[1]=1000; index[2]=1078; /* some factors below 2^71 (test the 71/75 bit kernel depending on compute capability) */
-    index[3]=1290; index[4]=1291; index[5]=1292; /* some factors below 2^75 (test 75 bit kernel) */
-    index[6]=1566; index[7]=1577; index[8]=1588; /* some factors below 2^95 (test 95 bit kernel) */
-#else /* Mersennes */
     index[0]=   2; index[1]=  25; index[2]=  57; /* some factors below 2^71 (test the 71/75 bit kernel depending on compute capability) */
     index[3]=  70; index[4]=  88; index[5]= 106; /* some factors below 2^75 (test 75 bit kernel) */
     index[6]=1547; index[7]=1552; index[8]=1556; /* some factors below 2^95 (test 95 bit kernel) */
-#endif
 
     for(i = 0; i < 9; i++)
     {
@@ -763,10 +745,6 @@ int main(int argc, char **argv)
   if(mystuff.verbosity >= 1)printf("  MORE_CLASSES              enabled\n");
 #else
   if(mystuff.verbosity >= 1)printf("  MORE_CLASSES              disabled\n");
-#endif
-
-#ifdef WAGSTAFF
-  if(mystuff.verbosity >= 1)printf("  Wagstaff mode             enabled\n");
 #endif
 
 #ifdef USE_DEVICE_PRINTF

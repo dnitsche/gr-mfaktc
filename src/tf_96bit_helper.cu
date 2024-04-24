@@ -10,8 +10,8 @@ the Free Software Foundation, either version 3 of the License, or
 mfaktc is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-                                
+GNU General Public License for more details.barrett
+
 You should have received a copy of the GNU General Public License
 along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -22,11 +22,7 @@ __device__ static void check_factor96(int96 f, int96 a, unsigned int *RES)
 in this case f is written into the RES array. */
 {
   int index;
-#ifdef WAGSTAFF
-  if(a.d2 == f.d2 && a.d1 == f.d1 && a.d0 == (f.d0 - 1))
-#else /* Mersennes */
   if((a.d2|a.d1) == 0 && a.d0 == 1)
-#endif
   {
     if(f.d2 != 0 || f.d1 != 0 || f.d0 != 1)	/* 1 isn't really a factor ;) */
     {
@@ -49,11 +45,7 @@ barrett based kernels have a lower limit of 2^64 so this function is used
 there. */
 {
   int index;
-#ifdef WAGSTAFF
-  if(a.d2 == f.d2 && a.d1 == f.d1 && a.d0 == (f.d0 - 1))
-#else /* Mersennes */
   if((a.d2|a.d1) == 0 && a.d0 == 1)
-#endif
   {
     index = atomicInc(&RES[0], 10000);
     if(index < 10)				/* limit to 10 factors per class */
@@ -87,7 +79,7 @@ __device__ static void create_FC96(int96 *f, unsigned int exp, int96 k, unsigned
   if(exp96.d1) /* exp96.d1 is 0 or 1 */
   {
     f->d1 = __add_cc(f->d1, k.d0);
-    f->d2 = __addc  (f->d2, k.d1);  
+    f->d2 = __addc  (f->d2, k.d1);
   }							// f = 2 * k * exp + 1
 }
 
@@ -106,7 +98,7 @@ is faster for _SOME_ kernels. */
 
   k.d0 = __umad32_cc(k_offset, NUM_CLASSES, k.d0);
   k.d1 = __umad32hic(k_offset, NUM_CLASSES, k.d1);
-        
+
   /* umad32 is slower here?! */
   f->d0 = 1 +                                  __umul32(k.d0, exp96.d0);
   f->d1 = __add_cc(__umul32hi(k.d0, exp96.d0), __umul32(k.d1, exp96.d0));
@@ -115,7 +107,7 @@ is faster for _SOME_ kernels. */
   if(exp96.d1) /* exp96.d1 is 0 or 1 */
   {
     f->d1 = __add_cc(f->d1, k.d0);
-    f->d2 = __addc  (f->d2, k.d1);  
+    f->d2 = __addc  (f->d2, k.d1);
   }							// f = 2 * k * exp + 1
 #endif
 }
@@ -212,10 +204,7 @@ q must be less than 100n!
   qf = qf * 4294967296.0f + __uint2float_rn(q.d1);
 
   qi=__float2uint_rz(qf*nf);
-  
-#ifdef WAGSTAFF
-  qi++; /* cause in underflow in subtraction so we can check for (-1) instead of (q - 1) */
-#endif
+
 /* at this point the quotient still is sometimes to small (the error is 1 in this case)
 --> final res odd and qi correct: n might be a factor
     final res odd and qi too small: n can't be a factor (because the correct res is even)
@@ -224,14 +213,10 @@ q must be less than 100n!
 so we compare the LSB of qi and q.d0, if they are the same (both even or both odd) the res (without correction) would be even. In this case increment qi by one.*/
 
   qi += ((~qi) ^ q.d0) & 1;
- 
+
   nn.d0 = __umul32(n.d0, qi);
 
-#ifdef WAGSTAFF
-  if((q.d0 - nn.d0) == 0xFFFFFFFF) /* is the lowest word of the result -1 (only in this case n might be a factor) */
-#else
   if((q.d0 - nn.d0) == 1) /* is the lowest word of the result 1 (only in this case n might be a factor) */
-#endif
   {
 #if (__CUDA_ARCH__ >= FERMI) && (CUDART_VERSION >= 4010) /* multiply-add with carry is not available on CC 1.x devices and before CUDA 4.1 */
     nn.d1 = __umad32hi_cc (n.d0, qi, __umul32(n.d1, qi));
@@ -241,13 +226,6 @@ so we compare the LSB of qi and q.d0, if they are the same (both even or both od
     nn.d2 = __addc   (__umul32hi(n.d1, qi), __umul32(n.d2, qi));
 #endif
 
-#ifdef WAGSTAFF
-    res  = __sub_cc (q.d0, nn.d0);
-    res &= __subc_cc(q.d1, nn.d1);
-    res &= __subc   (q.d2, nn.d2);
-    
-    if(res == 0xFFFFFFFF)
-#else /* Mersennes */
     nn.d0++;
     res  = __sub_cc (q.d0, nn.d0);
 //           __sub_cc (q.d0, nn.d0); /* the compiler (release 5.0, V0.2.1221) doesn't want to execute this so we need the TWO lines above... */
@@ -255,7 +233,6 @@ so we compare the LSB of qi and q.d0, if they are the same (both even or both od
     res |= __subc   (q.d2, nn.d2);
 
     if(res == 0)
-#endif
     {
       int index;
       index = atomicInc(&RES[0], 10000);
