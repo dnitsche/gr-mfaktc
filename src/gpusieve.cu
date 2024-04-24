@@ -242,7 +242,11 @@ __device__ __inline static void bitOrSometimesIffy (uint8 *locsieve, uint32 bclr
 	be done for each prime prior to sieving to figure out the first bit to clear.
 */
 
+#if __CUDA_ARCH__ < 750
 __global__ static void __launch_bounds__(256,6) SegSieve (uint8 *big_bit_array_dev, uint8 *pinfo_dev, uint32 maxp)
+#else
+__global__ static void __launch_bounds__(256,3) SegSieve (uint8 *big_bit_array_dev, uint8 *pinfo_dev, uint32 maxp)
+#endif
 {
 	__shared__ uint8 locsieve[block_size_in_bytes];
 	uint32 block_start = blockIdx.x * block_size;
@@ -1103,7 +1107,11 @@ __device__ unsigned int modularinverse (uint32 n, uint32 orig_d)
 
 // Calculate the modular inverses used in computing initial bit-to-clear values
 
+#if __CUDA_ARCH__ < 750
 __global__ static void __launch_bounds__(256,6) CalcModularInverses (uint32 exponent, int *calc_info)
+#else
+__global__ static void __launch_bounds__(256,3) CalcModularInverses (uint32 exponent, int *calc_info)
+#endif
 {
 	uint32	index;		// Index for prime and modinv data in calc_info
 	uint32	prime;		// The prime to work on
@@ -1134,7 +1142,11 @@ __global__ static void __launch_bounds__(256,6) CalcModularInverses (uint32 expo
 
 // Calculate the initial bit-to-clear values
 
+#if __CUDA_ARCH__ < 750
 __global__ static void __launch_bounds__(256,6) CalcBitToClear (uint32 exponent, int96 k_base, int *calc_info, uint8 *pinfo_dev)
+#else
+__global__ static void __launch_bounds__(256,3) CalcBitToClear (uint32 exponent, int96 k_base, int *calc_info, uint8 *pinfo_dev)
+#endif
 {
 	uint32	index;		// Index for prime and modinv data in calc_info
 	uint32	mask;		// Mask that tells us what bits must be preserved in pinfo_dev when setting bit-to-clear
