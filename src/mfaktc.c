@@ -251,7 +251,7 @@ see benchmarks in src/kernel_benchmarks.txt */
 
   if(mystuff->mode == MODE_NORMAL)
   {
-    if((mystuff->checkpoints == 1) && (checkpoint_read(mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, &cur_class, &factorsfound) == 1))
+    if((mystuff->checkpoints == 1) && (checkpoint_read(mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, &cur_class, &factorsfound) == 1))
     {
       printf("\nfound a valid checkpoint file!\n");
       if(mystuff->verbosity >= 1)printf("  last finished class was: %d\n", cur_class);
@@ -328,7 +328,7 @@ see benchmarks in src/kernel_benchmarks.txt */
             if(numfactors > 0 || timer_diff(&timer_last_checkpoint) / 1000000 >= (unsigned long long int)mystuff->checkpointdelay || mystuff->quit)
             {
               timer_init(&timer_last_checkpoint);
-              checkpoint_write(mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, cur_class, factorsfound);
+              checkpoint_write(mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, cur_class, factorsfound);
             }
           }
           if((mystuff->addfiledelay > 0) && timer_diff(&timer_last_addfilecheck) / 1000000 >= (unsigned long long int)mystuff->addfiledelay)
@@ -351,7 +351,7 @@ see benchmarks in src/kernel_benchmarks.txt */
   if(mystuff->mode == MODE_NORMAL)
   {
     retval = factorsfound;
-    if(mystuff->checkpoints == 1)checkpoint_delete(mystuff->exponent);
+    if(mystuff->checkpoints == 1)checkpoint_delete(mystuff->base, mystuff->exponent);
   }
   else // mystuff->mode != MODE_NORMAL
   {
