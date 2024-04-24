@@ -67,7 +67,7 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
   maxln2b = shiftcount-3;
   // TODO: find maximum working numbers
 #if defined (SHORTCUT_75BIT) || defined (SHORTCUT_64BIT)
-  if (maxln2b>9) maxln2b=9; // maximum preprocessing which is possible for 64 bit
+  if (maxln2b>16) maxln2b=16; // maximum preprocessing which is possible for 64 bit
 #else
   if (maxln2b>20) maxln2b=20; // maximum preprocessing which is possible
 #endif
