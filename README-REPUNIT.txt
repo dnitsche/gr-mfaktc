@@ -1,26 +1,26 @@
-###############################################
-# mfaktc (generalized-repunit-edition) README #
-###############################################
+##################################################
+# gr-mfaktc (generalized-repunit-edition) README #
+##################################################
 
 Content
 
-0   What is mfaktc (generalized-repunit-edition)?
-1   Running mfaktc (generalized-repunit-edition)
+0   What is gr-mfaktc (generalized-repunit-edition)?
+1   Running gr-mfaktc (generalized-repunit-edition)
 
 
 
-####################
-# 0 What is mfaktc #
-####################
+#######################
+# 0 What is gr-mfaktc #
+#######################
 
-mfaktc (generalized-repunit-edition) is a program based on mfaktc (See README.txt).
+gr-mfaktc (generalized-repunit-edition) is a program based on mfaktc (See README.txt).
 It allows factoring generalized repunits with abs(bases) >= 2 doing the work on a
 CUDA supported graphics card.
 
 
-############################
-# 1 Running mfaktc         #
-############################
+###############################
+# 1 Running gr-mfaktc         #
+###############################
 
 See README.txt for general details.
 
