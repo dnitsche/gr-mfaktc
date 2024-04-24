@@ -288,7 +288,7 @@ other return value
 */
 {
   int cur_class, max_class = NUM_CLASSES-1, i;
-  unsigned long long int k_min, k_max, k_range, tmp;
+  unsigned long long int k_min, k_max, k_range, tmp, max_classes_needed = 0;
   unsigned int f_hi, f_med, f_low;
   struct timeval timer, timer_last_checkpoint;
   static struct timeval timer_last_addfilecheck;
@@ -321,6 +321,16 @@ other return value
 
   k_min=calculate_k(mystuff->exponent, mystuff->bit_min);
   k_max=calculate_k(mystuff->exponent, mystuff->bit_max_stage);
+
+  for(cur_class=0; cur_class <= max_class; cur_class++)
+  {
+    if (class_needed(mystuff->base, mystuff->exponent, k_min, cur_class))
+    {
+      max_classes_needed++;
+    }
+  }
+  mystuff->stats.max_classes_needed = (int)max_classes_needed;
+  //printf("Testing %d out of %d classes\n", mystuff->stats.max_classes_needed, NUM_CLASSES);
 
   if((mystuff->mode == MODE_SELFTEST_FULL) || (mystuff->mode == MODE_SELFTEST_SHORT))
   {
@@ -552,11 +562,7 @@ k_max and k_min are used as 64bit temporary integers here...
     else            printf("tf(): time spent since restart:   ");
 
 /*  restart == 0 ==> time_est = time_run */
-#ifndef MORE_CLASSES
-    time_est = (time_run * 96ULL  ) / (unsigned long long int)(96 -restart);
-#else
-    time_est = (time_run * 960ULL ) / (unsigned long long int)(960-restart);
-#endif
+    time_est = (time_run * max_classes_needed  ) / (unsigned long long int)(max_classes_needed -restart);
 
     if(time_est > 86400000ULL)printf("%" PRIu64 "d ",   time_run / 86400000ULL);
     if(time_est > 3600000ULL) printf("%2" PRIu64 "h ", (time_run /  3600000ULL) % 24ULL);

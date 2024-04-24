@@ -115,18 +115,10 @@ void print_timestamp(FILE *outfile)
   fprintf(outfile, "[%s]\n", ptr);
 }
 
-int max_classes_multiplier(int base) {
-  if (base > 12 || base == 4 || base == 9 || base < 0)
-  {
-    return 2;
-  }
-  return 1;
-}
-
 void print_status_line(mystuff_t *mystuff)
 {
   unsigned long long int eta;
-  int i = 0, max_class_number;
+  int i = 0;
   char buffer[256];
   int index = 0;
   time_t now;
@@ -136,13 +128,6 @@ void print_status_line(mystuff_t *mystuff)
 
 
   if(mystuff->mode == MODE_SELFTEST_SHORT) return; /* no output during short selftest */
-
-#ifdef MORE_CLASSES
-  max_class_number = 960 * max_classes_multiplier(mystuff->base);
-#else
-  max_class_number = 96 * max_classes_multiplier(mystuff->base);
-#endif
-
 
   if(mystuff->stats.output_counter == 0)
   {
@@ -170,12 +155,12 @@ void print_status_line(mystuff_t *mystuff)
       }
       else if(mystuff->stats.progressformat[i+1] == 'p')
       {
-        index += sprintf(buffer + index, "%5.1f", (double)(mystuff->stats.class_counter * 100) / (double)max_class_number);
+        index += sprintf(buffer + index, "%5.1f", (double)(mystuff->stats.class_counter * 100) / (double)mystuff->stats.max_classes_needed);
       }
       else if(mystuff->stats.progressformat[i+1] == 'g')
       {
         if(mystuff->mode == MODE_NORMAL)
-          index += sprintf(buffer + index, "%7.2f", mystuff->stats.ghzdays * 86400000.0f / ((double)mystuff->stats.class_time * (double)max_class_number));
+          index += sprintf(buffer + index, "%7.2f", mystuff->stats.ghzdays * 86400000.0f / ((double)mystuff->stats.class_time * (double)mystuff->stats.max_classes_needed));
         else
           index += sprintf(buffer + index, "   n.a.");
       }
@@ -192,7 +177,7 @@ void print_status_line(mystuff_t *mystuff)
         {
           if(mystuff->stats.class_time > 25)
           {
-            eta = (mystuff->stats.class_time * (max_class_number - mystuff->stats.class_counter) + 500)  / 1000;
+            eta = (mystuff->stats.class_time * (mystuff->stats.max_classes_needed - mystuff->stats.class_counter) + 500)  / 1000;
                  if(eta < 3600) index += sprintf(buffer + index, "%2" PRIu64 "m%02" PRIu64 "s", eta / 60, eta % 60);
             else if(eta < 86400)index += sprintf(buffer + index, "%2" PRIu64 "h%02" PRIu64 "m", eta / 3600, (eta / 60) % 60);
             else                index += sprintf(buffer + index, "%2" PRIu64 "d%02" PRIu64 "h", eta / 86400, (eta / 3600) % 24);
@@ -342,11 +327,7 @@ void print_result_line(mystuff_t *mystuff, int factorsfound)
   }
   if(factorsfound)
   {
-#ifndef MORE_CLASSES
-    if((mystuff->mode == MODE_NORMAL) && (mystuff->stats.class_counter < 96))
-#else
-    if((mystuff->mode == MODE_NORMAL) && (mystuff->stats.class_counter < 960))
-#endif
+    if((mystuff->mode == MODE_NORMAL) && (mystuff->stats.class_counter < mystuff->stats.max_classes_needed))
     {
       sprintf(string, "found %d factor%s for %s[%d]%u from 2^%2d to 2^%2d (partially tested) [mfaktc %s %s]", factorsfound, (factorsfound > 1) ? "s" : "", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, MFAKTC_VERSION, mystuff->stats.kernelname);
     }
@@ -398,11 +379,12 @@ void print_factor(mystuff_t *mystuff, int factor_number, char *factor)
     }
     if(mystuff->mode == MODE_NORMAL)
     {
-#ifndef MORE_CLASSES
-      fprintf(resultfile, "%s%s[%d]%u has a factor: %s [TF:%d:%d%s:mfaktc %s %s]\n", UID, NAME_NUMBERS, mystuff->base, mystuff->exponent, factor, mystuff->bit_min, mystuff->bit_max_stage, ((mystuff->stopafterfactor == 2) && (mystuff->stats.class_counter <  96)) ? "*" : "" , MFAKTC_VERSION, mystuff->stats.kernelname);
-#else
-      fprintf(resultfile, "%s%s[%d]%u has a factor: %s [TF:%d:%d%s:mfaktc %s %s]\n", UID, NAME_NUMBERS, mystuff->base, mystuff->exponent, factor, mystuff->bit_min, mystuff->bit_max_stage, ((mystuff->stopafterfactor == 2) && (mystuff->stats.class_counter < 960)) ? "*" : "" , MFAKTC_VERSION, mystuff->stats.kernelname);
-#endif
+      fprintf(
+        resultfile, "%s%s[%d]%u has a factor: %s [TF:%d:%d%s:mfaktc %s %s]\n",
+        UID, NAME_NUMBERS, mystuff->base, mystuff->exponent, factor, mystuff->bit_min, mystuff->bit_max_stage,
+        ((mystuff->stopafterfactor == 2) && (mystuff->stats.class_counter < mystuff->stats.max_classes_needed)) ? "*" : "" ,
+        MFAKTC_VERSION, mystuff->stats.kernelname
+        );
     }
   }
   else /* factor_number >= 10 */

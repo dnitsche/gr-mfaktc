@@ -41,6 +41,7 @@ typedef struct
   float cpu_wait;                      /* percentage CPU was waiting for the GPU */
   int output_counter;                  /* count how often the status line was written since last headline */
   int class_counter;                   /* number of finished classes of the current job */
+  int max_classes_needed;              /* maximum number of needed classes of the current job */
   double ghzdays;                      /* primenet GHZdays for the current assignment (current stage) */
   char kernelname[30];
 }stats_t;
