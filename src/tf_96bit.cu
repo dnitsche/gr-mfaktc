@@ -41,21 +41,10 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 __device__ static void mul96_96(int192 *res, int96 a, unsigned int b)
 // res = a * b
 {
-  unsigned int carry = 0, carry2 = 0;
-	carry  = __umul32hi(a.d0, b);
 	res->d0   = __umul32  (a.d0, b);
-
-	carry2 = __umul32hi(a.d1, b);
-	res->d1   = __add_cc  (__umul32(a.d1, b), carry);
-	carry2 = __addc    (0, carry2);
-	carry  = carry2;
-
-	carry2 = __umul32hi(a.d2, b);
-	res->d2   = __add_cc  (__umul32(a.d2, b), carry);
-	carry2 = __addc    (0, carry2);
-
-	res->d3   = __add_cc  (0, carry2);
-
+	res->d1   = __add_cc  (__umul32(a.d1, b), __umul32hi(a.d0, b));
+	res->d2   = __add_cc  (__umul32(a.d2, b), __addc    (0, __umul32hi(a.d1, b)));
+	res->d3   = __add_cc  (0, __addc    (0, __umul32hi(a.d2, b)));
 #ifndef SHORTCUT_64BIT
 	res->d4   = 0;
 #endif
