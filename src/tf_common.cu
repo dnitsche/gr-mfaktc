@@ -36,7 +36,7 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
   unsigned long long int twait = 0;
   int96 factor,k_base;
   int192 b_preinit;
-  int shiftcount, ln2b, count = 0;
+  int shiftcount, ln2b, maxln2b, count = 0;
   unsigned long long int k_diff;
   char string[50];
   int factorsfound = 0;
@@ -64,7 +64,13 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
   while((1ULL<<shiftcount) < (unsigned long long int)mystuff->exponent)shiftcount++;
 //  printf("\n\nshiftcount = %d\n",shiftcount);
   shiftcount-=1;ln2b=1;
-  while(ln2b<20 || ln2b<mystuff->bit_min)	// how much preprocessing is possible
+  maxln2b = shiftcount-3;
+#if defined (SHORTCUT_75BIT) || defined (SHORTCUT_64BIT)
+  if (maxln2b>9) maxln2b=9; // maximum preprocessing which is possible for 64 bit
+#else
+  if (maxln2b>20) maxln2b=20; // maximum preprocessing which is possible
+#endif
+  while(ln2b<maxln2b || (unsigned long long int)(10*ln2b)<k_min*3)	// how much preprocessing is possible
   {
     shiftcount--;
     ln2b<<=1;
