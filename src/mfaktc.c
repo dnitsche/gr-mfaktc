@@ -590,10 +590,11 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
 {
   int i, j, tf_res, st_success=0, st_nofactor=0, st_wrongfactor=0, st_unknown=0;
 
+  #define NUM_SELFTESTS_GENERALIZED 25
   #define NUM_SELFTESTS_2 2867
   #define NUM_SELFTESTS_10 3022
-  #define NUM_SELFTESTS (NUM_SELFTESTS_2+NUM_SELFTESTS_10)
-  unsigned int exp[NUM_SELFTESTS], base[NUM_SELFTESTS], index[18];
+  #define NUM_SELFTESTS (NUM_SELFTESTS_GENERALIZED+NUM_SELFTESTS_2+NUM_SELFTESTS_10)
+  unsigned int exp[NUM_SELFTESTS], base[NUM_SELFTESTS], index[27];
   int num_selftests=0;
   int bit_min[NUM_SELFTESTS], f_class;
   unsigned long long int k[NUM_SELFTESTS];
@@ -603,9 +604,9 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
   int kernels[NUM_KERNEL+1]; // currently there are <NUM_KERNEL> different kernels, kernel numbers start at 1!
   int kernel_success[NUM_KERNEL+1], kernel_fail[NUM_KERNEL+1];
 
-  int offset = 0;
+  j = 0;
+  #include "selftest-data-generalized-repunit.c"
   #include "selftest-data-mersenne.c"
-  offset = NUM_SELFTESTS_2;
   #include "selftest-data-repunit.c"
 
   for(i = 0; i <= NUM_KERNEL; i++)
@@ -654,15 +655,38 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
   }
   else if(type == 1)
   {
+    j = 0;
     int offset = 0;
-    index[offset+ 0]=   2; index[offset+ 1]=  25; index[offset+ 2]=  57; /* some factors below 2^71 (test the 71/75 bit kernel depending on compute capability) */
-    index[offset+ 3]=  70; index[offset+ 4]=  88; index[offset+ 5]= 106; /* some factors below 2^75 (test 75 bit kernel) */
-    index[offset+ 6]=1547; index[offset+ 7]=1552; index[offset+ 8]=1556; /* some factors below 2^95 (test 95 bit kernel) */
-    offset = NUM_SELFTESTS_2;
-    index[offset+ 9]=   0; index[offset+10]=2893; index[offset+11]=3017; /* some factors below 2^64 (test 64 bit kernel) */
-    index[offset+12]=3020; index[offset+13]=3021; index[offset+14]=1500; /* some factors below 2^75 (test 75 bit kernel) */
-    index[offset+15]=1508; index[offset+16]=1518; index[offset+17]=1521; /* some factors below 2^95 (test 95 bit kernel) */
-    for(i = 0; i < 18; i++)
+    index[j++]=offset+   0;
+    index[j++]=offset+   1;
+    index[j++]=offset+   2;
+    index[j++]=offset+   3;
+    index[j++]=offset+   4;
+    index[j++]=offset+   5;
+    index[j++]=offset+   6;
+    index[j++]=offset+   7;
+    index[j++]=offset+   8;
+    offset += NUM_SELFTESTS_GENERALIZED;
+    index[j++]=offset+   2;
+    index[j++]=offset+  25;
+    index[j++]=offset+  57; /* some factors below 2^71 (test the 71/75 bit kernel depending on compute capability) */
+    index[j++]=offset+  70;
+    index[j++]=offset+  88;
+    index[j++]=offset+ 106; /* some factors below 2^75 (test 75 bit kernel) */
+    index[j++]=offset+1547;
+    index[j++]=offset+1552;
+    index[j++]=offset+1556; /* some factors below 2^95 (test 95 bit kernel) */
+    offset += NUM_SELFTESTS_2;
+    index[j++]=offset+   0;
+    index[j++]=offset+2893;
+    index[j++]=offset+3017; /* some factors below 2^64 (test 64 bit kernel) */
+    index[j++]=offset+3020;
+    index[j++]=offset+3021;
+    index[j++]=offset+1500; /* some factors below 2^75 (test 75 bit kernel) */
+    index[j++]=offset+1508;
+    index[j++]=offset+1518;
+    index[j++]=offset+1521; /* some factors below 2^95 (test 95 bit kernel) */
+    for(i = 0; i < 27; i++)
     {
       f_class = (int)(k[index[i]] % NUM_CLASSES);
 
