@@ -87,8 +87,85 @@ of exponents this isn't used here for now. */
   return ret;
 }
 
+int class_needed_default(unsigned int exp, unsigned long long int k_min, int c)
+{
+  int tmp;
+  tmp = (2 * (exp% 8) * ((k_min+c)% 8)) % 8;
+  if( ((tmp==0) || (tmp==2) || (tmp==4) || (tmp==6)) && \
+  ((2 * (exp% 3) * ((k_min+c)% 3)) % 3 !=  2) && \
+  ((2 * (exp% 7) * ((k_min+c)% 7)) % 7 !=  6))
+#ifdef MORE_CLASSES
+  if  ((2 * (exp % 11) * ((k_min + c) % 11)) % 11 != 10 )
+#endif
+  {
+    return 1;
+  }
 
-int class_needed(unsigned int exp, unsigned long long int k_min, int c)
+  return 0;
+}
+
+
+int class_needed_2(unsigned int exp, unsigned long long int k_min, int c)
+{
+ /*
+ checks whether the class c must be processed or can be ignored at all because
+ all factor candidates within the class c are a multiple of 3, 5, 7 or 11 (11
+ only if MORE_CLASSES is definied) or are 3 or 5 mod 8 (Mersenne)
+
+ k_min *MUST* be aligned in that way that k_min is in class 0!
+ */
+  if  ((2 * (exp %  8) * ((k_min + c) %  8)) %  8 !=  2)
+  if( ((2 * (exp %  8) * ((k_min + c) %  8)) %  8 !=  4) && \
+      ((2 * (exp %  3) * ((k_min + c) %  3)) %  3 !=  2) && \
+      ((2 * (exp %  5) * ((k_min + c) %  5)) %  5 !=  4) && \
+      ((2 * (exp %  7) * ((k_min + c) %  7)) %  7 !=  6))
+ #ifdef MORE_CLASSES
+   if  ((2 * (exp % 11) * ((k_min + c) % 11)) % 11 != 10 )
+ #endif
+   {
+     return 1;
+   }
+
+   return 0;
+}
+
+// got results from some experimental math
+int class_needed_5(unsigned int exp, unsigned long long int k_min, int c)
+{
+  int tmp;
+  tmp = (2 * (exp% 40) * ((k_min+c)% 40)) % 40;
+  if( ((tmp==0) || (tmp==8) || (tmp==10) || (tmp==18) || (tmp==20) || (tmp==28) || (tmp==30) || (tmp==38)) && \
+  ((2 * (exp% 3) * ((k_min+c)% 3)) % 3 !=  2) && \
+  ((2 * (exp% 7) * ((k_min+c)% 7)) % 7 !=  6))
+#ifdef MORE_CLASSES
+  if  ((2 * (exp % 11) * ((k_min + c) % 11)) % 11 != 10 )
+#endif
+  {
+    return 1;
+  }
+
+  return 0;
+}
+
+// got results from some experimental math
+int class_needed_8(unsigned int exp, unsigned long long int k_min, int c)
+{
+  int tmp;
+  tmp = (2 * (exp% 40) * ((k_min+c)% 40)) % 40;
+  if( ((tmp==0) || (tmp==6) || (tmp==8) || (tmp==16) || (tmp==22) || (tmp==30) || (tmp==32) || (tmp==38)) && \
+  ((2 * (exp% 3) * ((k_min+c)% 3)) % 3 !=  2) && \
+  ((2 * (exp% 7) * ((k_min+c)% 7)) % 7 !=  6))
+#ifdef MORE_CLASSES
+  if  ((2 * (exp % 11) * ((k_min + c) % 11)) % 11 != 10 )
+#endif
+  {
+    return 1;
+  }
+
+  return 0;
+}
+
+int class_needed_10(unsigned int exp, unsigned long long int k_min, int c)
 {
   int tmp;
 /*
@@ -128,6 +205,15 @@ k_min *MUST* be aligned in that way that k_min is in class 0!
   return 0;
 }
 
+int class_needed(unsigned int base, unsigned int exp, unsigned long long int k_min, int c) {
+  switch(base) {
+  case 2: return class_needed_2(exp, k_min, c); break;
+  case 5: return class_needed_5(exp, k_min, c); break;
+  case 8: return class_needed_8(exp, k_min, c); break;
+  case 10: return class_needed_10(exp, k_min, c); break;
+  default: return class_needed_default(exp, k_min, c); break;
+  }
+}
 
 int tf(mystuff_t *mystuff, int class_hint, unsigned long long int k_hint, int kernel)
 /*
@@ -262,7 +348,7 @@ see benchmarks in src/kernel_benchmarks.txt */
 /* calculate the number of classes which are allready processed. This value is needed to estimate ETA */
       for(i = 0; i < cur_class; i++)
       {
-        if(class_needed(mystuff->exponent, k_min, i))mystuff->stats.class_counter++;
+        if(class_needed(mystuff->base, mystuff->exponent, k_min, i))mystuff->stats.class_counter++;
       }
       restart = mystuff->stats.class_counter;
     }
@@ -279,7 +365,7 @@ see benchmarks in src/kernel_benchmarks.txt */
 
   for(; cur_class <= max_class; cur_class++)
   {
-    if(class_needed(mystuff->exponent, k_min, cur_class))
+    if(class_needed(mystuff->base, mystuff->exponent, k_min, cur_class))
     {
       mystuff->stats.class_number = cur_class;
       if(mystuff->quit)
