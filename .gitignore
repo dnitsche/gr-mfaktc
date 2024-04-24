@@ -1,3 +1,8 @@
 *.o
 mfaktc.exe
+.cproject
+.project
+out.log
+*results.txt
+worktodo.txt*
 
