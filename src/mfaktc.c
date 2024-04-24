@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #ifndef _MSC_VER
@@ -85,6 +86,18 @@ of exponents this isn't used here for now. */
   if((kernel == _95BIT_MUL32    || (mystuff->gpu_sieving && mystuff->exponent >= mystuff->gpu_sieve_min_exp && kernel == _95BIT_MUL32_GS))    && mystuff->bit_max_stage <= 95) ret = 1;
 
   return ret;
+}
+
+unsigned int * create_bit_mask(unsigned int length, ...) {
+  va_list blocks;
+  unsigned int * bit_mask = (unsigned int *) malloc(length * sizeof(unsigned int));
+  va_start(blocks, length);
+  for (unsigned int i = 0; i < length; ++i)
+  {
+    bit_mask[i] = va_arg(blocks, unsigned int);
+  }
+  va_end(blocks);
+  return bit_mask;
 }
 
 inline int no_small_factor(unsigned int exp, unsigned long long int k_min_plus_c)
