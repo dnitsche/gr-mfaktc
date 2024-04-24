@@ -156,13 +156,13 @@ int class_needed_3(unsigned int exp, unsigned long long int k_min, int c)
    return 0;
 }
 
-// got results from some experimental math
 int class_needed_5(unsigned int exp, unsigned long long int k_min, int c)
 {
   int tmp;
-  tmp = (2 * (exp% 40) * ((k_min+c)% 40)) % 40;
-  if( ((tmp==0) || (tmp==8) || (tmp==10) || (tmp==18) || (tmp==20) || (tmp==28) || (tmp==30) || (tmp==38)) && \
+  tmp = (2 * (exp% 5) * ((k_min+c)% 5)) % 5;
+  if( ((tmp==0) || (tmp==3)) && \
   ((2 * (exp% 3) * ((k_min+c)% 3)) % 3 !=  2) && \
+  ((2 * (exp% 5) * ((k_min+c)% 5)) % 5 !=  4) && \
   ((2 * (exp% 7) * ((k_min+c)% 7)) % 7 !=  6))
 #ifdef MORE_CLASSES
   if  ((2 * (exp % 11) * ((k_min + c) % 11)) % 11 != 10 )
