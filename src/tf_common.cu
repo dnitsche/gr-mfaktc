@@ -74,11 +74,11 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
 //  printf("ln2b = %d\n",ln2b);
   b_preinit.d5=0;b_preinit.d4=0;b_preinit.d3=0;b_preinit.d2=0;b_preinit.d1=0;b_preinit.d0=1;
 #ifdef SHORTCUT_64BIT
-  for(i=0; i<ln2b; i++) mul64(&b_preinit, b_preinit, 2);
+  for(i=0; i<ln2b; i++) mul64(&b_preinit, b_preinit, 10);
 #elif defined (SHORTCUT_75BIT)
-  for(i=0; i<ln2b; i++) mul75(&b_preinit, b_preinit, 2);
+  for(i=0; i<ln2b; i++) mul75(&b_preinit, b_preinit, 10);
 #else
-  for(i=0; i<ln2b; i++) mul96(&b_preinit, b_preinit, 2);
+  for(i=0; i<ln2b; i++) mul96(&b_preinit, b_preinit, 10);
 #endif
 
 
