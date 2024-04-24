@@ -123,10 +123,10 @@ only if MORE_CLASSES is definied) or are in the allowed remainder classes for cu
 k_min *MUST* be aligned in that way that k_min is in class 0!
 */
 int class_needed(unsigned int exp, unsigned long long int k_min, int c, remainders_t *rems) {
-  unsigned int m = rems->modulo_value;
   unsigned long long int k_min_plus_c = k_min+c;
-  unsigned int remainder = (2 * (exp% m) * (k_min_plus_c% m) + 1) % m;
   if (rems) {
+    unsigned int m = rems->modulo_value;
+    unsigned int remainder = (2 * (exp% m) * (k_min_plus_c% m) + 1) % m;
     return (((rems->bit_mask[remainder / 32] & (1<<(remainder% 32))) != 0) && no_small_factor(exp, k_min_plus_c));
   } else {
     return no_small_factor(exp, k_min_plus_c);
