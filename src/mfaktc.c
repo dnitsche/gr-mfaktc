@@ -796,6 +796,9 @@ int main(int argc, char **argv)
   int i, tmp = 0;
   char *ptr;
   int use_worktodo = 1;
+  remainders_t *remainders_pos = mystuff.remainders_pos;
+  remainders_t *remainders_neg = mystuff.remainders_neg;
+  #include "allowed-remainders-data.c"
 
   i = 1;
   mystuff.mode = MODE_NORMAL;
@@ -1248,6 +1251,13 @@ int main(int argc, char **argv)
   cudaFree(mystuff.d_bitarray);
   cudaFree(mystuff.d_sieve_info);
   cudaFree(mystuff.d_calc_bit_to_clear_info);
+
+  // 0 and 1 are not used
+  for (i = 2; i <= REMAINDERS_LUT_MAX; ++i)
+  {
+    free(remainders_pos[i].bit_mask);
+    free(remainders_neg[i].bit_mask);
+  }
 
   return 0;
 }
