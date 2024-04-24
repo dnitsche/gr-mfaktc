@@ -601,6 +601,7 @@ void print_last_CUDA_error()
 
 int main(int argc, char **argv)
 {
+  unsigned int base = 1;
   unsigned int exponent = 1;
   int bit_min = -1, bit_max = -1;
   int parse_ret = -1;
@@ -651,30 +652,36 @@ int main(int argc, char **argv)
     }
     else if(!strcmp((char*)"-tf", argv[i]))
     {
-      if(i+3 >= argc)
+      if(i+4 >= argc)
       {
         printf("ERROR: missing parameters for option \"-tf\"\n");
         return 1;
       }
-      exponent = (unsigned int)strtoul(argv[i+1], &ptr, 10);
-      if(*ptr || errno || (unsigned long)exponent != strtoul(argv[i+1],&ptr,10) )
+      base = (unsigned int)strtoul(argv[i+1], &ptr, 10);
+      if(*ptr || errno || (unsigned long)base != strtoul(argv[i+1],&ptr,10) )
+      {
+        printf("ERROR: can't parse parameter <base> for option \"-tf\"\n");
+        return 1;
+      }
+      exponent = (unsigned int)strtoul(argv[i+2], &ptr, 10);
+      if(*ptr || errno || (unsigned long)exponent != strtoul(argv[i+2],&ptr,10) )
       {
         printf("ERROR: can't parse parameter <exp> for option \"-tf\"\n");
         return 1;
       }
-      bit_min = (int)strtol(argv[i+2], &ptr, 10);
-      if(*ptr || errno || (long)bit_min != strtol(argv[i+2],&ptr,10) )
+      bit_min = (int)strtol(argv[i+3], &ptr, 10);
+      if(*ptr || errno || (long)bit_min != strtol(argv[i+3],&ptr,10) )
       {
         printf("ERROR: can't parse parameter <min> for option \"-tf\"\n");
         return 1;
       }
-      bit_max = (int)strtol(argv[i+3], &ptr, 10);
-      if(*ptr || errno || (long)bit_max != strtol(argv[i+3],&ptr,10) )
+      bit_max = (int)strtol(argv[i+4], &ptr, 10);
+      if(*ptr || errno || (long)bit_max != strtol(argv[i+4],&ptr,10) )
       {
         printf("ERROR: can't parse parameter <max> for option \"-tf\"\n");
         return 1;
       }
-      if(!valid_assignment(exponent, bit_min, bit_max, mystuff.verbosity))
+      if(!valid_assignment(base, exponent, bit_min, bit_max, mystuff.verbosity))
       {
         return 1;
       }
@@ -964,9 +971,10 @@ int main(int argc, char **argv)
     if(!use_worktodo)mystuff.addfiledelay = 0; /* disable addfile if not using worktodo at all (-tf on command line) */
     do
     {
-      if(use_worktodo)parse_ret = get_next_assignment(mystuff.workfile, &((mystuff.exponent)), &((mystuff.bit_min)), &((mystuff.bit_max_assignment)), NULL, mystuff.verbosity);
+      if(use_worktodo)parse_ret = get_next_assignment(mystuff.workfile, &((mystuff.base)), &((mystuff.exponent)), &((mystuff.bit_min)), &((mystuff.bit_max_assignment)), NULL, mystuff.verbosity);
       else /* got work from command */
       {
+        mystuff.base               = base;
         mystuff.exponent           = exponent;
         mystuff.bit_min            = bit_min;
         mystuff.bit_max_assignment = bit_max;
@@ -1010,8 +1018,8 @@ int main(int argc, char **argv)
 
             if(use_worktodo)
             {
-              if(mystuff.bit_max_stage == mystuff.bit_max_assignment)parse_ret = clear_assignment(mystuff.workfile, mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment, 0);
-              else                                                   parse_ret = clear_assignment(mystuff.workfile, mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment, mystuff.bit_max_stage);
+              if(mystuff.bit_max_stage == mystuff.bit_max_assignment)parse_ret = clear_assignment(mystuff.workfile, mystuff.base, mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment, 0);
+              else                                                   parse_ret = clear_assignment(mystuff.workfile, mystuff.base, mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment, mystuff.bit_max_stage);
 
                    if(parse_ret == CANT_OPEN_WORKFILE)   printf("ERROR: clear_assignment() / modify_assignment(): can't open \"%s\"\n", mystuff.workfile);
               else if(parse_ret == CANT_OPEN_TEMPFILE)   printf("ERROR: clear_assignment() / modify_assignment(): can't open \"__worktodo__.tmp\"\n");

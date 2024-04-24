@@ -38,6 +38,7 @@ typedef char LINE_BUFFER[MAX_LINE_LENGTH+1];
 
 struct ASSIGNMENT
 {
+	unsigned int base;
 	unsigned int exponent;
 	int bit_min;
 	int bit_max;
@@ -48,7 +49,7 @@ struct ASSIGNMENT
 };
 
 
-int valid_assignment(unsigned int exp, int bit_min, int bit_max, int verbosity);	// nonzero if assignment is valid
-enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, unsigned int *exponent, int *bit_min, int *bit_max, LINE_BUFFER *assignment_key, int verbosity);
-enum ASSIGNMENT_ERRORS clear_assignment(char *filename, unsigned int exponent, int bit_min, int bit_max, int bit_min_new);
+int valid_assignment(unsigned int base, unsigned int exp, int bit_min, int bit_max, int verbosity);	// nonzero if assignment is valid
+enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, unsigned int *base, unsigned int *exponent, int *bit_min, int *bit_max, LINE_BUFFER *assignment_key, int verbosity);
+enum ASSIGNMENT_ERRORS clear_assignment(char *filename, unsigned int base, unsigned int exponent, int bit_min, int bit_max, int bit_min_new);
 int process_add_file(char *workfile, char *addfile, int *addfilesstatus, int verbosity);

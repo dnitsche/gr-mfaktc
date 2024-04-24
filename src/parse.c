@@ -85,7 +85,7 @@ returns
 }
 
 
-int valid_assignment(unsigned int exp, int bit_min, int bit_max, int verbosity)
+int valid_assignment(unsigned int base, unsigned int exp, int bit_min, int bit_max, int verbosity)
 /*
 returns 1 if the assignment is within the supported bounds of mfaktc,
 0 otherwise.
@@ -93,7 +93,8 @@ returns 1 if the assignment is within the supported bounds of mfaktc,
 {
   int ret = 1;
 
-       if(exp < 50000 )      {ret = 0; if(verbosity >= 1)printf("WARNING: exponents < 50000 are not supported!\n");}
+  if(base != 10)      {ret = 0; if(verbosity >= 1)printf("WARNING: other bases than 10 are not supported!\n");}
+  else if(exp < 50000 )      {ret = 0; if(verbosity >= 1)printf("WARNING: exponents < 50000 are not supported!\n");}
   else if(!isprime(exp))      {ret = 0; if(verbosity >= 1)printf("WARNING: exponent is not prime!\n");}
   else if(bit_min < 1 )       {ret = 0; if(verbosity >= 1)printf("WARNING: bit_min < 1 doesn't make sense!\n");}
   else if(bit_min > 94)       {ret = 0; if(verbosity >= 1)printf("WARNING: bit_min > 94 is not supported!\n");}
@@ -267,6 +268,7 @@ output
  * Function name : get_next_assignment                                                                      *
  *   													    *
  *     INPUT  :	char *filename										    *
+ *		unsigned int *base									    *
  *		unsigned int *exponent									    *
  *		int *bit_min										    *
  *		int *bit_max										    *
@@ -277,7 +279,7 @@ output
  *     1 - get_next_assignment : cannot open file							    *
  *     2 - get_next_assignment : no valid assignment found						    *
  ************************************************************************************************************/
-enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, unsigned int *exponent, int *bit_min, int *bit_max, LINE_BUFFER *key, int verbosity)
+enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, unsigned int *base, unsigned int *exponent, int *bit_min, int *bit_max, LINE_BUFFER *key, int verbosity)
 {
   FILE *f_in;
   enum PARSE_WARNINGS value;
@@ -301,7 +303,7 @@ enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, unsigned int *exponen
       continue;
     if (NO_WARNING == value)
     {
-      if (valid_assignment(assignment.exponent,assignment.bit_min, assignment.bit_max, verbosity))
+      if (valid_assignment(assignment.base,assignment.exponent,assignment.bit_min, assignment.bit_max, verbosity))
         break;
       value = INVALID_DATA;
     }
@@ -329,6 +331,7 @@ enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, unsigned int *exponen
   fclose(f_in);
   if (NO_WARNING == value)
   {
+    *base = assignment.base;
     *exponent = assignment.exponent;
     *bit_min = assignment.bit_min;
     *bit_max = assignment.bit_max;
@@ -346,6 +349,7 @@ enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, unsigned int *exponen
  * Function name : clear_assignment                                                                         *
  *   													    *
  *     INPUT  :	char *filename										    *
+ *		unsigned int base									    *
  *		unsigned int exponent									    *
  *		int bit_min		- from old assignment file			    *
  *		int bit_max										    *
@@ -361,7 +365,7 @@ enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, unsigned int *exponen
  * If bit_min_new is zero then the specified assignment will be cleared. If bit_min_new is greater than     *
  * zero the specified assignment will be modified                                                           *
  ************************************************************************************************************/
-enum ASSIGNMENT_ERRORS clear_assignment(char *filename, unsigned int exponent, int bit_min, int bit_max, int bit_min_new)
+enum ASSIGNMENT_ERRORS clear_assignment(char *filename, unsigned int base, unsigned int exponent, int bit_min, int bit_max, int bit_min_new)
 {
   int found = FALSE;
   FILE *f_in, *f_out;
@@ -393,7 +397,7 @@ enum ASSIGNMENT_ERRORS clear_assignment(char *filename, unsigned int exponent, i
       current_line++;
       if (NO_WARNING == value)
       {
-        if( (exponent == assignment.exponent) && (bit_min == assignment.bit_min) && (bit_max == assignment.bit_max))	// make final decision
+        if( (base == assignment.base) && (exponent == assignment.exponent) && (bit_min == assignment.bit_min) && (bit_max == assignment.bit_max))	// make final decision
         {
           if (line_to_drop > current_line)
           line_to_drop = current_line;
