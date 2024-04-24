@@ -205,7 +205,6 @@ For correct results a must be less than 2^64 (a.d2 == 0) */
 {
 #if (__CUDA_ARCH__ >= FERMI) && (CUDART_VERSION >= 4010) /* multiply-add with carry is not available on CC 1.x devices and before CUDA 4.1 */
   asm("{\n\t"
-//      ".reg .u32 a2;\n\t"
 
       "mul.lo.u32     %0, %4, %4;\n\t"     /* (a.d0 * a.d0).lo */
       "mul.lo.u32     %1, %4, %5;\n\t"     /* (a.d0 * a.d1).lo */
@@ -213,11 +212,11 @@ For correct results a must be less than 2^64 (a.d2 == 0) */
 
       "add.cc.u32     %1, %1, %1;\n\t"     /* 2 * (a.d0 * a.d1).lo */
       "addc.cc.u32    %2, %2, %2;\n\t"     /* 2 * (a.d0 * a.d1).hi */
-      "madc.hi.u32    %3, %4, 0, 0;\n\t"  /* 2 * (a.d0 * a.d2).hi */
+      "addc.u32       %3, 0, 0;\n\t"       /* propagate carry */
 
       "mad.hi.cc.u32  %1, %4, %4, %1;\n\t" /* (a.d0 * a.d0).hi */
       "madc.lo.cc.u32 %2, %5, %5, %2;\n\t" /* (a.d1 * a.d1).lo */
-      "madc.hi.cc.u32 %3, %5, %5, %3;\n\t" /* (a.d1 * a.d1).hi */
+      "madc.hi.u32    %3, %5, %5, %3;\n\t" /* (a.d1 * a.d1).hi */
       "}"
       : "=r"(res->d0), "=r"(res->d1), "=r"(res->d2), "=r"(res->d3)
       : "r"(a.d0), "r"(a.d1));
