@@ -32,7 +32,8 @@ CSRC  = sieve.c timer.c parse.c read_config.c mfaktc.c checkpoint.c \
 CUSRC = tf_96bit.cu gpusieve.cu
 
 COBJS  = $(CSRC:.c=.o)
-CUOBJS = $(CUSRC:.cu=.o) tf_75bit.o
+CUOBJS = $(CUSRC:.cu=.o) tf_75bit.o tf_64bit.o
+
 
 ##############################################################################
 
@@ -46,6 +47,9 @@ clean :
 
 sieve.o : sieve.c
 	$(CC) $(CFLAGS) $(CFLAGS_EXTRA_SIEVE) -c $< -o $@
+
+tf_64bit.o : tf_96bit.cu
+	$(NVCC) $(NVCCFLAGS) -c $< -o $@ -DSHORTCUT_64BIT
 
 tf_75bit.o : tf_96bit.cu
 	$(NVCC) $(NVCCFLAGS) -c $< -o $@ -DSHORTCUT_75BIT
