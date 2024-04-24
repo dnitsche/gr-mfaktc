@@ -40,7 +40,7 @@ void print_help(char *string)
   printf("Usage: %s [options]\n", string);
   printf("  -h                     display this help and exit\n");
   printf("  -d <device number>     specify the device number used by this program\n");
-  printf("  -tf <exp> <min> <max>  trial factor %s<exp> from 2^<min> to 2^<max> and exit\n", NAME_NUMBERS);
+  printf("  -tf <base> <exp> <min> <max>  trial factor %s(<base>)<exp> from 2^<min> to 2^<max> and exit\n", NAME_NUMBERS);
   printf("                         instead of parsing the worktodo file\n");
   printf("  -st                    run builtin selftest and exit\n");
   printf("  -st2                   same as -st but extended range for k_min/m_max\n");
@@ -262,6 +262,10 @@ void print_status_line(mystuff_t *mystuff)
       {
         index += sprintf(buffer + index, "%s", mystuff->ComputerID);
       }
+      else if(mystuff->stats.progressformat[i+1] == 'B')
+      {
+        index += sprintf(buffer + index, "%-10u", mystuff->base);
+      }
       else if(mystuff->stats.progressformat[i+1] == 'M')
       {
         index += sprintf(buffer + index, "%-10u", mystuff->exponent);
@@ -337,16 +341,16 @@ void print_result_line(mystuff_t *mystuff, int factorsfound)
     if((mystuff->mode == MODE_NORMAL) && (mystuff->stats.class_counter < 960))
 #endif
     {
-      sprintf(string, "found %d factor%s for %s%u from 2^%2d to 2^%2d (partially tested) [mfaktc %s %s]", factorsfound, (factorsfound > 1) ? "s" : "", NAME_NUMBERS, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, MFAKTC_VERSION, mystuff->stats.kernelname);
+      sprintf(string, "found %d factor%s for %s(%u)%u from 2^%2d to 2^%2d (partially tested) [mfaktc %s %s]", factorsfound, (factorsfound > 1) ? "s" : "", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, MFAKTC_VERSION, mystuff->stats.kernelname);
     }
     else
     {
-      sprintf(string, "found %d factor%s for %s%u from 2^%2d to 2^%2d [mfaktc %s %s]", factorsfound, (factorsfound > 1) ? "s" : "", NAME_NUMBERS, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, MFAKTC_VERSION, mystuff->stats.kernelname);
+      sprintf(string, "found %d factor%s for %s(%u)%u from 2^%2d to 2^%2d [mfaktc %s %s]", factorsfound, (factorsfound > 1) ? "s" : "", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, MFAKTC_VERSION, mystuff->stats.kernelname);
     }
   }
   else
   {
-    sprintf(string, "no factor for %s%u from 2^%d to 2^%d [mfaktc %s %s]", NAME_NUMBERS, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, MFAKTC_VERSION, mystuff->stats.kernelname);
+    sprintf(string, "no factor for %s(%u)%u from 2^%d to 2^%d [mfaktc %s %s]", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, MFAKTC_VERSION, mystuff->stats.kernelname);
   }
 
   if(mystuff->mode != MODE_SELFTEST_SHORT)
@@ -383,21 +387,21 @@ void print_factor(mystuff_t *mystuff, int factor_number, char *factor)
     if(mystuff->mode != MODE_SELFTEST_SHORT)
     {
       if(mystuff->printmode == 1 && factor_number == 0)printf("\n");
-      printf("%s%u has a factor: %s\n", NAME_NUMBERS, mystuff->exponent, factor);
+      printf("%s(%u)%u has a factor: %s\n", NAME_NUMBERS, mystuff->base, mystuff->exponent, factor);
     }
     if(mystuff->mode == MODE_NORMAL)
     {
 #ifndef MORE_CLASSES
-      fprintf(resultfile, "%s%s%u has a factor: %s [TF:%d:%d%s:mfaktc %s %s]\n", UID, NAME_NUMBERS, mystuff->exponent, factor, mystuff->bit_min, mystuff->bit_max_stage, ((mystuff->stopafterfactor == 2) && (mystuff->stats.class_counter <  96)) ? "*" : "" , MFAKTC_VERSION, mystuff->stats.kernelname);
+      fprintf(resultfile, "%s%s(%u)%u has a factor: %s [TF:%d:%d%s:mfaktc %s %s]\n", UID, NAME_NUMBERS, mystuff->base, mystuff->exponent, factor, mystuff->bit_min, mystuff->bit_max_stage, ((mystuff->stopafterfactor == 2) && (mystuff->stats.class_counter <  96)) ? "*" : "" , MFAKTC_VERSION, mystuff->stats.kernelname);
 #else
-      fprintf(resultfile, "%s%s%u has a factor: %s [TF:%d:%d%s:mfaktc %s %s]\n", UID, NAME_NUMBERS, mystuff->exponent, factor, mystuff->bit_min, mystuff->bit_max_stage, ((mystuff->stopafterfactor == 2) && (mystuff->stats.class_counter < 960)) ? "*" : "" , MFAKTC_VERSION, mystuff->stats.kernelname);
+      fprintf(resultfile, "%s%s(%u)%u has a factor: %s [TF:%d:%d%s:mfaktc %s %s]\n", UID, NAME_NUMBERS, mystuff->base, mystuff->exponent, factor, mystuff->bit_min, mystuff->bit_max_stage, ((mystuff->stopafterfactor == 2) && (mystuff->stats.class_counter < 960)) ? "*" : "" , MFAKTC_VERSION, mystuff->stats.kernelname);
 #endif
     }
   }
   else /* factor_number >= 10 */
   {
-    if(mystuff->mode != MODE_SELFTEST_SHORT)      printf("%s%u: %d additional factors not shown\n",      NAME_NUMBERS, mystuff->exponent, factor_number-10);
-    if(mystuff->mode == MODE_NORMAL)fprintf(resultfile,"%s%s%u: %d additional factors not shown\n", UID, NAME_NUMBERS, mystuff->exponent, factor_number-10);
+    if(mystuff->mode != MODE_SELFTEST_SHORT)      printf("%s(%u)%u: %d additional factors not shown\n",      NAME_NUMBERS, mystuff->base, mystuff->exponent, factor_number-10);
+    if(mystuff->mode == MODE_NORMAL)fprintf(resultfile,"%s%s(%u)%u: %d additional factors not shown\n", UID, NAME_NUMBERS, mystuff->base, mystuff->exponent, factor_number-10);
   }
 
   if(mystuff->mode == MODE_NORMAL)fclose(resultfile);

@@ -981,7 +981,7 @@ int main(int argc, char **argv)
       }
       if(parse_ret == OK)
       {
-        if(mystuff.verbosity >= 1)printf("got assignment: exp=%u bit_min=%d bit_max=%d (%.2f GHz-days)\n", mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment, primenet_ghzdays(mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment));
+        if(mystuff.verbosity >= 1)printf("got assignment: base=%u exp=%u bit_min=%d bit_max=%d (%.2f GHz-days)\n", mystuff.base, mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment, primenet_ghzdays(mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment));
         if(mystuff.gpu_sieving && mystuff.exponent < mystuff.gpu_sieve_min_exp)
         {
           printf("ERROR: GPU sieve requested but current settings don't allow exponents below\n");
