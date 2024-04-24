@@ -331,7 +331,9 @@ Precalculated here since it is the same for all steps in the following loop */
   exp<<= 32 - shiftcount;
   while(exp)
   {
-#if defined(SHORTCUT_75BIT) || defined(SHORTCUT_64BIT)
+#if defined(SHORTCUT_64BIT)
+    square_96_128(&b,a);			// b = a^2
+#elif defined(SHORTCUT_75BIT)
     square_96_160(&b,a);			// b = a^2
 #else
     square_96_192(&b,a);			// b = a^2
