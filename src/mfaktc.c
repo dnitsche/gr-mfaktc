@@ -303,7 +303,7 @@ other return value
   mystuff->stats.output_counter = 0; /* reset output counter, needed for status headline */
   mystuff->stats.ghzdays = primenet_ghzdays(mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage);
 
-  if(mystuff->mode != MODE_SELFTEST_SHORT)printf("Starting trial factoring %s%u from 2^%d to 2^%d (%.2f GHz-days)\n", NAME_NUMBERS, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, mystuff->stats.ghzdays);
+  if(mystuff->mode != MODE_SELFTEST_SHORT)printf("Starting trial factoring %s(%u)%u from 2^%d to 2^%d (%.2f GHz-days)\n", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, mystuff->stats.ghzdays);
   if((mystuff->mode != MODE_NORMAL) && (mystuff->mode != MODE_SELFTEST_SHORT) && (mystuff->mode != MODE_SELFTEST_FULL))
   {
     printf("ERROR, invalid mode for tf(): %d\n", mystuff->mode);
