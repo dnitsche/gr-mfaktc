@@ -1,3 +1,7 @@
+version 0.21-generalized-repunit-edition (2020-05-05)
+- contributors: Fan Ming, Danilo Nitsche (danilo.nitsche@gmx.de)
+  - fixed issue on Geforce 1660 cards
+
 version 0.21-generalized-repunit-edition (2019-10-31)
 - contributors: Danilo Nitsche (danilo.nitsche@gmx.de)
   - implemented factoring of generalized repunits
