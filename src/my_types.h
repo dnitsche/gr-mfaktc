@@ -46,6 +46,12 @@ typedef struct
   char kernelname[30];
 }stats_t;
 
+typedef struct
+{
+  unsigned int modulo_value;           /* the modulo value for the remainder bit mask */
+  unsigned int *bit_mask;              /* the bit mask that defines the valid remainders modulo modulo_value */
+}remainders_t;
+
 
 typedef struct
 {
