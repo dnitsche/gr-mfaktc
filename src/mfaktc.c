@@ -122,7 +122,7 @@ only if MORE_CLASSES is definied) or are in the allowed remainder classes for cu
 
 k_min *MUST* be aligned in that way that k_min is in class 0!
 */
-int class_needed(int base, unsigned int exp, unsigned long long int k_min, int c, remainders_t *rems) {
+int class_needed(unsigned int exp, unsigned long long int k_min, int c, remainders_t *rems) {
   unsigned int m = rems->modulo_value;
   unsigned long long int k_min_plus_c = k_min+c;
   unsigned int remainder = (2 * (exp% m) * (k_min_plus_c% m) + 1) % m;
@@ -198,7 +198,7 @@ other return value
 
   for(cur_class=0; cur_class <= max_class; cur_class++)
   {
-    if (class_needed(mystuff->base, mystuff->exponent, k_min, cur_class, remainders))
+    if (class_needed(mystuff->exponent, k_min, cur_class, remainders))
     {
       max_classes_needed++;
     }
@@ -283,7 +283,7 @@ see benchmarks in src/kernel_benchmarks.txt */
 /* calculate the number of classes which are allready processed. This value is needed to estimate ETA */
       for(i = 0; i < cur_class; i++)
       {
-        if(class_needed(mystuff->base, mystuff->exponent, k_min, i, remainders))mystuff->stats.class_counter++;
+        if(class_needed(mystuff->exponent, k_min, i, remainders))mystuff->stats.class_counter++;
       }
       restart = mystuff->stats.class_counter;
     }
@@ -300,7 +300,7 @@ see benchmarks in src/kernel_benchmarks.txt */
 
   for(; cur_class <= max_class; cur_class++)
   {
-    if(class_needed(mystuff->base, mystuff->exponent, k_min, cur_class, remainders))
+    if(class_needed(mystuff->exponent, k_min, cur_class, remainders))
     {
       mystuff->stats.class_number = cur_class;
       if(mystuff->quit)
