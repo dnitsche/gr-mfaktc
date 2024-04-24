@@ -569,9 +569,9 @@ Precalculated here since it is the same for all steps in the following loop */
     if(exp&0x80000000) {
       mul96_96(&b,a,abs_base);			// b = a * abs_base (optional multiply by |base|)
       #ifndef DEBUG_GPU_MATH
-      mod_192_96(&a,b,f,ff);			// a = b mod f
+      mod_128_96(&a,b,f,ff);			// a = b mod f
       #else
-      mod_192_96(&a,b,f,ff,modbasecase_debug);			// a = b mod f
+      mod_128_96(&a,b,f,ff,modbasecase_debug);			// a = b mod f
       #endif
     }
     exp<<=1;
