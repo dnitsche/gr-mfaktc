@@ -19,13 +19,13 @@
   {1,3,9,13,27,31,37,39} or {±1, ±3, ±9, ±13} for 2kp+1.
   See also: https://math.stackexchange.com/questions/1767306/find-all-prime-p-such-that-legendre-symbol-of-left-frac10p-right-1
 
-  Encoding this as a bit map gives 2^1+2^2+2^9+2^13+2^27+2^31+2^37+2^39 = 689476477446.
-  In base 2 this is 1010000010001000000000000010001000000110 (each 1 marks the allowed remainder)
-  or in hex 0xa088002206. Splitting this into 32 bit blocks we get 0xa0 0x88002206. Storing these in increasing
-  block order this is then [0x882a82,0x20] as defined for remainders_pos[10].
+  Encoding this as a bit map gives 2^1+2^3+2^9+2^13+2^27+2^31+2^37+2^39 = 689476477450.
+  In base 2 this is 1010000010001000000000000010001000001010 (each 1 marks the allowed remainder)
+  or in hex 0xa08800220a. Splitting this into 32 bit blocks we get 0xa0 0x8800220a. Storing these in increasing
+  block order this is then [0x8800220a,0xa0] as defined for remainders_pos[10].
 
   The Mathematica program to generate this file:
-  Some note: This program is certainly not optimal (code wise), although it larger range much faster.
+  Some note: This program is certainly not optimal (code wise).
 
     mapCR[n_, a_, r_] := ChineseRemainder[{a, #}, {4, n}] & /@ r;
     mapCRJoin[n_, r_, s_] := Sort[mapCR[n, 1, r[s]]~Join~mapCR[n, 3, r[-s]]];
