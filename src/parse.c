@@ -141,7 +141,7 @@ output
 
   enum PARSE_WARNINGS reason = NO_WARNING;
 
-  unsigned long proposed_exponent, proposed_bit_min, proposed_bit_max;
+  unsigned long proposed_base, proposed_exponent, proposed_bit_min, proposed_bit_max;
 
   if(NULL==fgets(line, MAX_LINE_LENGTH+1, f_in))
   {
@@ -205,6 +205,20 @@ output
     ptr_start++;
   if ('R' == *ptr_start)	// R means Repunit exponent...
     ptr_start++;
+  if ('(' == *ptr_start) { // optional base for repunit
+    ptr_start++;
+    errno = 0;
+    proposed_base = strtoul(ptr_start, &ptr_end, 10);
+    if (ptr_start == ptr_end)
+      return INVALID_FORMAT;	// no conversion
+    if ((0!=errno) || (proposed_base > UINT_MAX))
+      return INVALID_DATA;	// for example, too many digits.
+    if (')' != *ptr_end)
+      return INVALID_FORMAT;	// no conversion
+    ptr_start = 1 + strstr(ptr_start,")");
+  } else {
+    proposed_base = 10;
+  };
   errno = 0;
   proposed_exponent = strtoul(ptr_start, &ptr_end, 10);
   if (ptr_start == ptr_end)
