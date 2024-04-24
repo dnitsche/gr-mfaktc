@@ -208,18 +208,18 @@ division will be skipped
     tmp.d3  = __umul32hi(q.d2, fac);
 
     tmp.d3 += __umul32  (q.d3, fac);
-//#ifndef SHORTCUT_64BIT
+#ifndef SHORTCUT_64BIT
     tmp.d4  = __umul32hi(q.d3, fac);
 
     tmp.d4 += __umul32  (q.d4, fac);
-//#endif
+#endif
     q.d0 = tmp.d0;
     q.d1 = tmp.d1;
     q.d2 = tmp.d2;
     q.d3 = tmp.d3;
-//#ifndef SHORTCUT_64BIT
+#ifndef SHORTCUT_64BIT
     q.d4 = tmp.d4;
-//#endif
+#endif
   }
   MODBASECASE_NONZERO_ERROR(q.d5, 5, 5, 6);
   MODBASECASE_NONZERO_ERROR(q.d4, 5, 4, 7);
