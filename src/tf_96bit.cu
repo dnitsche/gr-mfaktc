@@ -103,14 +103,22 @@ division will be skipped
 // nn = n * qi
   nn.d1 =                                 __umul32(n.d0, qi);
   nn.d2 = __add_cc (__umul32hi(n.d0, qi), __umul32(n.d1, qi));
+#ifndef SHORTCUT_64BIT
   nn.d3 = __addc_cc(__umul32hi(n.d1, qi), __umul32(n.d2, qi));
   nn.d4 = __addc   (__umul32hi(n.d2, qi),                  0);
+#else
+  nn.d3 = __addc   (__umul32hi(n.d1, qi),                  0);
+#endif
 
 // shiftleft nn 23 bits
 #ifdef DEBUG_GPU_MATH
   nn.d5 =                  nn.d4 >> 9;
 #endif
+#ifndef SHORTCUT_64BIT
   nn.d4 = (nn.d4 << 23) + (nn.d3 >> 9);
+#else
+  nn.d4 = (nn.d3 >> 9);
+#endif
   nn.d3 = (nn.d3 << 23) + (nn.d2 >> 9);
   nn.d2 = (nn.d2 << 23) + (nn.d1 >> 9);
   nn.d1 =  nn.d1 << 23;
@@ -120,7 +128,9 @@ division will be skipped
   q.d2 = __subc_cc(q.d2, nn.d2);
   q.d3 = __subc_cc(q.d3, nn.d3);
 #ifndef DEBUG_GPU_MATH
+  #ifndef SHORTCUT_64BIT
   q.d4 = __subc   (q.d4, nn.d4);
+  #endif
 #else
   q.d4 = __subc_cc(q.d4, nn.d4);
   q.d5 = __subc   (q.d5, nn.d5);
@@ -129,8 +139,12 @@ division will be skipped
 /********** Step 3, Offset 2^35 (1*32 + 3) **********/
   MODBASECASE_NONZERO_ERROR(q.d5, 3, 5, 2);
 
+#ifndef SHORTCUT_64BIT
   qf= __uint2float_rn(q.d4);
   qf= qf * 4294967296.0f + __uint2float_rn(q.d3);
+#else
+  qf= __uint2float_rn(q.d3);
+#endif
   qf= qf * 4294967296.0f + __uint2float_rn(q.d2);
   qf*= 536870912.0f; // add (q.d1 >> 3) ???
 //  qf*= 4294967296.0f; /* this includes the shiftleft of qi by 3 bits! */
@@ -145,20 +159,30 @@ division will be skipped
 // nn = n * qi
   nn.d1 =                                 __umul32(n.d0, qi);
   nn.d2 = __add_cc (__umul32hi(n.d0, qi), __umul32(n.d1, qi));
+#ifndef SHORTCUT_64BIT
   nn.d3 = __addc_cc(__umul32hi(n.d1, qi), __umul32(n.d2, qi));
   nn.d4 = __addc   (__umul32hi(n.d2, qi),                  0);
+#else
+  nn.d3 = __addc   (__umul32hi(n.d1, qi),                  0);
+#endif
 
 //  q = q - nn
   q.d1 = __sub_cc (q.d1, nn.d1);
   q.d2 = __subc_cc(q.d2, nn.d2);
   q.d3 = __subc_cc(q.d3, nn.d3);
+#ifndef SHORTCUT_64BIT
   q.d4 = __subc   (q.d4, nn.d4);
+#endif
 
 /********** Step 4, Offset 2^15 (0*32 + 15) **********/
   MODBASECASE_NONZERO_ERROR(q.d5, 4, 5, 4);
 
+#ifndef SHORTCUT_64BIT
   qf= __uint2float_rn(q.d4);
   qf= qf * 4294967296.0f + __uint2float_rn(q.d3);
+#else
+  qf= __uint2float_rn(q.d3);
+#endif
   qf= qf * 4294967296.0f + __uint2float_rn(q.d2);
   qf= qf * 4294967296.0f + __uint2float_rn(q.d1);
   qf*= 131072.0f;
@@ -170,14 +194,22 @@ division will be skipped
 // nn = n * qi
   nn.d0 =                                 __umul32(n.d0, qi);
   nn.d1 = __add_cc (__umul32hi(n.d0, qi), __umul32(n.d1, qi));
+#ifndef SHORTCUT_64BIT
   nn.d2 = __addc_cc(__umul32hi(n.d1, qi), __umul32(n.d2, qi));
   nn.d3 = __addc   (__umul32hi(n.d2, qi),                  0);
+#else
+  nn.d2 = __addc   (__umul32hi(n.d1, qi),                  0);
+#endif
 
 // shiftleft nn 15 bits
 #ifdef DEBUG_GPU_MATH
   nn.d4 =                  nn.d3 >> 17;
 #endif
+#ifndef SHORTCUT_64BIT
   nn.d3 = (nn.d3 << 15) + (nn.d2 >> 17);
+#else
+  nn.d3 = (nn.d2 >> 17);
+#endif
   nn.d2 = (nn.d2 << 15) + (nn.d1 >> 17);
   nn.d1 = (nn.d1 << 15) + (nn.d0 >> 17);
   nn.d0 =  nn.d0 << 15;
