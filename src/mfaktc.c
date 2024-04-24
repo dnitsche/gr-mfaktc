@@ -87,21 +87,29 @@ of exponents this isn't used here for now. */
   return ret;
 }
 
-int class_needed_default(unsigned int exp, unsigned long long int k_min, int c)
+inline int no_small_factor(unsigned int exp, unsigned long long int k_min_plus_c)
 {
-  int tmp;
-  tmp = (2 * (exp% 8) * ((k_min+c)% 8)) % 8;
-  if( ((tmp==0) || (tmp==2) || (tmp==4) || (tmp==6)) && \
-  ((2 * (exp% 3) * ((k_min+c)% 3)) % 3 !=  2) && \
-  ((2 * (exp% 5) * ((k_min+c)% 5)) % 5 !=  4) && \
-  ((2 * (exp% 7) * ((k_min+c)% 7)) % 7 !=  6))
+  if(
+    ((2 * (exp% 3) * (k_min_plus_c% 3)) % 3 !=  2) && \
+    ((2 * (exp% 5) * (k_min_plus_c% 5)) % 5 !=  4) && \
+    ((2 * (exp% 7) * (k_min_plus_c% 7)) % 7 !=  6))
 #ifdef MORE_CLASSES
-  if  ((2 * (exp % 11) * ((k_min + c) % 11)) % 11 != 10 )
+  if  ((2 * (exp % 11) * (k_min_plus_c % 11)) % 11 != 10 )
 #endif
   {
     return 1;
   }
+  return 0;
+}
 
+int class_needed_default(unsigned int exp, unsigned long long int k_min, int c)
+{
+  unsigned long long int k_min_plus_c = k_min+c;
+  int tmp = (2 * (exp% 8) * (k_min_plus_c% 8)) % 8;
+  if( ((tmp==0) || (tmp==2) || (tmp==4) || (tmp==6)) && no_small_factor(exp, k_min_plus_c))
+  {
+    return 1;
+  }
   return 0;
 }
 
@@ -114,19 +122,12 @@ int class_needed_2(unsigned int exp, unsigned long long int k_min, int c)
 
  k_min *MUST* be aligned in that way that k_min is in class 0!
  */
-   int tmp;
-   tmp = (2 * (exp% 8) * ((k_min+c)% 8)) % 8;
-   if( ((tmp==0) || (tmp==6)) && \
-      ((2 * (exp %  3) * ((k_min + c) %  3)) %  3 !=  2) && \
-      ((2 * (exp %  5) * ((k_min + c) %  5)) %  5 !=  4) && \
-      ((2 * (exp %  7) * ((k_min + c) %  7)) %  7 !=  6))
- #ifdef MORE_CLASSES
-   if  ((2 * (exp % 11) * ((k_min + c) % 11)) % 11 != 10 )
- #endif
+   unsigned long long int k_min_plus_c = k_min+c;
+   int tmp = (2 * (exp% 8) * (k_min_plus_c% 8)) % 8;
+   if( ((tmp==0) || (tmp==6)) && no_small_factor(exp, k_min_plus_c))
    {
      return 1;
    }
-
    return 0;
 }
 
@@ -140,69 +141,42 @@ int class_needed_3(unsigned int exp, unsigned long long int k_min, int c)
 
  k_min *MUST* be aligned in that way that k_min is in class 0!
  */
-   int tmp;
-   tmp = (2 * (exp% 12) * ((k_min+c)% 12)) % 12;
-   if( ((tmp==0) || (tmp==10)) && \
-      ((2 * (exp %  3) * ((k_min + c) %  3)) %  3 !=  2) && \
-      ((2 * (exp %  5) * ((k_min + c) %  5)) %  5 !=  4) && \
-      ((2 * (exp %  7) * ((k_min + c) %  7)) %  7 !=  6))
- #ifdef MORE_CLASSES
-   if  ((2 * (exp % 11) * ((k_min + c) % 11)) % 11 != 10 )
- #endif
+   unsigned long long int k_min_plus_c = k_min+c;
+   int tmp = (2 * (exp% 12) * (k_min_plus_c% 12)) % 12;
+   if( ((tmp==0) || (tmp==10)) && no_small_factor(exp, k_min_plus_c))
    {
      return 1;
    }
-
    return 0;
 }
 
 int class_needed_5(unsigned int exp, unsigned long long int k_min, int c)
 {
-  int tmp;
-  tmp = (2 * (exp% 5) * ((k_min+c)% 5)) % 5;
-  if( ((tmp==0) || (tmp==3)) && \
-  ((2 * (exp% 3) * ((k_min+c)% 3)) % 3 !=  2) && \
-  ((2 * (exp% 5) * ((k_min+c)% 5)) % 5 !=  4) && \
-  ((2 * (exp% 7) * ((k_min+c)% 7)) % 7 !=  6))
-#ifdef MORE_CLASSES
-  if  ((2 * (exp % 11) * ((k_min + c) % 11)) % 11 != 10 )
-#endif
+  unsigned long long int k_min_plus_c = k_min+c;
+  int tmp = (2 * (exp% 5) * (k_min_plus_c% 5)) % 5;
+  if( ((tmp==0) || (tmp==3)) && no_small_factor(exp, k_min_plus_c))
   {
     return 1;
   }
-
   return 0;
 }
 
 int class_needed_6(unsigned int exp, unsigned long long int k_min, int c)
 {
-  int tmp;
-  tmp = (2 * (exp% 24) * ((k_min+c)% 24)) % 24;
-  if( ((tmp==0) || (tmp==4) || (tmp==18) || (tmp==22)) && \
-  ((2 * (exp% 3) * ((k_min+c)% 3)) % 3 !=  2) && \
-  ((2 * (exp% 5) * ((k_min+c)% 5)) % 5 !=  4) && \
-  ((2 * (exp% 7) * ((k_min+c)% 7)) % 7 !=  6))
-#ifdef MORE_CLASSES
-  if  ((2 * (exp % 11) * ((k_min + c) % 11)) % 11 != 10 )
-#endif
+  unsigned long long int k_min_plus_c = k_min+c;
+  int tmp = (2 * (exp% 24) * (k_min_plus_c% 24)) % 24;
+  if( ((tmp==0) || (tmp==4) || (tmp==18) || (tmp==22)) && no_small_factor(exp, k_min_plus_c))
   {
     return 1;
   }
-
   return 0;
 }
 
 int class_needed_7(unsigned int exp, unsigned long long int k_min, int c)
 {
-  int tmp;
-  tmp = (2 * (exp% 28) * ((k_min+c)% 28)) % 28;
-  if( ((tmp==0) || (tmp==2) || (tmp==8) || (tmp==18) || (tmp==24) || (tmp==26)) && \
-  ((2 * (exp% 3) * ((k_min+c)% 3)) % 3 !=  2) && \
-  ((2 * (exp% 5) * ((k_min+c)% 5)) % 5 !=  4) && \
-  ((2 * (exp% 7) * ((k_min+c)% 7)) % 7 !=  6))
-#ifdef MORE_CLASSES
-  if  ((2 * (exp % 11) * ((k_min + c) % 11)) % 11 != 10 )
-#endif
+  unsigned long long int k_min_plus_c = k_min+c;
+  int tmp = (2 * (exp% 28) * (k_min_plus_c% 28)) % 28;
+  if( ((tmp==0) || (tmp==2) || (tmp==8) || (tmp==18) || (tmp==24) || (tmp==26)) && no_small_factor(exp, k_min_plus_c))
   {
     return 1;
   }
@@ -212,15 +186,9 @@ int class_needed_7(unsigned int exp, unsigned long long int k_min, int c)
 
 int class_needed_8(unsigned int exp, unsigned long long int k_min, int c)
 {
-  int tmp;
-  tmp = (2 * (exp% 8) * ((k_min+c)% 8)) % 8;
-  if( ((tmp==0) || (tmp==6)) && \
-  ((2 * (exp% 3) * ((k_min+c)% 3)) % 3 !=  2) && \
-  ((2 * (exp% 5) * ((k_min+c)% 5)) % 5 !=  4) && \
-  ((2 * (exp% 7) * ((k_min+c)% 7)) % 7 !=  6))
-#ifdef MORE_CLASSES
-  if  ((2 * (exp % 11) * ((k_min + c) % 11)) % 11 != 10 )
-#endif
+  unsigned long long int k_min_plus_c = k_min+c;
+  int tmp = (2 * (exp% 8) * (k_min_plus_c% 8)) % 8;
+  if( ((tmp==0) || (tmp==6)) && no_small_factor(exp, k_min_plus_c))
   {
     return 1;
   }
@@ -230,7 +198,6 @@ int class_needed_8(unsigned int exp, unsigned long long int k_min, int c)
 
 int class_needed_10(unsigned int exp, unsigned long long int k_min, int c)
 {
-  int tmp;
 /*
 checks whether the class c must be processed or can be ignored at all because
 all factor candidates within the class c are a multiple of 3, 5, 7 or 11 (11
@@ -254,17 +221,12 @@ See also: https://math.stackexchange.com/questions/1767306/find-all-prime-p-such
 
 k_min *MUST* be aligned in that way that k_min is in class 0!
 */
-  tmp = (2 * (exp% 40) * ((k_min+c)% 40)) % 40;
-  if( ((tmp==0) || (tmp==2) || (tmp==8) || (tmp==12) || (tmp==26) || (tmp==30) || (tmp==36) || (tmp==38)) && \
-  ((2 * (exp% 3) * ((k_min+c)% 3)) % 3 !=  2) && \
-  ((2 * (exp% 7) * ((k_min+c)% 7)) % 7 !=  6))
-#ifdef MORE_CLASSES
-  if  ((2 * (exp % 11) * ((k_min + c) % 11)) % 11 != 10 )
-#endif
+  unsigned long long int k_min_plus_c = k_min+c;
+  int tmp = (2 * (exp% 40) * (k_min_plus_c% 40)) % 40;
+  if( ((tmp==0) || (tmp==2) || (tmp==8) || (tmp==12) || (tmp==26) || (tmp==30) || (tmp==36) || (tmp==38)) && no_small_factor(exp, k_min_plus_c))
   {
     return 1;
   }
-
   return 0;
 }
 
