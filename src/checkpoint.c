@@ -11,7 +11,7 @@ mfaktc is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-                                
+
 You should have received a copy of the GNU General Public License
 along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -27,7 +27,7 @@ unsigned int checkpoint_checksum(char *string, int chars)
 {
   unsigned int chksum=0;
   int i,j;
-  
+
   for(i=0;i<chars;i++)
   {
     for(j=7;j>=0;j--)

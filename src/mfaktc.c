@@ -357,7 +357,7 @@ see benchmarks in src/kernel_benchmarks.txt */
   {
     if(mystuff->h_RES[0] == 0)
     {
-      printf("ERROR: selftest failed for %s%u\n", NAME_NUMBERS, mystuff->exponent);
+      printf("ERROR: selftest failed for %s(%u)%u\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
       printf("  no factor found\n");
       retval = 1;
     }
@@ -393,7 +393,7 @@ k_max and k_min are used as 64bit temporary integers here...
       }
       if(k_min != 1) /* the factor should appear ONCE */
       {
-        printf("ERROR: selftest failed for %s%u!\n", NAME_NUMBERS, mystuff->exponent);
+        printf("ERROR: selftest failed for %s(%u)%u!\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
         printf("  expected result: %08X %08X %08X\n", f_hi, f_med, f_low);
         for(i=0; ((unsigned int)i < mystuff->h_RES[0]) && (i < 10); i++)
         {
@@ -403,7 +403,7 @@ k_max and k_min are used as 64bit temporary integers here...
       }
       else
       {
-        if(mystuff->mode != MODE_SELFTEST_SHORT)printf("selftest for %s%u passed!\n", NAME_NUMBERS, mystuff->exponent);
+        if(mystuff->mode != MODE_SELFTEST_SHORT)printf("selftest for %s(%u)%u passed!\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
       }
     }
   }
@@ -454,7 +454,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
   int i, j, tf_res, st_success=0, st_nofactor=0, st_wrongfactor=0, st_unknown=0;
 
   #define NUM_SELFTESTS 3022
-  unsigned int exp[NUM_SELFTESTS], index[9];
+  unsigned int exp[NUM_SELFTESTS], base[NUM_SELFTESTS], index[9];
   int num_selftests=0;
   int bit_min[NUM_SELFTESTS], f_class;
   unsigned long long int k[NUM_SELFTESTS];
@@ -479,6 +479,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
       printf("########## testcase %d/%d ##########\n", i+1, NUM_SELFTESTS);
       f_class = (int)(k[i] % NUM_CLASSES);
 
+      mystuff->base               = base[i];
       mystuff->exponent           = exp[i];
       mystuff->bit_min            = bit_min[i];
       mystuff->bit_max_assignment = bit_min[i] + 1;
