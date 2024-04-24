@@ -367,8 +367,7 @@ Precalculated here since it is the same for all steps in the following loop */
   }
 #endif
 
-/* finally check if we found a factor and write the factor to RES[]
-this kernel has a lower FC limit of 2^64 so we can use check_big_factor96() */
+/* finally check if we found a factor and write the factor to RES[] */
   check_factor96(f, a, RES);
 }
 
