@@ -197,6 +197,55 @@ For correct results a must be less than 2^80 (a.d2 less than 2^16) */
 #endif
 }
 
+__device__ static void square_96_128(int192 *res, int96 a)
+/* res = a^2
+this is a stripped down version of square_96_192, it doesn't compute res.d5 and res.d4
+and is a little bit faster.
+For correct results a must be less than 2^64 (a.d2 == 0) */
+{
+#if (__CUDA_ARCH__ >= FERMI) && (CUDART_VERSION >= 4010) /* multiply-add with carry is not available on CC 1.x devices and before CUDA 4.1 */
+  asm("{\n\t"
+//      ".reg .u32 a2;\n\t"
+
+      "mul.lo.u32     %0, %4, %4;\n\t"     /* (a.d0 * a.d0).lo */
+      "mul.lo.u32     %1, %4, %5;\n\t"     /* (a.d0 * a.d1).lo */
+      "mul.hi.u32     %2, %4, %5;\n\t"     /* (a.d0 * a.d1).hi */
+
+      "add.cc.u32     %1, %1, %1;\n\t"     /* 2 * (a.d0 * a.d1).lo */
+      "addc.cc.u32    %2, %2, %2;\n\t"     /* 2 * (a.d0 * a.d1).hi */
+      "madc.hi.u32    %3, %4, 0, 0;\n\t"  /* 2 * (a.d0 * a.d2).hi */
+
+      "mad.hi.cc.u32  %1, %4, %4, %1;\n\t" /* (a.d0 * a.d0).hi */
+      "madc.lo.cc.u32 %2, %5, %5, %2;\n\t" /* (a.d1 * a.d1).lo */
+      "madc.hi.cc.u32 %3, %5, %5, %3;\n\t" /* (a.d1 * a.d1).hi */
+      "}"
+      : "=r"(res->d0), "=r"(res->d1), "=r"(res->d2), "=r"(res->d3)
+      : "r"(a.d0), "r"(a.d1));
+#else
+  asm("{\n\t"
+      ".reg .u32 a2, t1;\n\t"
+
+      "mul.lo.u32     %0, %5, %5;\n\t"     /* (a.d0 * a.d0).lo */
+      "mul.lo.u32     %1, %5, %6;\n\t"     /* (a.d0 * a.d1).lo */
+      "mul.hi.u32     %2, %5, %6;\n\t"     /* (a.d0 * a.d1).hi */
+
+      "add.cc.u32     %1, %1, %1;\n\t"     /* 2 * (a.d0 * a.d1).lo */
+      "addc.cc.u32    %2, %2, %2;\n\t"     /* 2 * (a.d0 * a.d1).hi */
+      "mul.hi.u32     t1, %5, a2;\n\t"     /* 2 * (a.d0 * a.d2).hi */
+      "addc.u32       %3, t1,  0;\n\t"     /* %3 (res.d3) has some space left because a2 is < 2^17 */
+
+      "mul.hi.u32     t1, %5, %5;\n\t"     /* (a.d0 * a.d0).hi */
+      "add.cc.u32     %1, %1, t1;\n\t"
+      "mul.lo.u32     t1, %6, %6;\n\t"     /* (a.d1 * a.d1).lo */
+      "addc.cc.u32    %2, %2, t1;\n\t"
+      "mul.hi.u32     t1, %6, %6;\n\t"     /* (a.d1 * a.d1).hi */
+      "addc.cc.u32    %3, %3, t1;\n\t"
+      "}"
+      : "=r"(res->d0), "=r"(res->d1), "=r"(res->d2), "=r"(res->d3), "=r"(res->d4)
+      : "r"(a.d0), "r"(a.d1), "r"(a.d2));
+#endif
+}
+
 #ifdef SHORTCUT_64BIT
 extern "C" __host__ void mul64(int192 *res, int192 a, int b)
 #elif defined (SHORTCUT_75BIT)
