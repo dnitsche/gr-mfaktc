@@ -38,7 +38,7 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 #include "gpusieve_helper.cu"
 
 
-__device__ static void mul96_96(int192 *res, int96 a, unsigned int b)
+__device__ static void mul96_uint_192(int192 *res, int96 a, unsigned int b)
 // res = a * b
 {
 	res->d0   = __umul32  (a.d0, b);
@@ -567,7 +567,7 @@ Precalculated here since it is the same for all steps in the following loop */
     mod_192_96(&a,b,f,ff,modbasecase_debug);			// a = b mod f
 #endif
     if(exp&0x80000000) {
-      mul96_96(&b,a,abs_base);			// b = a * abs_base (optional multiply by |base|)
+      mul96_uint_192(&b,a,abs_base);			// b = a * abs_base (optional multiply by |base|)
       #ifndef DEBUG_GPU_MATH
       mod_128_96(&a,b,f,ff);			// a = b mod f
       #else
