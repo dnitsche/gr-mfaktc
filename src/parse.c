@@ -203,7 +203,7 @@ output
   ptr_start = ptr;
   while( (isspace(*ptr_start)) && ('\0' != *ptr_start ))
     ptr_start++;
-  if ('M' == *ptr_start)	// M means Mersenne exponent...
+  if ('R' == *ptr_start)	// R means Repunit exponent...
     ptr_start++;
   errno = 0;
   proposed_exponent = strtoul(ptr_start, &ptr_end, 10);
