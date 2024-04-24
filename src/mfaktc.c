@@ -90,6 +90,7 @@ of exponents this isn't used here for now. */
 
 int class_needed(unsigned int exp, unsigned long long int k_min, int c)
 {
+  int tmp;
 /*
 checks whether the class c must be processed or can be ignored at all because
 all factor candidates within the class c are a multiple of 3, 5, 7 or 11 (11
@@ -97,11 +98,10 @@ only if MORE_CLASSES is definied) or are 3 or 5 mod 8 (Mersenne)
 
 k_min *MUST* be aligned in that way that k_min is in class 0!
 */
-  if  ((2 * (exp %  8) * ((k_min + c) %  8)) %  8 !=  2)
-  if( ((2 * (exp %  8) * ((k_min + c) %  8)) %  8 !=  4) && \
-      ((2 * (exp %  3) * ((k_min + c) %  3)) %  3 !=  2) && \
-      ((2 * (exp %  5) * ((k_min + c) %  5)) %  5 !=  4) && \
-      ((2 * (exp %  7) * ((k_min + c) %  7)) %  7 !=  6))
+  tmp = (2 * (exp% 40) * ((k_min+c)% 40)) % 40;
+  if( ((tmp==0) || (tmp==2) || (tmp==8) || (tmp==12) || (tmp==26) || (tmp==30) || (tmp==36) || (tmp==38)) && \
+  ((2 * (exp% 3) * ((k_min+c)% 3)) % 3 !=  2) && \
+  ((2 * (exp% 7) * ((k_min+c)% 7)) % 7 !=  6))
 #ifdef MORE_CLASSES
   if  ((2 * (exp % 11) * ((k_min + c) % 11)) % 11 != 10 )
 #endif
