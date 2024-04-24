@@ -28,7 +28,7 @@ on some other factors asweel, but you don't have to worry about.
 
 #define SIEVE_SIZE_LIMIT 32
 
-
+#define REMAINDERS_LUT_MAX 1000
 
 /*
 If MORE_CLASSES is defined than the while TF process is split into 4620
