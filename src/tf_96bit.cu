@@ -39,15 +39,16 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #ifndef DEBUG_GPU_MATH
-__device__ static void mod_192_96(int96 *res, int192 q, int96 n, float nf)
+__device__ static void mod_192_96(int96 *res, int192 q, int96 n, float nf, bool optionalmul)
 #else
-__device__ static void mod_192_96(int96 *res, int192 q, int96 n, float nf, unsigned int *modbasecase_debug)
+__device__ static void mod_192_96(int96 *res, int192 q, int96 n, float nf, bool optionalmul, unsigned int *modbasecase_debug)
 #endif
 /* res = q mod n */
 {
   float qf;
   unsigned int qi;
-  int192 nn;
+  int192 nn, tmp;
+  int fac = 2;
 
 /********** Step 1, Offset 2^75 (2*32 + 11) **********/
 /*
@@ -193,6 +194,33 @@ division will be skipped
 #endif
 
 /********** Step 5, Offset 2^0 (0*32 + 0) **********/
+// should only be used for f<2^64 !!!!!!!!!!!
+  if (optionalmul) // optional multiply by fac modulo n
+  {
+    // multiply by fac
+    tmp.d0 = __umul32  (q.d0, fac);
+    tmp.d1 = __umul32hi(q.d0, fac);
+
+    tmp.d1 += __umul32  (q.d1, fac);
+    tmp.d2  = __umul32hi(q.d1, fac);
+
+    tmp.d2 += __umul32  (q.d2, fac);
+    tmp.d3  = __umul32hi(q.d2, fac);
+
+    tmp.d3 += __umul32  (q.d3, fac);
+//#ifndef SHORTCUT_64BIT
+    tmp.d4  = __umul32hi(q.d3, fac);
+
+    tmp.d4 += __umul32  (q.d4, fac);
+//#endif
+    q.d0 = tmp.d0;
+    q.d1 = tmp.d1;
+    q.d2 = tmp.d2;
+    q.d3 = tmp.d3;
+//#ifndef SHORTCUT_64BIT
+    q.d4 = tmp.d4;
+//#endif
+  }
   MODBASECASE_NONZERO_ERROR(q.d5, 5, 5, 6);
   MODBASECASE_NONZERO_ERROR(q.d4, 5, 4, 7);
 
@@ -264,23 +292,22 @@ Precalculated here since it is the same for all steps in the following loop */
   ff=__int_as_float(0x3f7ffffb) / ff;	// just a little bit below 1.0f so we allways underestimate the quotient
 
 #ifndef DEBUG_GPU_MATH
-  mod_192_96(&a,b,f,ff);			// a = b mod f
+  mod_192_96(&a,b,f,ff,false);			// a = b mod f
 #else
-  mod_192_96(&a,b,f,ff,modbasecase_debug);	// a = b mod f
+  mod_192_96(&a,b,f,ff,false,modbasecase_debug);	// a = b mod f
 #endif
   exp<<= 32 - shiftcount;
   while(exp)
   {
-#ifdef SHORTCUT_75BIT
+#if defined(SHORTCUT_75BIT) || defined(SHORTCUT_64BIT)
     square_96_160(&b,a);			// b = a^2
 #else
     square_96_192(&b,a);			// b = a^2
 #endif
-    if(exp&0x80000000)shl_192(&b);              // "optional multiply by 2" in Prime 95 documentation
 #ifndef DEBUG_GPU_MATH
-      mod_192_96(&a,b,f,ff);			// a = b mod f
+    mod_192_96(&a,b,f,ff,exp&0x80000000);			// a = b mod f
 #else
-      mod_192_96(&a,b,f,ff,modbasecase_debug);	// a = b mod f
+    mod_192_96(&a,b,f,ff,exp&0x80000000,modbasecase_debug);			// a = b mod f
 #endif
     exp<<=1;
   }
