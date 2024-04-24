@@ -230,6 +230,18 @@ k_min *MUST* be aligned in that way that k_min is in class 0!
   return 0;
 }
 
+int class_needed_11(unsigned int exp, unsigned long long int k_min, int c)
+{
+  unsigned long long int k_min_plus_c = k_min+c;
+  int tmp = (2 * (exp% 44) * (k_min_plus_c% 44)) % 44;
+  if( ((tmp==0) || (tmp==4) || (tmp==6) || (tmp==8) || (tmp==18) || (tmp==24) || (tmp==34) || (tmp==36) || (tmp==38) || (tmp==42)) \
+    && no_small_factor(exp, k_min_plus_c))
+  {
+    return 1;
+  }
+  return 0;
+}
+
 int class_needed(unsigned int base, unsigned int exp, unsigned long long int k_min, int c) {
   switch(base) {
   case 2: return class_needed_2(exp, k_min, c); break;
@@ -239,6 +251,7 @@ int class_needed(unsigned int base, unsigned int exp, unsigned long long int k_m
   case 7: return class_needed_7(exp, k_min, c); break;
   case 8: return class_needed_8(exp, k_min, c); break;
   case 10: return class_needed_10(exp, k_min, c); break;
+  case 11: return class_needed_11(exp, k_min, c); break;
   default: return class_needed_default(exp, k_min, c); break;
   }
 }
