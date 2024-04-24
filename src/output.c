@@ -183,7 +183,7 @@ void print_status_line(mystuff_t *mystuff)
       {
         if(mystuff->mode == MODE_NORMAL)
         {
-          if(mystuff->stats.class_time > 250)
+          if(mystuff->stats.class_time > 25)
           {
             eta = (mystuff->stats.class_time * (max_class_number - mystuff->stats.class_counter) + 500)  / 1000;
                  if(eta < 3600) index += sprintf(buffer + index, "%2" PRIu64 "m%02" PRIu64 "s", eta / 60, eta % 60);
