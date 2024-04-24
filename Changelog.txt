@@ -1,3 +1,11 @@
+version 0.21.1 generalized-repunit-edition (2024-04-23)
+- contributors: Danilo Nitsche (danilo.nitsche@gmx.de)
+  - fixed brokens tests
+    - modulo function did not work nicely for too large bases
+      fixed by adding another modulo calculation
+    - fixed bug in the Mathematica code that generated allowed-remainder-data.c
+      for some bases the LUT was wrong
+
 version 0.21-generalized-repunit-edition (2024-04-17)
 - contributors: Danilo Nitsche (danilo.nitsche@gmx.de)
   - extracted test cases to text file (selftest.txt)
