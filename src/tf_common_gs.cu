@@ -66,13 +66,14 @@ extern "C" __host__ int tf_class_95_gs(unsigned long long int k_min, unsigned lo
   }
 //  printf("shiftcount = %d\n",shiftcount);
 //  printf("ln2b = %d\n",ln2b);
-  b_preinit.d5=0;b_preinit.d4=0;b_preinit.d3=0;b_preinit.d2=0;b_preinit.d1=0;b_preinit.d0=0;
-  if     (ln2b<32 )b_preinit.d0=1<< ln2b;
-  else if(ln2b<64 )b_preinit.d1=1<<(ln2b-32);
-  else if(ln2b<96 )b_preinit.d2=1<<(ln2b-64);
-  else if(ln2b<128)b_preinit.d3=1<<(ln2b-96);
-  else if(ln2b<160)b_preinit.d4=1<<(ln2b-128);
-  else             b_preinit.d5=1<<(ln2b-160);	// b_preinit = 2^ln2b
+b_preinit.d5=0;b_preinit.d4=0;b_preinit.d3=0;b_preinit.d2=0;b_preinit.d1=0;b_preinit.d0=1;
+#ifdef SHORTCUT_64BIT
+  for(i=0; i<ln2b; i++) mul64(&b_preinit, b_preinit, 10);
+#elif defined (SHORTCUT_75BIT)
+  for(i=0; i<ln2b; i++) mul75(&b_preinit, b_preinit, 10);
+#else
+  for(i=0; i<ln2b; i++) mul96(&b_preinit, b_preinit, 10);
+#endif
 
 /* set result array to 0 */
   cudaMemset(mystuff->d_RES, 0, 1*sizeof(int)); //first int of result array contains the number of factors found
