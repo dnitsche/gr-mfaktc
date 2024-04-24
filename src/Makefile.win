@@ -8,6 +8,7 @@ CUFLAGS = -DWIN64 -Xcompiler /EHsc,/W3,/nologo,/Ox $(NVCCFLAGS)
 
 ############################################################
 
+# generate code for various compute capabilities
 NVCCFLAGS += --generate-code arch=compute_90,code=sm_90
 NVCCFLAGS += --generate-code arch=compute_89,code=sm_89
 NVCCFLAGS += --generate-code arch=compute_87,code=sm_87
@@ -67,7 +68,6 @@ checkpoint.obj: checkpoint.c params.h
 mfaktc.obj: mfaktc.c params.h my_types.h compatibility.h sieve.h \
  read_config.h parse.h timer.h tf_96bit.h \
  checkpoint.h signal_handler.h output.h gpusieve.h \
- selftest-data-generalized-repunit.c selftest-data-mersenne.c selftest-data-repunit.c \
  allowed-remainders-data.c
 
 output.obj: output.c params.h my_types.h output.h compatibility.h

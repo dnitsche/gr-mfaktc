@@ -12,15 +12,23 @@ CFLAGS_EXTRA_SIEVE = -funroll-all-loops
 NVCC = $(CUDA_DIR)/bin/nvcc
 NVCCFLAGS = $(CUDA_INCLUDE) --ptxas-options=-v
 
+############################################################
+
 # generate code for various compute capabilities
-#NVCCFLAGS += --generate-code arch=compute_20,code=sm_20 # CC 2.x GPUs will use this code, one code fits all!
-#NVCCFLAGS += --generate-code arch=compute_30,code=sm_30 # all CC 3.x GPUs _COULD_ use this code
-#NVCCFLAGS += --generate-code arch=compute_35,code=sm_35 # but CC 3.5 (3.2?) _CAN_ use funnel shift which is useful for mfaktc
-NVCCFLAGS += --generate-code arch=compute_50,code=sm_50 # CC 5.x GPUs will use this code
-NVCCFLAGS += --generate-code arch=compute_60,code=sm_60 # CC 6.0 GPUs will use this code
-NVCCFLAGS += --generate-code arch=compute_61,code=sm_61 # CC 6.1 GPUs will use this code
-NVCCFLAGS += --generate-code arch=compute_70,code=sm_70 # CC 7.x GPUs will use this code
-NVCCFLAGS += --generate-code arch=compute_75,code=sm_75 # CC 7.5 GPUs will use this code
+NVCCFLAGS += --generate-code arch=compute_90,code=sm_90
+NVCCFLAGS += --generate-code arch=compute_89,code=sm_89
+NVCCFLAGS += --generate-code arch=compute_87,code=sm_87
+NVCCFLAGS += --generate-code arch=compute_86,code=sm_86
+NVCCFLAGS += --generate-code arch=compute_80,code=sm_80
+NVCCFLAGS += --generate-code arch=compute_75,code=sm_75
+NVCCFLAGS += --generate-code arch=compute_72,code=sm_72
+NVCCFLAGS += --generate-code arch=compute_70,code=sm_70
+NVCCFLAGS += --generate-code arch=compute_62,code=sm_62
+NVCCFLAGS += --generate-code arch=compute_61,code=sm_61
+NVCCFLAGS += --generate-code arch=compute_60,code=sm_60
+NVCCFLAGS += --generate-code arch=compute_50,code=sm_50
+
+############################################################
 
 # pass some options to the C host compiler (e.g. gcc on Linux)
 NVCCFLAGS += --compiler-options=-Wall
@@ -72,7 +80,6 @@ checkpoint.o: checkpoint.c params.h
 mfaktc.o: mfaktc.c params.h my_types.h compatibility.h sieve.h \
  read_config.h parse.h timer.h tf_96bit.h \
  checkpoint.h signal_handler.h output.h gpusieve.h \
- selftest-data-generalized-repunit.c selftest-data-mersenne.c selftest-data-repunit.c \
  allowed-remainders-data.c
 
 output.o: output.c params.h my_types.h output.h compatibility.h
