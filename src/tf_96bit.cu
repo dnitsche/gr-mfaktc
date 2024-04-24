@@ -60,7 +60,6 @@ __device__ static void mod_128_96(int96 *res, int192 q, int96 n, float nf, unsig
   float qf;
   unsigned int qi;
   int192 nn;
-  // int96 tmp96;
 
 /********** Step 1, Offset 2^75 (2*32 + 11) **********/
 /*
@@ -68,10 +67,7 @@ the 75 bit kernel has only one difference: the first iteration of the
 division will be skipped
 */
 #if !defined(SHORTCUT_75BIT) && !defined(SHORTCUT_64BIT)
-  qf= __uint2float_rn(q.d5);
-  qf= qf * 4294967296.0f + __uint2float_rn(q.d4);
-  qf= qf * 4294967296.0f + __uint2float_rn(q.d3);
-  qf*= 2097152.0f;
+  qf= __uint2float_rn(q.d3) * 2097152.0f;
 
   qi=__float2uint_rz(qf*nf);
 
@@ -93,17 +89,15 @@ division will be skipped
 //  q = q - nn
   q.d2 = __sub_cc (q.d2, nn.d2);
   q.d3 = __subc_cc(q.d3, nn.d3);
-  q.d4 = __subc_cc(q.d4, nn.d4);
-  q.d5 = __subc   (q.d5, nn.d5);
+  q.d4 = __subc_cc(0, nn.d4);
+  q.d5 = __subc   (0, nn.d5);
 #endif // SHORTCUT_75BIT SHORTCUT_64BIT
 /********** Step 2, Offset 2^55 (1*32 + 23) **********/
 #if !defined(SHORTCUT_75BIT) && !defined(SHORTCUT_64BIT)
-  qf= __uint2float_rn(q.d5);
-  qf= qf * 4294967296.0f + __uint2float_rn(q.d4);
+  qf= qf * 4294967296.0f * 4294967296.0f + __uint2float_rn(q.d3);
 #else
-  qf= __uint2float_rn(q.d4);
+  qf= __uint2float_rn(q.d3);
 #endif
-  qf= qf * 4294967296.0f + __uint2float_rn(q.d3);
   qf= qf * 4294967296.0f + __uint2float_rn(q.d2);
   qf*= 512.0f;
 
@@ -141,23 +135,17 @@ division will be skipped
   q.d3 = __subc_cc(q.d3, nn.d3);
 #ifndef DEBUG_GPU_MATH
   #ifndef SHORTCUT_64BIT
-  q.d4 = __subc   (q.d4, nn.d4);
+  q.d4 = __subc   (0, nn.d4);
   #endif
 #else
-  q.d4 = __subc_cc(q.d4, nn.d4);
-  q.d5 = __subc   (q.d5, nn.d5);
+  q.d4 = __subc_cc(0, nn.d4);
+  q.d5 = __subc   (0, nn.d5);
 #endif
 
 /********** Step 3, Offset 2^35 (1*32 + 3) **********/
   MODBASECASE_NONZERO_ERROR(q.d5, 3, 5, 2);
 
-#ifndef SHORTCUT_64BIT
-  qf= __uint2float_rn(q.d4);
-  qf= qf * 4294967296.0f + __uint2float_rn(q.d3);
-#else
-  qf= __uint2float_rn(q.d3);
-#endif
-  qf= qf * 4294967296.0f + __uint2float_rn(q.d2);
+  qf= __uint2float_rn(q.d3) * 4294967296.0f + __uint2float_rn(q.d2);
   qf*= 536870912.0f; // add (q.d1 >> 3) ???
 //  qf*= 4294967296.0f; /* this includes the shiftleft of qi by 3 bits! */
 
@@ -183,19 +171,13 @@ division will be skipped
   q.d2 = __subc_cc(q.d2, nn.d2);
   q.d3 = __subc_cc(q.d3, nn.d3);
 #ifndef SHORTCUT_64BIT
-  q.d4 = __subc   (q.d4, nn.d4);
+  q.d4 = __subc   (0, nn.d4);
 #endif
 
 /********** Step 4, Offset 2^15 (0*32 + 15) **********/
   MODBASECASE_NONZERO_ERROR(q.d5, 4, 5, 4);
 
-#ifndef SHORTCUT_64BIT
-  qf= __uint2float_rn(q.d4);
-  qf= qf * 4294967296.0f + __uint2float_rn(q.d3);
-#else
-  qf= __uint2float_rn(q.d3);
-#endif
-  qf= qf * 4294967296.0f + __uint2float_rn(q.d2);
+  qf= __uint2float_rn(q.d3) * 4294967296.0f + __uint2float_rn(q.d2);
   qf= qf * 4294967296.0f + __uint2float_rn(q.d1);
   qf*= 131072.0f;
 
