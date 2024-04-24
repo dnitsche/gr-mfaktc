@@ -40,6 +40,7 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
   unsigned long long int k_diff;
   char string[50];
   int factorsfound = 0;
+  unsigned int abs_base = abs(mystuff->base);
 
   int h_ktab_index = 0;
   int h_ktab_cpu[CPU_STREAMS_MAX];			// the set of h_ktab[N]s currently ownt by CPU
@@ -72,7 +73,7 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
 #else
   if (maxlogb>20) maxlogb=20; // maximum preprocessing which is possible
 #endif
-  if (mystuff->base<=10)
+  if (abs_base<=10)
   {
     while(logb<maxlogb || 10*logb<mystuff->bit_min*3)	// how much preprocessing is possible
     {
@@ -85,11 +86,11 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
 //  printf("logb = %d\n",logb);
   b_preinit.d5=0;b_preinit.d4=0;b_preinit.d3=0;b_preinit.d2=0;b_preinit.d1=0;b_preinit.d0=1;
 #ifdef SHORTCUT_64BIT
-  for(i=0; i<logb; i++) mul64(&b_preinit, b_preinit, mystuff->base);
+  for(i=0; i<logb; i++) mul64(&b_preinit, b_preinit, abs_base);
 #elif defined (SHORTCUT_75BIT)
-  for(i=0; i<logb; i++) mul75(&b_preinit, b_preinit, mystuff->base);
+  for(i=0; i<logb; i++) mul75(&b_preinit, b_preinit, abs_base);
 #else
-  for(i=0; i<logb; i++) mul96(&b_preinit, b_preinit, mystuff->base);
+  for(i=0; i<logb; i++) mul96(&b_preinit, b_preinit, abs_base);
 #endif
 
 
