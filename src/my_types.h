@@ -117,8 +117,10 @@ typedef struct
 enum GPUKernels
 {
   AUTOSELECT_KERNEL,
+  _64BIT_MUL32,
   _75BIT_MUL32,
   _95BIT_MUL32,
+  _64BIT_MUL32_GS,
   _75BIT_MUL32_GS,
   _95BIT_MUL32_GS,
 };
