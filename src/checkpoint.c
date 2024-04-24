@@ -22,7 +22,7 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "params.h"
 
-#define FILENAMELENGTH 20
+#define FILENAMELENGTH 40
 #define BUFFERLENGTH 100
 
 unsigned int checkpoint_checksum(char *string, int chars)
