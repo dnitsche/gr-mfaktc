@@ -880,7 +880,7 @@ int main(int argc, char **argv)
     i++;
   }
 
-  printf("mfaktc (repunit edition) v%s (%dbit built)\n\n", MFAKTC_VERSION, (int)(sizeof(void*)*8));
+  printf("mfaktc (generalized repunit edition) v%s (%dbit built)\n\n", MFAKTC_VERSION, (int)(sizeof(void*)*8));
 
 /* print current configuration */
 
