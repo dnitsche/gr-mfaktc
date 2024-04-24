@@ -16,9 +16,11 @@ NVCCFLAGS = $(CUDA_INCLUDE) --ptxas-options=-v
 #NVCCFLAGS += --generate-code arch=compute_20,code=sm_20 # CC 2.x GPUs will use this code, one code fits all!
 #NVCCFLAGS += --generate-code arch=compute_30,code=sm_30 # all CC 3.x GPUs _COULD_ use this code
 #NVCCFLAGS += --generate-code arch=compute_35,code=sm_35 # but CC 3.5 (3.2?) _CAN_ use funnel shift which is useful for mfaktc
-#NVCCFLAGS += --generate-code arch=compute_50,code=sm_50 # CC 5.x GPUs will use this code
-#NVCCFLAGS += --generate-code arch=compute_60,code=sm_60 # CC 6.0 GPUs will use this code
+NVCCFLAGS += --generate-code arch=compute_50,code=sm_50 # CC 5.x GPUs will use this code
+NVCCFLAGS += --generate-code arch=compute_60,code=sm_60 # CC 6.0 GPUs will use this code
 NVCCFLAGS += --generate-code arch=compute_61,code=sm_61 # CC 6.1 GPUs will use this code
+NVCCFLAGS += --generate-code arch=compute_70,code=sm_70 # CC 7.x GPUs will use this code
+NVCCFLAGS += --generate-code arch=compute_75,code=sm_75 # CC 7.5 GPUs will use this code
 
 # pass some options to the C host compiler (e.g. gcc on Linux)
 NVCCFLAGS += --compiler-options=-Wall
