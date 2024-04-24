@@ -69,9 +69,6 @@ __device__ static void create_FC96(int96 *f, unsigned int exp, int96 k, unsigned
   k.d0 = __add_cc (k.d0, __umul32  (k_offset, NUM_CLASSES));
   k.d1 = __addc   (k.d1, __umul32hi(k_offset, NUM_CLASSES));	/* k is limited to 2^64 -1 so there is no need for k.d2 */
 
-//  mul_96(&f,k,exp96);					// f = 2 * k * exp
-//  f.d0 += 1;						// f = 2 * k * exp + 1
-
   f->d0 = 1 +                                  __umul32(k.d0, exp96.d0);
   f->d1 = __add_cc(__umul32hi(k.d0, exp96.d0), __umul32(k.d1, exp96.d0));
   f->d2 = __addc  (__umul32hi(k.d1, exp96.d0),                        0);
