@@ -211,10 +211,19 @@ other return value
                                    : &mystuff->remainders_neg[-mystuff->base];
   }
 
+  if(mystuff->verbosity >= 2) {
+    if (remainders == NULL) {
+      printf("INFO: No known remainders for base %d, falling back to simple trial factoring.\n", mystuff->base);
+    }
+  }
   // Only for some bases the allowed remainders can be used together with the no_small_factor check.
   // So check if combining both is possible, otherwise default is the small factor test
   // I could remove the unused cases from the data file, but they might be useful with a better design.
   if (remainders && !both_tests_possible(remainders->modulo_value)) {
+    if(mystuff->verbosity >= 2) {
+      printf("INFO: Remainder lookup table for base %d is incompatible to class count %d.\n", mystuff->base, NUM_CLASSES);
+      printf("INFO: Falling back to simple trial factoring.\n");
+    }
     remainders = NULL;
   }
 
