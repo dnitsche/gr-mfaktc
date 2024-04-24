@@ -48,6 +48,13 @@ res = a - b */
   res->d2 = __subc   (a.d2, b.d2);
 }
 
+__device__ static void copy_96(int96 *res, int96 &other)
+/* res = other */
+{
+  res->d0 = other.d0;
+  res->d1 = other.d1;
+  res->d2 = other.d2;
+}
 
 __device__ static void square_96_192(int192 *res, int96 a)
 /* res = a^2
