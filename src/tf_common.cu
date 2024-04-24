@@ -176,7 +176,7 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
         printf(" STREAM_SCHEDULE: started GPU kernel on stream %d using h_ktab[%d]\n\n", stream, h_ktab_inuse[stream]);
 #endif
 #ifdef DEBUG_GPU_MATH
-        cudaThreadSynchronize(); /* needed to get the output from device printf() */
+        cudaDeviceSynchronize(); /* needed to get the output from device printf() */
 #endif
 #ifdef DEBUG_STREAM_SCHEDULE_CHECK
         int j, index_count;
@@ -202,8 +202,8 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
   }
 
 /* wait to finish the current calculations on the device */
-  cuda_ret = cudaThreadSynchronize();
-  if(cuda_ret != cudaSuccess)printf("per class final cudaThreadSynchronize failed!\n");
+  cuda_ret = cudaDeviceSynchronize();
+  if(cuda_ret != cudaSuccess)printf("per class final cudaDeviceSynchronize failed!\n");
 
 /* download results from GPU */
   cudaMemcpy(mystuff->h_RES, mystuff->d_RES, 32*sizeof(int), cudaMemcpyDeviceToHost);

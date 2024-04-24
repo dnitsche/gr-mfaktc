@@ -160,7 +160,7 @@ extern "C" __host__ int tf_class_95_gs(unsigned long long int k_min, unsigned lo
       );
 
     // Sync before doing more GPU sieving
-    cudaThreadSynchronize();
+    cudaDeviceSynchronize();
 
     // Count the number of blocks processed
     count += numblocks;
