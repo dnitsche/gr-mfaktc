@@ -22,6 +22,8 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "params.h"
 
+#define FILENAMELENGTH 20
+
 unsigned int checkpoint_checksum(char *string, int chars)
 /* generates a CRC-32 like checksum of the string */
 {
@@ -51,7 +53,7 @@ checkpoint_write() writes the checkpoint file.
 */
 {
   FILE *f;
-  char buffer[100], filename[20];
+  char buffer[100], filename[FILENAMELENGTH];
   unsigned int i;
 
   sprintf(filename, "%s_%d_%u.ckp", NAME_NUMBERS, base, exp);
@@ -84,7 +86,7 @@ returns 0 otherwise
 {
   FILE *f;
   int ret=0,i,chksum;
-  char buffer[100], buffer2[100], *ptr, filename[20];
+  char buffer[100], buffer2[100], *ptr, filename[FILENAMELENGTH];
 
   for(i=0;i<100;i++)buffer[i]=0;
 
@@ -131,7 +133,7 @@ void checkpoint_delete(int base, unsigned int exp)
 tries to delete the checkpoint file
 */
 {
-  char filename[20];
+  char filename[FILENAMELENGTH];
   sprintf(filename, "%s_%d_%u.ckp", NAME_NUMBERS, base, exp);
 
   if(remove(filename))
