@@ -5,6 +5,7 @@ version 0.21.1 generalized-repunit-edition (2024-04-23)
       fixed by adding another modulo calculation
     - fixed bug in the Mathematica code that generated allowed-remainder-data.c
       for some bases the LUT was wrong
+    - there seems to be a bug in the CPU siever. As a workaround I lowered the default SievePrimes in mfaktc.ini
 
 version 0.21-generalized-repunit-edition (2024-04-17)
 - contributors: Danilo Nitsche (danilo.nitsche@gmx.de)
