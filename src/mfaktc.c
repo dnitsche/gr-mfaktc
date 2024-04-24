@@ -115,100 +115,12 @@ inline int no_small_factor(unsigned int exp, unsigned long long int k_min_plus_c
   return 0;
 }
 
-int class_needed_default(unsigned int exp, unsigned long long int k_min, int c)
-{
-  return no_small_factor(exp, k_min+c);
-}
-
-int class_needed_2(unsigned int exp, unsigned long long int k_min, int c)
-{
- /*
- checks whether the class c must be processed or can be ignored at all because
- all factor candidates within the class c are a multiple of 3, 5, 7 or 11 (11
- only if MORE_CLASSES is definied) or are 3 or 5 mod 8 (Mersenne)
-
- k_min *MUST* be aligned in that way that k_min is in class 0!
- */
-   unsigned long long int k_min_plus_c = k_min+c;
-   int tmp = (2 * (exp% 8) * (k_min_plus_c% 8)) % 8;
-   if( ((tmp==0) || (tmp==6)) && no_small_factor(exp, k_min_plus_c))
-   {
-     return 1;
-   }
-   return 0;
-}
-
-int class_needed_3(unsigned int exp, unsigned long long int k_min, int c)
-{
- /*
- checks whether the class c must be processed or can be ignored at all because
- all factor candidates within the class c are a multiple of 3, 5, 7 or 11 (11
- only if MORE_CLASSES is definied).
- Allowed are 1 and 11 mod 12
-
- k_min *MUST* be aligned in that way that k_min is in class 0!
- */
-   unsigned long long int k_min_plus_c = k_min+c;
-   int tmp = (2 * (exp% 12) * (k_min_plus_c% 12)) % 12;
-   if( ((tmp==0) || (tmp==10)) && no_small_factor(exp, k_min_plus_c))
-   {
-     return 1;
-   }
-   return 0;
-}
-
-int class_needed_5(unsigned int exp, unsigned long long int k_min, int c)
-{
-  unsigned long long int k_min_plus_c = k_min+c;
-  int tmp = (2 * (exp% 5) * (k_min_plus_c% 5)) % 5;
-  if( ((tmp==0) || (tmp==3)) && no_small_factor(exp, k_min_plus_c))
-  {
-    return 1;
-  }
-  return 0;
-}
-
-int class_needed_6(unsigned int exp, unsigned long long int k_min, int c)
-{
-  unsigned long long int k_min_plus_c = k_min+c;
-  int tmp = (2 * (exp% 24) * (k_min_plus_c% 24)) % 24;
-  if( ((tmp==0) || (tmp==4) || (tmp==18) || (tmp==22)) && no_small_factor(exp, k_min_plus_c))
-  {
-    return 1;
-  }
-  return 0;
-}
-
-int class_needed_7(unsigned int exp, unsigned long long int k_min, int c)
-{
-  unsigned long long int k_min_plus_c = k_min+c;
-  int tmp = (2 * (exp% 28) * (k_min_plus_c% 28)) % 28;
-  if( ((tmp==0) || (tmp==2) || (tmp==8) || (tmp==18) || (tmp==24) || (tmp==26)) && no_small_factor(exp, k_min_plus_c))
-  {
-    return 1;
-  }
-  return 0;
-}
-
-int class_needed_8(unsigned int exp, unsigned long long int k_min, int c)
-{
-  unsigned long long int k_min_plus_c = k_min+c;
-  int tmp = (2 * (exp% 8) * (k_min_plus_c% 8)) % 8;
-  if( ((tmp==0) || (tmp==6)) && no_small_factor(exp, k_min_plus_c))
-  {
-    return 1;
-  }
-  return 0;
-}
-
-int class_needed_10(unsigned int exp, unsigned long long int k_min, int c)
-{
 /*
 checks whether the class c must be processed or can be ignored at all because
 all factor candidates within the class c are a multiple of 3, 5, 7 or 11 (11
 only if MORE_CLASSES is definied) or are ((1 or 7 mod 8) and (1 or 4 mod 5)) or ((3 or 5 mod 8) and (2 or 3 mod 5))
 Derivation:
-Similar to Mersenne factors we find for repunits that Legendre(10,p)===1 (10 is a quadratic residue mod p)
+Similar to Mersenne factors we find for base 10 repunits that Legendre(10,p)===1 (10 is a quadratic residue mod p)
 Legendre(10,p) = Legendre(2,p)*Legendre(5,p)
                                    / +1 if p = 1 or 7 mod 8
 Legendre(2,p) = (-1)^((p^2-1)/8) = |
@@ -224,52 +136,18 @@ Filtering the possible values mod 40 gives the following allowed values:
 Thus allowed values for 2kp are: {0,2,8,12,26,30,36,38}
 See also: https://math.stackexchange.com/questions/1767306/find-all-prime-p-such-that-legendre-symbol-of-left-frac10p-right-1
 
+For other bases this is similarly derived.
+
 k_min *MUST* be aligned in that way that k_min is in class 0!
 */
+int class_needed(int base, unsigned int exp, unsigned long long int k_min, int c, remainders_t *rems) {
+  unsigned int m = rems->modulo_value;
   unsigned long long int k_min_plus_c = k_min+c;
-  int tmp = (2 * (exp% 40) * (k_min_plus_c% 40)) % 40;
-  if( ((tmp==0) || (tmp==2) || (tmp==8) || (tmp==12) || (tmp==26) || (tmp==30) || (tmp==36) || (tmp==38)) && no_small_factor(exp, k_min_plus_c))
-  {
-    return 1;
-  }
-  return 0;
-}
-
-int class_needed_11(unsigned int exp, unsigned long long int k_min, int c)
-{
-  unsigned long long int k_min_plus_c = k_min+c;
-  int tmp = (2 * (exp% 44) * (k_min_plus_c% 44)) % 44;
-  if( ((tmp==0) || (tmp==4) || (tmp==6) || (tmp==8) || (tmp==18) || (tmp==24) || (tmp==34) || (tmp==36) || (tmp==38) || (tmp==42)) \
-    && no_small_factor(exp, k_min_plus_c))
-  {
-    return 1;
-  }
-  return 0;
-}
-
-int class_needed_12(unsigned int exp, unsigned long long int k_min, int c)
-{
-  unsigned long long int k_min_plus_c = k_min+c;
-  int tmp = (2 * (exp% 12) * (k_min_plus_c% 12)) % 12;
-  if( ((tmp==0) || (tmp==10)) && no_small_factor(exp, k_min_plus_c))
-  {
-    return 1;
-  }
-  return 0;
-}
-
-int class_needed(int base, unsigned int exp, unsigned long long int k_min, int c) {
-  switch(base) {
-  case 2: return class_needed_2(exp, k_min, c); break;
-  case 3: return class_needed_3(exp, k_min, c); break;
-  case 5: return class_needed_5(exp, k_min, c); break;
-  case 6: return class_needed_6(exp, k_min, c); break;
-  case 7: return class_needed_7(exp, k_min, c); break;
-  case 8: return class_needed_8(exp, k_min, c); break;
-  case 10: return class_needed_10(exp, k_min, c); break;
-  case 11: return class_needed_11(exp, k_min, c); break;
-  case 12: return class_needed_12(exp, k_min, c); break;
-  default: return class_needed_default(exp, k_min, c); break;
+  unsigned int remainder = (2 * (exp% m) * (k_min_plus_c% m) + 1) % m;
+  if (rems) {
+    return (((rems->bit_mask[remainder / 32] & (1<<(remainder% 32))) != 0) && no_small_factor(exp, k_min_plus_c));
+  } else {
+    return no_small_factor(exp, k_min_plus_c);
   }
 }
 
@@ -299,6 +177,7 @@ other return value
   unsigned int f_hi, f_med, f_low;
   struct timeval timer, timer_last_checkpoint;
   static struct timeval timer_last_addfilecheck;
+  remainders_t *remainders = NULL;
   int factorsfound = 0, numfactors = 0, restart = 0;
 
   int retval = 0;
@@ -329,9 +208,15 @@ other return value
   k_min=calculate_k(mystuff->exponent, mystuff->bit_min);
   k_max=calculate_k(mystuff->exponent, mystuff->bit_max_stage);
 
+  if (abs(mystuff->base) <= REMAINDERS_LUT_MAX)
+  {
+    remainders = mystuff->base > 0 ? &mystuff->remainders_pos[mystuff->base]
+                                   : &mystuff->remainders_neg[-mystuff->base];
+  }
+
   for(cur_class=0; cur_class <= max_class; cur_class++)
   {
-    if (class_needed(mystuff->base, mystuff->exponent, k_min, cur_class))
+    if (class_needed(mystuff->base, mystuff->exponent, k_min, cur_class, remainders))
     {
       max_classes_needed++;
     }
@@ -416,7 +301,7 @@ see benchmarks in src/kernel_benchmarks.txt */
 /* calculate the number of classes which are allready processed. This value is needed to estimate ETA */
       for(i = 0; i < cur_class; i++)
       {
-        if(class_needed(mystuff->base, mystuff->exponent, k_min, i))mystuff->stats.class_counter++;
+        if(class_needed(mystuff->base, mystuff->exponent, k_min, i, remainders))mystuff->stats.class_counter++;
       }
       restart = mystuff->stats.class_counter;
     }
@@ -433,7 +318,7 @@ see benchmarks in src/kernel_benchmarks.txt */
 
   for(; cur_class <= max_class; cur_class++)
   {
-    if(class_needed(mystuff->base, mystuff->exponent, k_min, cur_class))
+    if(class_needed(mystuff->base, mystuff->exponent, k_min, cur_class, remainders))
     {
       mystuff->stats.class_number = cur_class;
       if(mystuff->quit)
