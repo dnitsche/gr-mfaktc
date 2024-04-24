@@ -297,7 +297,7 @@ other return value
   mystuff->stats.output_counter = 0; /* reset output counter, needed for status headline */
   mystuff->stats.ghzdays = primenet_ghzdays(mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage);
 
-  if(mystuff->mode != MODE_SELFTEST_SHORT)printf("Starting trial factoring %s[%u]%u from 2^%d to 2^%d (%.2f GHz-days)\n", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, mystuff->stats.ghzdays);
+  if(mystuff->mode != MODE_SELFTEST_SHORT)printf("Starting trial factoring %s[%d]%u from 2^%d to 2^%d (%.2f GHz-days)\n", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, mystuff->stats.ghzdays);
   if((mystuff->mode != MODE_NORMAL) && (mystuff->mode != MODE_SELFTEST_SHORT) && (mystuff->mode != MODE_SELFTEST_FULL))
   {
     printf("ERROR, invalid mode for tf(): %d\n", mystuff->mode);
@@ -498,7 +498,7 @@ see benchmarks in src/kernel_benchmarks.txt */
   {
     if(mystuff->h_RES[0] == 0)
     {
-      printf("ERROR: selftest failed for %s[%u]%u\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
+      printf("ERROR: selftest failed for %s[%d]%u\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
       printf("  no factor found\n");
       retval = 1;
     }
@@ -534,7 +534,7 @@ k_max and k_min are used as 64bit temporary integers here...
       }
       if(k_min != 1) /* the factor should appear ONCE */
       {
-        printf("ERROR: selftest failed for %s[%u]%u!\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
+        printf("ERROR: selftest failed for %s[%d]%u!\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
         printf("  expected result: %08X %08X %08X\n", f_hi, f_med, f_low);
         for(i=0; ((unsigned int)i < mystuff->h_RES[0]) && (i < 10); i++)
         {
@@ -544,7 +544,7 @@ k_max and k_min are used as 64bit temporary integers here...
       }
       else
       {
-        if(mystuff->mode != MODE_SELFTEST_SHORT)printf("selftest for %s[%u]%u passed!\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
+        if(mystuff->mode != MODE_SELFTEST_SHORT)printf("selftest for %s[%d]%u passed!\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
       }
     }
   }
@@ -1154,7 +1154,7 @@ int main(int argc, char **argv)
       }
       if(parse_ret == OK)
       {
-        if(mystuff.verbosity >= 1)printf("got assignment: base=%u exp=%u bit_min=%d bit_max=%d (%.2f GHz-days)\n", mystuff.base, mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment, primenet_ghzdays(mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment));
+        if(mystuff.verbosity >= 1)printf("got assignment: base=%d exp=%u bit_min=%d bit_max=%d (%.2f GHz-days)\n", mystuff.base, mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment, primenet_ghzdays(mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment));
         if(mystuff.gpu_sieving && mystuff.exponent < mystuff.gpu_sieve_min_exp)
         {
           printf("ERROR: GPU sieve requested but current settings don't allow exponents below\n");
