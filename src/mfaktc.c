@@ -210,7 +210,7 @@ other return value
                                    : &mystuff->remainders_neg[-mystuff->base];
   }
 
-  if(mystuff->verbosity >= 2) {
+  if(mystuff->mode != MODE_SELFTEST_SHORT && mystuff->verbosity >= 1) {
     if (remainders == NULL) {
       printf("INFO: No known remainders for base %d, falling back to simple trial factoring.\n", mystuff->base);
     }
@@ -219,9 +219,19 @@ other return value
   // So check if combining both is possible, otherwise default is the small factor test
   // I could remove the unused cases from the data file, but they might be useful with a better design.
   if (remainders && !both_tests_possible(remainders->modulo_value)) {
-    if(mystuff->verbosity >= 2) {
+    if(mystuff->mode != MODE_SELFTEST_SHORT && mystuff->verbosity >= 1) {
+      int optimal_counter = 0, nsf_counter = 0;
+      for(cur_class=0; cur_class <= max_class; cur_class++)
+      {
+        if (class_needed(mystuff->exponent, k_min + cur_class, remainders)) {
+          optimal_counter++;
+        }
+        if (class_needed(mystuff->exponent, k_min + cur_class, NULL)) {
+          nsf_counter++;
+        }
+      }
       printf("INFO: Remainder lookup table for base %d is incompatible to class count %d.\n", mystuff->base, NUM_CLASSES);
-      printf("INFO: Falling back to simple trial factoring.\n");
+      printf("INFO: Falling back to simple trial factoring (%4.2f x slower).\n", (double)nsf_counter/(double)optimal_counter);
     }
     remainders = NULL;
   }
