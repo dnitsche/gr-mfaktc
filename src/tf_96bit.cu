@@ -39,9 +39,9 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #ifndef DEBUG_GPU_MATH
-__device__ static void mod_192_96(int96 *res, int192 q, int96 n, float nf, bool optionalmul, unsigned int abs_base, bool negativeBase)
+__device__ static void mod_192_96(int96 *res, int192 q, int96 n, float nf, bool optionalmul, unsigned int abs_base)
 #else
-__device__ static void mod_192_96(int96 *res, int192 q, int96 n, float nf, bool optionalmul, unsigned int abs_base, bool negativeBase, unsigned int *modbasecase_debug)
+__device__ static void mod_192_96(int96 *res, int192 q, int96 n, float nf, bool optionalmul, unsigned int abs_base, unsigned int *modbasecase_debug)
 #endif
 /* res = q mod n */
 {
@@ -337,9 +337,9 @@ Precalculated here since it is the same for all steps in the following loop */
   ff=__int_as_float(0x3f7ffffb) / ff;	// just a little bit below 1.0f so we always underestimate the quotient
 
 #ifndef DEBUG_GPU_MATH
-  mod_192_96(&a,b,f,ff,false,abs_base,negativeBase);			// a = b mod f
+  mod_192_96(&a,b,f,ff,false,abs_base);			// a = b mod f
 #else
-  mod_192_96(&a,b,f,ff,false,abs_base,negativeBase,modbasecase_debug);	// a = b mod f
+  mod_192_96(&a,b,f,ff,false,abs_base,modbasecase_debug);	// a = b mod f
 #endif
   exp<<= 32 - shiftcount;
   while(exp)
@@ -352,9 +352,9 @@ Precalculated here since it is the same for all steps in the following loop */
     square_96_192(&b,a);			// b = a^2
 #endif
 #ifndef DEBUG_GPU_MATH
-    mod_192_96(&a,b,f,ff,exp&0x80000000,abs_base,negativeBase);			// a = b mod f
+    mod_192_96(&a,b,f,ff,exp&0x80000000,abs_base);			// a = b mod f
 #else
-    mod_192_96(&a,b,f,ff,exp&0x80000000,abs_base,negativeBase,modbasecase_debug);			// a = b mod f
+    mod_192_96(&a,b,f,ff,exp&0x80000000,abs_base,modbasecase_debug);			// a = b mod f
 #endif
     exp<<=1;
   }
