@@ -48,7 +48,7 @@ __device__ static void mod_192_96(int96 *res, int192 q, int96 n, float nf, bool 
   float qf;
   unsigned int qi;
   int192 nn, tmp;
-  int fac = 2;
+  int fac = 10;
 
 /********** Step 1, Offset 2^75 (2*32 + 11) **********/
 /*
