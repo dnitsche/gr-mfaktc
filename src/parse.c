@@ -190,16 +190,26 @@ output
     if ((ptr[scanpos] == '/') && (ptr[scanpos+1] == '/'))
       break;	// //comment delimiter
   }
+  proposed_base = 10; // set default for base
   // must have 2, 3 or 4 commas...
   if(2==number_of_commas)
-  {
+  {// e.g.: Factor=3300019,1,64
     assignment->assignment_key[0] = '\0';
-    proposed_base = 10;
   } else if(3==number_of_commas)
-  {
+  {// e.g.: Factor=base=10,3300019,1,64   or   Factor=bla,3300019,1,64
     if (strncasecmp("Base=", ptr, 5) == 0) // starts with "Base="? (case-insensitive)
     {
+      ptr = 1 + strstr(ptr,"=");
+      ptr_start = ptr;
+      errno = 0;
+      proposed_base = strtoul(ptr_start, &ptr_end, 10);
+      if (ptr_start == ptr_end)
+        return INVALID_FORMAT;  // no conversion
+      if ((0!=errno) || (proposed_base > UINT_MAX))
+        return INVALID_DATA;  // for example, too many digits.
       assignment->assignment_key[0] = '\0';
+      ptr = ptr_end;
+      ptr = 1 + strstr(ptr,",");
     } else
     {
       strncpy(assignment->assignment_key,ptr,1+(strstr(ptr,",")-ptr) );	// copy the comma..
@@ -207,7 +217,7 @@ output
       ptr=1 + strstr(ptr,",");
     }
   } else if(4==number_of_commas)
-  {
+  {// Factor=bla,base=10,3300019,1,64
     strncpy(assignment->assignment_key,ptr,1+(strstr(ptr,",")-ptr) );	// copy the comma..
     *strstr(assignment->assignment_key,",") = '\0';	// null-terminate key
     ptr=1 + strstr(ptr,",");
@@ -215,6 +225,16 @@ output
     {
       return NO_BASE_EQUAL;
     }
+    ptr = 1 + strstr(ptr,"="); // don't rescan..
+    ptr_start = ptr;
+    errno = 0;
+    proposed_base = strtoul(ptr_start, &ptr_end, 10);
+    if (ptr_start == ptr_end)
+      return INVALID_FORMAT;  // no conversion
+    if ((0!=errno) || (proposed_base > UINT_MAX))
+      return INVALID_DATA;  // for example, too many digits.
+    ptr = ptr_end;
+    ptr = 1 + strstr(ptr,",");
   } else {
     return INVALID_FORMAT;
   }
@@ -224,20 +244,6 @@ output
     ptr_start++;
   if ('R' == *ptr_start)	// R means Repunit exponent...
     ptr_start++;
-  if ('(' == *ptr_start) { // optional base for repunit
-    ptr_start++;
-    errno = 0;
-    proposed_base = strtoul(ptr_start, &ptr_end, 10);
-    if (ptr_start == ptr_end)
-      return INVALID_FORMAT;	// no conversion
-    if ((0!=errno) || (proposed_base > UINT_MAX))
-      return INVALID_DATA;	// for example, too many digits.
-    if (')' != *ptr_end)
-      return INVALID_FORMAT;	// no conversion
-    ptr_start = 1 + strstr(ptr_start,")");
-  } else {
-    proposed_base = 10;
-  };
   errno = 0;
   proposed_exponent = strtoul(ptr_start, &ptr_end, 10);
   if (ptr_start == ptr_end)
@@ -469,7 +475,7 @@ enum ASSIGNMENT_ERRORS clear_assignment(char *filename, unsigned int base, unsig
           fprintf(f_out,"Factor=" );
           if (strlen(assignment.assignment_key) != 0)
             fprintf(f_out,"%s,", assignment.assignment_key);
-          fprintf(f_out,"R(%u)%u,%u,%u",base, exponent, bit_min_new, bit_max);
+          fprintf(f_out,"base=%u,%u,%u,%u", base, exponent, bit_min_new, bit_max);
           if (tail != NULL)
             fprintf(f_out,"%s",tail);
         }

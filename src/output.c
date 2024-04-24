@@ -357,7 +357,7 @@ void print_result_line(mystuff_t *mystuff, int factorsfound)
   }
   else
   {
-    sprintf(string, "no factor for %s(%u)%u from 2^%d to 2^%d [mfaktc %s %s]", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, MFAKTC_VERSION, mystuff->stats.kernelname);
+    sprintf(string, "no factor for %s[%u]%u from 2^%d to 2^%d [mfaktc %s %s]", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, MFAKTC_VERSION, mystuff->stats.kernelname);
   }
 
   if(mystuff->mode != MODE_SELFTEST_SHORT)
