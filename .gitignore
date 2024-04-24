@@ -1,6 +1,7 @@
 *.o
 *.obj
 mfaktc.exe
+gr-mfaktc.exe
 *.ckp
 .cproject
 .project
