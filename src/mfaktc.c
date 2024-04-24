@@ -180,7 +180,6 @@ int class_needed_7(unsigned int exp, unsigned long long int k_min, int c)
   {
     return 1;
   }
-
   return 0;
 }
 
@@ -192,7 +191,6 @@ int class_needed_8(unsigned int exp, unsigned long long int k_min, int c)
   {
     return 1;
   }
-
   return 0;
 }
 
