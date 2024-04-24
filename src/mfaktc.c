@@ -514,25 +514,19 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
   unsigned int i, j;
 
   #define NUM_QUICK_SELFTESTS 27
-  #define NUM_SELFTESTS_GENERALIZED 4026
-  #define NUM_SELFTESTS_2 2867
-  #define NUM_SELFTESTS_10 3022
-  #define NUM_SELFTESTS (NUM_SELFTESTS_GENERALIZED+NUM_SELFTESTS_2+NUM_SELFTESTS_10)
-  unsigned int exp[NUM_SELFTESTS], index[NUM_QUICK_SELFTESTS];
-  int base[NUM_SELFTESTS];
+  int parse_ret = -1;
+  int quicktest_base[NUM_QUICK_SELFTESTS], quicktest_bit_min[NUM_QUICK_SELFTESTS];
+  unsigned long long int quicktest_k[NUM_QUICK_SELFTESTS];
+  unsigned int quicktest_exp[NUM_QUICK_SELFTESTS];
   int num_selftests=0;
-  int bit_min[NUM_SELFTESTS], f_class;
-  unsigned long long int k[NUM_SELFTESTS];
+  int f_class;
+  unsigned long long int k;
   int retval=1;
+  FILE *f_in;
 
   #define NUM_KERNEL 6
   int kernels[NUM_KERNEL+1]; // currently there are <NUM_KERNEL> different kernels, kernel numbers start at 1!
   int kernel_success[NUM_KERNEL+1], kernel_fail[NUM_KERNEL+1];
-
-  j = 0;
-  #include "selftest-data-generalized-repunit.c"
-  #include "selftest-data-mersenne.c"
-  #include "selftest-data-repunit.c"
 
   for(i = 0; i <= NUM_KERNEL; i++)
   {
@@ -542,16 +536,28 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
 
   if(type == 0)
   {
-    for(i = 0; i < NUM_SELFTESTS; i++)
+    f_in = fopen(mystuff->selftestfile, "r");
+    if(NULL == f_in)
     {
-      printf("########## testcase %u/%d ##########\n", i+1, NUM_SELFTESTS);
-      f_class = (int)(k[i] % NUM_CLASSES);
+      printf("Can't open selftest file %s\n", mystuff->selftestfile);
+      return 1;
+    }
+    i=0;
+    do
+    {
+      parse_ret = get_next_selftest(f_in, mystuff->selftestfile, &mystuff->base, &mystuff->exponent, &mystuff->bit_min, &k, mystuff->verbosity);
+      if(parse_ret == OK)
+      {
+        mystuff->bit_max_assignment = mystuff->bit_min + 1;
+        mystuff->bit_max_stage      = mystuff->bit_max_assignment;
+        if(mystuff->verbosity >= 1)printf("got selftest: base=%d exp=%u bit_min=%d bit_max=%d (%.2f GHz-days)\n", mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_assignment, primenet_ghzdays(mystuff->exponent, mystuff->bit_min, mystuff->bit_max_assignment));
+      }
+      else if(parse_ret == CANT_OPEN_FILE)             printf("ERROR: get_next_assignment(): can't open \"%s\"\n", mystuff->selftestfile);
+      else if(parse_ret == VALID_SELFTEST_NOT_FOUND) printf("ERROR: get_next_selftest(): no valid selftest found in \"%s\"\n", mystuff->selftestfile);
+      else if(parse_ret != OK)                         printf("ERROR: get_next_assignment(): Unknown error (%d)\n", parse_ret);
 
-      mystuff->base               = base[i];
-      mystuff->exponent           = exp[i];
-      mystuff->bit_min            = bit_min[i];
-      mystuff->bit_max_assignment = bit_min[i] + 1;
-      mystuff->bit_max_stage      = mystuff->bit_max_assignment;
+      printf("########## testcase %u ##########\n", ++i);
+      f_class = (int)(k % NUM_CLASSES);
 
 /* create a list which kernels can handle this testcase */
       j = 0;
@@ -565,7 +571,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
       do
       {
         num_selftests++;
-        tf_res=tf(mystuff, f_class, k[i], kernels[--j]);
+        tf_res=tf(mystuff, f_class, k, kernels[--j]);
              if(tf_res == 0)st_success++;
         else if(tf_res == 1)st_nofactor++;
         else if(tf_res == 2)st_wrongfactor++;
@@ -577,48 +583,48 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
       }
       while(j>0);
     }
+    while(parse_ret == OK && !mystuff->quit);
+    fclose(f_in);
   }
   else if(type == 1)
   {
     j = 0;
-    int offset = 0;
-    index[j++]=offset+   15;
-    index[j++]=offset+   600;
-    index[j++]=offset+   800;
-    index[j++]=offset+   1600;
-    index[j++]=offset+   1800;
-    index[j++]=offset+   2600;
-    index[j++]=offset+   2800;
-    index[j++]=offset+   3600;
-    index[j++]=offset+   3800;
-    offset += NUM_SELFTESTS_GENERALIZED;
-    index[j++]=offset+   2;
-    index[j++]=offset+  25;
-    index[j++]=offset+  57; /* some factors below 2^71 (test the 71/75 bit kernel depending on compute capability) */
-    index[j++]=offset+  70;
-    index[j++]=offset+  88;
-    index[j++]=offset+ 106; /* some factors below 2^75 (test 75 bit kernel) */
-    index[j++]=offset+1547;
-    index[j++]=offset+1552;
-    index[j++]=offset+1556; /* some factors below 2^95 (test 95 bit kernel) */
-    offset += NUM_SELFTESTS_2;
-    index[j++]=offset+   0;
-    index[j++]=offset+2893;
-    index[j++]=offset+3017; /* some factors below 2^64 (test 64 bit kernel) */
-    index[j++]=offset+3020;
-    index[j++]=offset+3021;
-    index[j++]=offset+1500; /* some factors below 2^75 (test 75 bit kernel) */
-    index[j++]=offset+1508;
-    index[j++]=offset+1518;
-    index[j++]=offset+1521; /* some factors below 2^95 (test 95 bit kernel) */
+    quicktest_base[j]=8; quicktest_exp[j]=60000359; quicktest_bit_min[j]=23, quicktest_k[j++]=1ULL;
+    quicktest_base[j]=-3; quicktest_exp[j]=2152663; quicktest_bit_min[j]=32, quicktest_k[j++]=1095ULL;
+    quicktest_base[j]=-3; quicktest_exp[j]=2187919; quicktest_bit_min[j]=37, quicktest_k[j++]=40497ULL;
+    quicktest_base[j]=-5; quicktest_exp[j]=1449431; quicktest_bit_min[j]=30, quicktest_k[j++]=471ULL;
+    quicktest_base[j]=-5; quicktest_exp[j]=1461349; quicktest_bit_min[j]=35, quicktest_k[j++]=20126ULL;
+    quicktest_base[j]=-25; quicktest_exp[j]=241691; quicktest_bit_min[j]=27, quicktest_k[j++]=520ULL;
+    quicktest_base[j]=-25; quicktest_exp[j]=218213; quicktest_bit_min[j]=32, quicktest_k[j++]=16788ULL;
+    quicktest_base[j]=-97; quicktest_exp[j]=184993; quicktest_bit_min[j]=26, quicktest_k[j++]=311ULL;
+    quicktest_base[j]=-97; quicktest_exp[j]=224267; quicktest_bit_min[j]=32, quicktest_k[j++]=13137ULL;
+    quicktest_base[j]=2; quicktest_exp[j]=49635893; quicktest_bit_min[j]=67, quicktest_k[j++]=2822192209735ULL;
+    quicktest_base[j]=2; quicktest_exp[j]=51375383; quicktest_bit_min[j]=69, quicktest_k[j++]=6940180143997ULL;
+    quicktest_base[j]=2; quicktest_exp[j]=47644171; quicktest_bit_min[j]=70, quicktest_k[j++]=24735972078953ULL;
+    quicktest_base[j]=2; quicktest_exp[j]=51038681; quicktest_bit_min[j]=71, quicktest_k[j++]=40470748619263ULL;
+    quicktest_base[j]=2; quicktest_exp[j]=53076719; quicktest_bit_min[j]=73, quicktest_k[j++]=120985819416700ULL;
+    quicktest_base[j]=2; quicktest_exp[j]=53123843; quicktest_bit_min[j]=74, quicktest_k[j++]=341136139967028ULL;
+    quicktest_base[j]=2; quicktest_exp[j]=3321928703; quicktest_bit_min[j]=90, quicktest_k[j++]=216815004777177520ULL;
+    quicktest_base[j]=2; quicktest_exp[j]=3321931973; quicktest_bit_min[j]=92, quicktest_k[j++]=1239904465059470560ULL;
+    quicktest_base[j]=2; quicktest_exp[j]=3321928619; quicktest_bit_min[j]=94, quicktest_k[j++]=5842180456452690237ULL;
+    quicktest_base[j]=10; quicktest_exp[j]=2866499; quicktest_bit_min[j]=22, quicktest_k[j++]=1ULL;
+    quicktest_base[j]=10; quicktest_exp[j]=1729921; quicktest_bit_min[j]=51, quicktest_k[j++]=814719986ULL;
+    quicktest_base[j]=10; quicktest_exp[j]=2482747; quicktest_bit_min[j]=63, quicktest_k[j++]=2535777165740ULL;
+    quicktest_base[j]=10; quicktest_exp[j]=403433; quicktest_bit_min[j]=67, quicktest_k[j++]=298752168742983ULL;
+    quicktest_base[j]=10; quicktest_exp[j]=422057; quicktest_bit_min[j]=74, quicktest_k[j++]=33049396387644000ULL;
+    quicktest_base[j]=10; quicktest_exp[j]=554959; quicktest_bit_min[j]=74, quicktest_k[j++]=17159798614416960ULL;
+    quicktest_base[j]=10; quicktest_exp[j]=575173; quicktest_bit_min[j]=76, quicktest_k[j++]=69855747841296921ULL;
+    quicktest_base[j]=10; quicktest_exp[j]=444113; quicktest_bit_min[j]=81, quicktest_k[j++]=2952735258276177528ULL;
+    quicktest_base[j]=10; quicktest_exp[j]=442487; quicktest_bit_min[j]=83, quicktest_k[j++]=18301568359523242500ULL;
     for(i = 0; i < NUM_QUICK_SELFTESTS; i++)
     {
-      f_class = (int)(k[index[i]] % NUM_CLASSES);
+      k = quicktest_k[i];
+      f_class = (int)(k % NUM_CLASSES);
 
-      mystuff->base               = base[index[i]];
-      mystuff->exponent           = exp[index[i]];
-      mystuff->bit_min            = bit_min[index[i]];
-      mystuff->bit_max_assignment = bit_min[index[i]] + 1;
+      mystuff->base               = quicktest_base[i];
+      mystuff->exponent           = quicktest_exp[i];
+      mystuff->bit_min            = quicktest_bit_min[i];
+      mystuff->bit_max_assignment = quicktest_bit_min[i] + 1;
       mystuff->bit_max_stage      = mystuff->bit_max_assignment;
 
       j = 0;
@@ -632,7 +638,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
       do
       {
         num_selftests++;
-        tf_res=tf(mystuff, f_class, k[index[i]], kernels[--j]);
+        tf_res=tf(mystuff, f_class, k, kernels[--j]);
              if(tf_res == 0)st_success++;
         else if(tf_res == 1)st_nofactor++;
         else if(tf_res == 2)st_wrongfactor++;
@@ -725,6 +731,7 @@ int main(int argc, char **argv)
   mystuff.gpu_sieve_processing_size = GPU_SIEVE_PROCESS_SIZE_DEFAULT * 1024;	/* Default to 8K bits processed by each block in a Barrett kernel. */
   sprintf(mystuff.resultfile, "results.txt");
   sprintf(mystuff.workfile, "worktodo.txt");
+  sprintf(mystuff.selftestfile, "selftest.txt");
   sprintf(mystuff.addfile, "worktodo.add");
   mystuff.addfilestatus = -1;                                                   /* -1 -> timer not initialized! */
 

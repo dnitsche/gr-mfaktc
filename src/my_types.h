@@ -74,7 +74,10 @@ typedef struct
   int sieve_primes_upper_limit;        /* the upper limit of sieve_primes for the current exponent */
   int sieve_primes_min, sieve_primes_max; /* user configureable sieve_primes min/max */
 
+  unsigned int min_exponent;
+
   char workfile[51];                   /* allow filenames up to 50 chars... */
+  char selftestfile[51];              /* allow filenames up to 50 chars... */
   char addfile[51];                    /* allow filenames up to 50 chars... */
   char resultfile[51];                 /* allow filenames up to 50 chars... */
   int num_streams, cpu_streams;

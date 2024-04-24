@@ -31,8 +31,10 @@ enum ASSIGNMENT_ERRORS
 	ASSIGNMENT_NOT_FOUND=5,
 	CANT_RENAME=6,
 	CANT_READ=7,
-	CANT_WRITE=8
+	CANT_WRITE=8,
+	VALID_SELFTEST_NOT_FOUND=9
 };
+
 #define MAX_LINE_LENGTH 100
 typedef char LINE_BUFFER[MAX_LINE_LENGTH+1];
 
@@ -48,8 +50,16 @@ struct ASSIGNMENT
 						// otherwise, it followed the assignment on the same line.
 };
 
+struct SELFTEST
+{
+	int base;
+	unsigned int exponent;
+	int bit_min;
+	unsigned long long k;
+};
 
 int valid_assignment(int base, unsigned int exp, int bit_min, int bit_max, int verbosity);	// nonzero if assignment is valid
 enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, int *base, unsigned int *exponent, int *bit_min, int *bit_max, LINE_BUFFER *assignment_key, int verbosity);
 enum ASSIGNMENT_ERRORS clear_assignment(char *filename, int base, unsigned int exponent, int bit_min, int bit_max, int bit_min_new);
 int process_add_file(char *workfile, char *addfile, int *addfilesstatus, int verbosity);
+enum ASSIGNMENT_ERRORS get_next_selftest(FILE* f_in, char *filename, int *base, unsigned int *exponent, int *bit_min, unsigned long long *k, int verbosity);

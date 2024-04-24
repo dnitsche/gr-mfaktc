@@ -570,3 +570,200 @@ int process_add_file(char *workfilename, char *addfilename, int *addfilesstatus,
   }
   return OK;
 }
+
+// note:  parse_selftest_line() is a function that
+//  returns the text of the line, the selftest data structure, and a success code.
+enum PARSE_WARNINGS parse_selftest_line(FILE *f_in, struct SELFTEST *selftest, LINE_BUFFER *linecopy)
+/*
+input
+  f_in: an open file from where data is read
+output
+  assignment: structure of line, with any assignment if found
+  linecopy: a copy of the last read line
+*/
+{
+  char line[MAX_LINE_LENGTH+1], *ptr, *ptr_start, *ptr_end;
+  int c;  // extended char pulled from stream;
+
+  unsigned int scanpos;
+  unsigned int number_of_commas;
+
+  enum PARSE_WARNINGS reason = NO_WARNING;
+
+  long proposed_base;
+
+  unsigned long proposed_exponent, proposed_bit_min;
+  unsigned long long proposed_k;
+
+  size_t len = MAX_LINE_LENGTH+1;
+
+  if(NULL==fgets(line, len, f_in))
+  {
+    return END_OF_FILE;
+  }
+
+  if (linecopy != NULL) // maybe it wasn't needed....
+    strcpy(*linecopy,line); // this is what was read...
+  if((strlen(line) == MAX_LINE_LENGTH) && (!feof(f_in)) && (line[strlen(line)-1] !='\n') ) // long lines disallowed,
+  {
+    reason = LONG_LINE;
+    do
+    {
+      c = fgetc(f_in);
+      if ((EOF == c) ||(iscntrl(c)))  // found end of line
+        break;
+    }
+    while(TRUE);
+  }
+
+  ptr=line;
+  while (('\0'!=ptr[0]) && isspace(ptr[0])) // skip leading spaces
+    ptr++;
+  if ('\0' == ptr[0]) // blank line...
+    return BLANK_LINE;
+  if( ('\\'==ptr[0]) && ('\\'==ptr[1]) )
+    return NONBLANK_LINE;   // it's a comment, so ignore....don't care about long lines either..
+  if( ('/'==ptr[0]) && ('/'==ptr[1]) )
+    return NONBLANK_LINE;   // it's a comment, so ignore....don't care about long lines either..
+  if( ('#'==ptr[0]) )
+    return NONBLANK_LINE;   // it's a comment, so ignore....don't care about long lines either..
+  while (('\0'!=ptr[0]) && isspace(ptr[0])) // ignore blanks...
+    ptr++;
+  number_of_commas = 0;
+  for(scanpos = 0; scanpos < strlen(ptr); scanpos++)
+  {
+    if(ptr[scanpos] == ',')
+      number_of_commas++; // count the number of ',' in the line
+    if ((ptr[scanpos] == '\\') && (ptr[scanpos+1] == '\\'))
+      break;  // comment delimiter
+    if ((ptr[scanpos] == '/') && (ptr[scanpos+1] == '/'))
+      break;  // //comment delimiter
+  }
+  // must have 3 commas... e.g. 2,50804297,67,1777608657747
+  if(3==number_of_commas)
+  {// e.g.: 2,50804297,67,1777608657747   or   -97,246971,33,17514
+    // extract base
+    ptr_start = ptr;
+    errno = 0;
+    proposed_base = strtol(ptr_start, &ptr_end, 10);
+    if (ptr_start == ptr_end)
+      return INVALID_FORMAT;  // no conversion
+    if ((0!=errno) || (proposed_base > INT_MAX) || (proposed_base < INT_MIN))
+      return INVALID_DATA;  // for example, too many digits.
+    ptr = ptr_end;
+    ptr = 1 + strstr(ptr,",");
+  } else {
+    return INVALID_FORMAT;
+  }
+  // extract exponent
+  // ptr now points at exponent
+  ptr_start = ptr;
+  while( (isspace(*ptr_start)) && ('\0' != *ptr_start ))
+    ptr_start++;
+  errno = 0;
+  proposed_exponent = strtoul(ptr_start, &ptr_end, 10);
+  if (ptr_start == ptr_end)
+    return INVALID_FORMAT;  // no conversion
+  if ((0!=errno) || (proposed_exponent > UINT_MAX))
+    return INVALID_DATA;  // for example, too many digits.
+  ptr=ptr_end;
+
+  // ptr now points at bit_min
+  ptr_start = 1 + strstr(ptr,",");
+  errno = 0;
+  proposed_bit_min = strtoul(ptr_start, &ptr_end, 10);
+  if (ptr_start == ptr_end)
+    return INVALID_FORMAT;
+  if ((0!=errno) || (proposed_bit_min > UCHAR_MAX))
+    return INVALID_DATA;
+  ptr = ptr_end;
+
+  // ptr now points at k
+  ptr_start = 1 + strstr(ptr,",");
+  errno =0;
+  proposed_k = strtoull(ptr_start, &ptr_end, 10);
+  if (ptr_start == ptr_end)
+    return INVALID_FORMAT;
+  if (0!=errno)
+    return INVALID_DATA;
+  ptr = ptr_end;
+  while (('\0'!=ptr[0]) && isspace(ptr[0])) // ignore blanks...
+    ptr++;
+  if (NULL != strstr(ptr,"\n"))   // kill off any trailing newlines...
+    *strstr(ptr,"\n") = '\0';
+
+  selftest->base = proposed_base;
+  selftest->exponent = proposed_exponent;
+  selftest->bit_min = proposed_bit_min;
+  selftest->k = proposed_k;
+
+  return reason;
+}
+
+/************************************************************************************************************
+ * Function name : get_next_selftest                                                                      *
+ *                                *
+ *     INPUT  : 
+ *    FILE* f_in
+ *    char *filename                        *
+ *    int *base                     *
+ *    unsigned int *exponent                      *
+ *    int *bit_min                        *
+ *    unsigned long long *k                        *
+ *     OUTPUT :                                                         *
+ *                                                                                                          *
+ *     0 - OK                           *
+// *     1 - get_next_selftest : cannot open file                 *
+ *     2 - get_next_selftest : no valid selftest found                *
+ ************************************************************************************************************/
+enum ASSIGNMENT_ERRORS get_next_selftest(FILE * f_in, char *filename, int *base, unsigned int *exponent, int *bit_min, unsigned long long *k, int verbosity)
+{
+  enum PARSE_WARNINGS value;
+  struct SELFTEST selftest;
+  unsigned int linecount=0;
+  LINE_BUFFER line;
+
+  do
+  {
+    linecount++;
+    value = parse_selftest_line(f_in,&selftest,&line);
+    if ((BLANK_LINE == value) || (NONBLANK_LINE == value))
+      continue;
+    if (NO_WARNING == value)
+    {
+      if (valid_assignment(selftest.base, selftest.exponent, selftest.bit_min, selftest.bit_min+1, verbosity))
+        break;
+      value = INVALID_DATA;
+    }
+
+    if (END_OF_FILE == value)
+      break;
+    if(verbosity >= 1)
+    {
+      printf("WARNING: ignoring line %u in \"%s\"! Reason: ", linecount, filename);
+      switch(value)
+      {
+        case LONG_LINE:           printf("line is too long\n"); break;
+        case INVALID_FORMAT:      printf("invalid format\n");break;
+        case INVALID_DATA:        printf("invalid data\n");break;
+        default:                  printf("unknown error on >%s<",line); break;
+      }
+    }
+
+    // if (LONG_LINE != value)
+    //  return 2;
+  }
+  while (TRUE);
+
+  if (NO_WARNING == value)
+  {
+    *base = selftest.base;
+    *exponent = selftest.exponent;
+    *bit_min = selftest.bit_min;
+    *k = selftest.k;
+
+    return OK;
+  }
+  else
+    return VALID_SELFTEST_NOT_FOUND;
+}
