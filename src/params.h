@@ -135,6 +135,7 @@ The following lines define the min, default and max value.
 #define CPU_STREAMS_MAX     5 /* DO NOT CHANGE! */
 
 
+#define MIN_EXPONENT 50000
 
 /* set NUM_CLASSES and SIEVE_SIZE depending on MORE_CLASSES and SIEVE_SIZE_LIMIT */
 #ifndef MORE_CLASSES
