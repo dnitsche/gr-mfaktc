@@ -148,7 +148,7 @@ b_preinit.d5=0;b_preinit.d4=0;b_preinit.d3=0;b_preinit.d2=0;b_preinit.d1=0;b_pre
     // Now let the GPU trial factor the candidates that survived the sieving
 
     MFAKTC_FUNC<<<numblocks, THREADS_PER_BLOCK, shared_mem_required>>>(
-      mystuff->exponent, k_base, mystuff->d_bitarray,
+      mystuff->exponent, mystuff->base, k_base, mystuff->d_bitarray,
       mystuff->gpu_sieve_processing_size, shiftcount,
       b_preinit, mystuff->d_RES
 #ifdef DEBUG_GPU_MATH

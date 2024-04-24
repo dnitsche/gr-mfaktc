@@ -162,7 +162,7 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
         k_base.d1 =  k_min_grid[h_ktab_index] >> 32;
         k_base.d2 = 0;
 
-        MFAKTC_FUNC<<<blocksPerGrid, threadsPerBlock, 0, mystuff->stream[stream]>>>(mystuff->exponent, k_base, mystuff->d_ktab[stream], shiftcount, b_preinit, mystuff->d_RES
+        MFAKTC_FUNC<<<blocksPerGrid, threadsPerBlock, 0, mystuff->stream[stream]>>>(mystuff->exponent, mystuff->base, k_base, mystuff->d_ktab[stream], shiftcount, b_preinit, mystuff->d_RES
 #ifdef DEBUG_GPU_MATH
                                                                                     , mystuff->d_modbasecase_debug
 #endif
