@@ -38,10 +38,33 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 #include "gpusieve_helper.cu"
 
 
+__device__ static void mul96_96(int192 *res, int96 a, unsigned int b)
+// res = a * b
+{
+  unsigned int carry = 0, carry2 = 0;
+	carry  = __umul32hi(a.d0, b);
+	res->d0   = __umul32  (a.d0, b);
+
+	carry2 = __umul32hi(a.d1, b);
+	res->d1   = __add_cc  (__umul32(a.d1, b), carry);
+	carry2 = __addc    (0, carry2);
+	carry  = carry2;
+
+	carry2 = __umul32hi(a.d2, b);
+	res->d2   = __add_cc  (__umul32(a.d2, b), carry);
+	carry2 = __addc    (0, carry2);
+
+	res->d3   = __add_cc  (0, carry2);
+
+#ifndef SHORTCUT_64BIT
+	res->d4   = 0;
+#endif
+}
+
 #ifndef DEBUG_GPU_MATH
-__device__ static void mod_192_96(int96 *res, int192 q, int96 n, float nf, bool optionalmul, unsigned int abs_base)
+__device__ static void mod_192_96(int96 *res, int192 q, int96 n, float nf)
 #else
-__device__ static void mod_192_96(int96 *res, int192 q, int96 n, float nf, bool optionalmul, unsigned int abs_base, unsigned int *modbasecase_debug)
+__device__ static void mod_192_96(int96 *res, int192 q, int96 n, float nf, unsigned int *modbasecase_debug)
 #endif
 /* res = q mod n */
 {
@@ -224,37 +247,6 @@ division will be skipped
   q.d4 = __subc   (q.d4, nn.d4);
 #endif
 
-/********** Step 5, Offset 2^0 (0*32 + 0) **********/
-// should only be used for f<2^64 !!!!!!!!!!!
-  if (optionalmul) // optional multiply by abs_base modulo n
-  {
-    unsigned int carry = 0, carry2 = 0;
-	// multiply by abs_base
-	carry  = __umul32hi(q.d0, abs_base);
-	q.d0   = __umul32  (q.d0, abs_base);
-
-	carry2 = __umul32hi(q.d1, abs_base);
-	q.d1   = __add_cc  (__umul32(q.d1, abs_base), carry);
-	carry2 = __addc    (0, carry2);
-	carry  = carry2;
-
-	carry2 = __umul32hi(q.d2, abs_base);
-	q.d2   = __add_cc  (__umul32(q.d2, abs_base), carry);
-	carry2 = __addc    (0, carry2);
-	carry  = carry2;
-
-	carry2 = __umul32hi(q.d3, abs_base);
-	q.d3   = __add_cc  (__umul32(q.d3, abs_base), carry);
-	carry  = __addc    (0, carry2);
-	//carry  = carry2; // not needed
-
-#ifndef SHORTCUT_64BIT
-	//carry2 = __umul32hi(q.d4, abs_base);
-	q.d4   = __add_cc  (__umul32(q.d4, abs_base), carry);
-	//carry2 = __addc    (0, carry2);
-	//carry  = carry2;
-#endif
-  }
   MODBASECASE_NONZERO_ERROR(q.d5, 5, 5, 6);
   MODBASECASE_NONZERO_ERROR(q.d4, 5, 4, 7);
 
@@ -305,7 +297,7 @@ division will be skipped
   MODBASECASE_NONZERO_ERROR(q.d3, 6, 3, 11);
 
 /*
-qi is allways a little bit too small, this is OK for all steps except the last
+qi is always a little bit too small, this is OK for all steps except the last
 one. Sometimes the result is a little bit bigger than n
 */
 /*  if(cmp_ge_96(*res,n))
@@ -337,9 +329,9 @@ Precalculated here since it is the same for all steps in the following loop */
   ff=__int_as_float(0x3f7ffffb) / ff;	// just a little bit below 1.0f so we always underestimate the quotient
 
 #ifndef DEBUG_GPU_MATH
-  mod_192_96(&a,b,f,ff,false,abs_base);			// a = b mod f
+  mod_192_96(&a,b,f,ff);			// a = b mod f
 #else
-  mod_192_96(&a,b,f,ff,false,abs_base,modbasecase_debug);	// a = b mod f
+  mod_192_96(&a,b,f,ff,modbasecase_debug);	// a = b mod f
 #endif
   exp<<= 32 - shiftcount;
   while(exp)
@@ -352,10 +344,18 @@ Precalculated here since it is the same for all steps in the following loop */
     square_96_192(&b,a);			// b = a^2
 #endif
 #ifndef DEBUG_GPU_MATH
-    mod_192_96(&a,b,f,ff,exp&0x80000000,abs_base);			// a = b mod f
+    mod_192_96(&a,b,f,ff);			// a = b mod f
 #else
-    mod_192_96(&a,b,f,ff,exp&0x80000000,abs_base,modbasecase_debug);			// a = b mod f
+    mod_192_96(&a,b,f,ff,modbasecase_debug);			// a = b mod f
 #endif
+    if(exp&0x80000000) {
+      mul96_96(&b,a,abs_base);			// b = a * abs_base (optional multiply by |base|)
+      #ifndef DEBUG_GPU_MATH
+      mod_192_96(&a,b,f,ff);			// a = b mod f
+      #else
+      mod_192_96(&a,b,f,ff,modbasecase_debug);			// a = b mod f
+      #endif
+    }
     exp<<=1;
   }
 
