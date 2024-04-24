@@ -269,10 +269,19 @@ division will be skipped
   nn.d0 =                                 __umul32(n.d0, qi);
   nn.d1 = __add_cc (__umul32hi(n.d0, qi), __umul32(n.d1, qi));
 #ifndef DEBUG_GPU_MATH
+  #ifdef SHORTCUT_64BIT
+  nn.d2 = __addc   (__umul32hi(n.d1, qi), 0);
+  #else
   nn.d2 = __addc   (__umul32hi(n.d1, qi), __umul32(n.d2, qi));
+  #endif
 #else
+  #ifdef SHORTCUT_64BIT
+  nn.d2 = __addc_cc(__umul32hi(n.d1, qi), 0);
+  nn.d3 = __addc   (0,                    0);
+  #else
   nn.d2 = __addc_cc(__umul32hi(n.d1, qi), __umul32(n.d2, qi));
   nn.d3 = __addc   (__umul32hi(n.d2, qi),                  0);
+  #endif
 #endif
 
 //  q = q - nn
