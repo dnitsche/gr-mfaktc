@@ -30,27 +30,6 @@ extern "C" __host__ int tf_class_95_gs(unsigned long long int k_min, unsigned lo
 #define MFAKTC_FUNC mfaktc_95_gs
   #endif
 #endif
-#ifdef TF_BARRETT
-  #ifdef TF_BARRETT_76BIT_GS
-extern "C" __host__ int tf_class_barrett76_gs(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff)
-#define MFAKTC_FUNC mfaktc_barrett76_gs
-  #elif defined TF_BARRETT_77BIT_GS
-extern "C" __host__ int tf_class_barrett77_gs(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff)
-#define MFAKTC_FUNC mfaktc_barrett77_gs
-  #elif defined TF_BARRETT_79BIT_GS
-extern "C" __host__ int tf_class_barrett79_gs(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff)
-#define MFAKTC_FUNC mfaktc_barrett79_gs
-  #elif defined TF_BARRETT_87BIT_GS
-extern "C" __host__ int tf_class_barrett87_gs(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff)
-#define MFAKTC_FUNC mfaktc_barrett87_gs
-  #elif defined TF_BARRETT_88BIT_GS
-extern "C" __host__ int tf_class_barrett88_gs(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff)
-#define MFAKTC_FUNC mfaktc_barrett88_gs
-  #else
-extern "C" __host__ int tf_class_barrett92_gs(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff)
-#define MFAKTC_FUNC mfaktc_barrett92_gs
-  #endif
-#endif
 {
   int i;
   timeval timer;
@@ -94,10 +73,10 @@ extern "C" __host__ int tf_class_barrett92_gs(unsigned long long int k_min, unsi
   else if(ln2b<160)b_preinit.d4=1<<(ln2b-128);
   else             b_preinit.d5=1<<(ln2b-160);	// b_preinit = 2^ln2b
 
-/* set result array to 0 */  
+/* set result array to 0 */
   cudaMemset(mystuff->d_RES, 0, 1*sizeof(int)); //first int of result array contains the number of factors found
 
-#ifdef DEBUG_GPU_MATH  
+#ifdef DEBUG_GPU_MATH
   cudaMemset(mystuff->d_modbasecase_debug, 0, 32*sizeof(int));
 #endif
 
@@ -116,7 +95,7 @@ extern "C" __host__ int tf_class_barrett92_gs(unsigned long long int k_min, unsi
   else shared_mem_required = 22;					// 67894 primes expect 19.94%
 #endif
   shared_mem_required = mystuff->gpu_sieve_processing_size * sizeof (int) * shared_mem_required / 100;
-  
+
   // FIXME: can't use all the shared memory for GPU sieve, lets keep 1kiB spare...
   if(mystuff->verbosity >= 3)printf("shared_mem_required = %d bytes\n", shared_mem_required + 1024);
 
@@ -128,7 +107,7 @@ extern "C" __host__ int tf_class_barrett92_gs(unsigned long long int k_min, unsi
     printf("       the amount of shared memory needed\n");
     exit(1);
   }
-     
+
 
   // Loop until all the k's are processed
   for(;;)
@@ -157,9 +136,6 @@ extern "C" __host__ int tf_class_barrett92_gs(unsigned long long int k_min, unsi
     // Now let the GPU trial factor the candidates that survived the sieving
 
     MFAKTC_FUNC<<<numblocks, THREADS_PER_BLOCK, shared_mem_required>>>(mystuff->exponent, k_base, mystuff->d_bitarray, mystuff->gpu_sieve_processing_size, shiftcount, b_preinit, mystuff->d_RES
-#if defined (TF_BARRETT) && (defined(TF_BARRETT_87BIT_GS) || defined(TF_BARRETT_88BIT_GS) || defined(TF_BARRETT_92BIT_GS) || defined(DEBUG_GPU_MATH))
-                                                                       , mystuff->bit_min-63
-#endif
 #ifdef DEBUG_GPU_MATH
                                                                        , mystuff->d_modbasecase_debug
 #endif
@@ -187,7 +163,7 @@ extern "C" __host__ int tf_class_barrett92_gs(unsigned long long int k_min, unsi
 #ifdef DEBUG_GPU_MATH
   cudaMemcpy(mystuff->h_modbasecase_debug, mystuff->d_modbasecase_debug, 32*sizeof(int), cudaMemcpyDeviceToHost);
   for(i=0;i<32;i++)if(mystuff->h_modbasecase_debug[i] != 0)printf("h_modbasecase_debug[%2d] = %u\n", i, mystuff->h_modbasecase_debug[i]);
-#endif  
+#endif
 
   // Set grid count to the number of blocks processed.  The print code will convert this to a
   // count of candidates processed (by multiplying by 8192 * THREADS_PER_BLOCK.
