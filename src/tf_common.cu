@@ -36,7 +36,7 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
   unsigned long long int twait = 0;
   int96 factor,k_base;
   int192 b_preinit;
-  int shiftcount, logb, maxlogb, count = 0;
+  int shiftcount, logb, maxlogb, count = 0; // logarithm to base ´base´
   unsigned long long int k_diff;
   char string[50];
   int factorsfound = 0;
@@ -61,8 +61,8 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
   for(i=0; i<mystuff->cpu_streams; i++)k_min_grid[i] = 0;
   h_ktab_index = 0;
 
-  // FIXME for non base 10
   shiftcount=0;
+  // shiftcount = (int)log2(exponent), how many bits are there to process
   while((1ULL<<shiftcount) < (unsigned long long int)mystuff->exponent)shiftcount++;
 //  printf("\n\nshiftcount = %d\n",shiftcount);
   shiftcount-=1;logb=1;
@@ -78,13 +78,14 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
     while(logb<maxlogb || 10*logb<mystuff->bit_min*3)	// how much preprocessing is possible
     {
       shiftcount--;
-      logb<<=1;
-      if(mystuff->exponent&(1<<(shiftcount)))logb++;
+      logb<<=1; // log(x^2)
+      if(mystuff->exponent&(1<<(shiftcount)))logb++; // optional mul with abs_base
     }
   }
 //  printf("shiftcount = %d\n",shiftcount);
 //  printf("logb = %d\n",logb);
   b_preinit.d5=0;b_preinit.d4=0;b_preinit.d3=0;b_preinit.d2=0;b_preinit.d1=0;b_preinit.d0=1;
+// just calculate abs_base^logb
 #ifdef SHORTCUT_64BIT
   for(i=0; i<logb; i++) mul64(&b_preinit, b_preinit, abs_base);
 #elif defined (SHORTCUT_75BIT)
@@ -93,14 +94,10 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
   for(i=0; i<logb; i++) mul96(&b_preinit, b_preinit, abs_base);
 #endif
 
-
 /* set result array to 0 */
   cudaMemsetAsync(mystuff->d_RES, 0, 1*sizeof(int)); //first int of result array contains the number of factors found
-//  for(i=0;i<32;i++)mystuff->h_RES[i]=0;
-//  cudaMemcpy(mystuff->d_RES, mystuff->h_RES, 32*sizeof(int), cudaMemcpyHostToDevice);
 
 #ifdef DEBUG_GPU_MATH
-//  cudaMemcpy(mystuff->d_modbasecase_debug, mystuff->h_RES, 32*sizeof(int), cudaMemcpyHostToDevice);
   cudaMemset(mystuff->d_modbasecase_debug, 0, 32*sizeof(int));
 #endif
 

@@ -36,13 +36,13 @@ extern "C" __host__ int tf_class_95_gs(unsigned long long int k_min, unsigned lo
   timeval timer;
   int96 factor,k_base;
   int192 b_preinit;
-  unsigned int abs_base = abs(mystuff->base);
   int shiftcount, logb, maxlogb, count = 0; // logarithm to base ´base´
   int numblocks;
   unsigned long long k_remaining;
   char string[50];
   int shared_mem_required;
   int factorsfound = 0;
+  unsigned int abs_base = abs(mystuff->base);
 
   // If we've never initialized the GPU sieving code, do so now.
 //  gpusieve_init (mystuff); // moved to main() function!
