@@ -243,7 +243,10 @@ other return value
     }
   }
   mystuff->stats.max_classes_needed = (int)max_classes_needed;
-  //printf("Testing %d out of %d classes\n", mystuff->stats.max_classes_needed, NUM_CLASSES);
+
+  if(mystuff->mode != MODE_SELFTEST_SHORT && mystuff->verbosity >= 1) {
+    printf("INFO: Testing %d out of %d classes.\n", mystuff->stats.max_classes_needed, NUM_CLASSES);
+  }
 
   if((mystuff->mode == MODE_SELFTEST_FULL) || (mystuff->mode == MODE_SELFTEST_SHORT))
   {
