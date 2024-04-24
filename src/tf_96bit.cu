@@ -304,7 +304,9 @@ this kernel has a lower FC limit of 2^64 so we can use check_big_factor96() */
 
 
 __global__ void
-#ifdef SHORTCUT_75BIT
+#ifdef SHORTCUT_64BIT
+__launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_64(unsigned int exp, int96 k, unsigned int *k_tab, int shiftcount, int192 b, unsigned int *RES
+#elif defined(SHORTCUT_75BIT)
 __launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_75(unsigned int exp, int96 k, unsigned int *k_tab, int shiftcount, int192 b, unsigned int *RES
 #else
 __launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_95(unsigned int exp, int96 k, unsigned int *k_tab, int shiftcount, int192 b, unsigned int *RES
@@ -333,7 +335,9 @@ a is precomputed on host ONCE. */
 
 
 __global__ void
-#ifdef SHORTCUT_75BIT
+#ifdef SHORTCUT_64BIT
+__launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_64_gs(unsigned int exp, int96 k_base, unsigned int *bit_array, unsigned int bits_to_process, int shiftcount, int192 b, unsigned int *RES
+#elif defined(SHORTCUT_75BIT)
 __launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_75_gs(unsigned int exp, int96 k_base, unsigned int *bit_array, unsigned int bits_to_process, int shiftcount, int192 b, unsigned int *RES
 #else
 __launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_95_gs(unsigned int exp, int96 k_base, unsigned int *bit_array, unsigned int bits_to_process, int shiftcount, int192 b, unsigned int *RES

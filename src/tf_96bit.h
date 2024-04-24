@@ -11,21 +11,25 @@ mfaktc is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-                                
+
 You should have received a copy of the GNU General Public License
 along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifdef _MSC_VER
 extern "C" {
+       int tf_class_64(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff);
        int tf_class_75(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff);
        int tf_class_95(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff);
+       int tf_class_64_gs(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff);
        int tf_class_75_gs(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff);
        int tf_class_95_gs(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff);
 }
 #else
+extern int tf_class_64(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff);
 extern int tf_class_75(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff);
 extern int tf_class_95(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff);
+extern int tf_class_64_gs(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff);
 extern int tf_class_75_gs(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff);
 extern int tf_class_95_gs(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff);
 #endif

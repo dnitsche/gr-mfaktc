@@ -21,7 +21,10 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 #undef RAW_GPU_BENCH // FIXME
 
 
-#ifdef SHORTCUT_75BIT
+#ifdef SHORTCUT_64BIT
+extern "C" __host__ int tf_class_64_gs(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff)
+#define MFAKTC_FUNC mfaktc_64_gs
+#elif defined (SHORTCUT_75BIT)
 extern "C" __host__ int tf_class_75_gs(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff)
 #define MFAKTC_FUNC mfaktc_75_gs
 #else

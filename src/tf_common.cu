@@ -17,7 +17,10 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-#ifdef SHORTCUT_75BIT
+#ifdef SHORTCUT_64BIT
+extern "C" __host__ int tf_class_64(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff)
+#define MFAKTC_FUNC mfaktc_64
+#elif defined (SHORTCUT_75BIT)
 extern "C" __host__ int tf_class_75(unsigned long long int k_min, unsigned long long int k_max, mystuff_t *mystuff)
 #define MFAKTC_FUNC mfaktc_75
 #else
