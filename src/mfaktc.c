@@ -193,7 +193,7 @@ int class_needed_10(unsigned int exp, unsigned long long int k_min, int c)
 /*
 checks whether the class c must be processed or can be ignored at all because
 all factor candidates within the class c are a multiple of 3, 5, 7 or 11 (11
-only if MORE_CLASSES is definied) or are ()(1 or 7 mod 8) and (1 or 4 mod 5)) or ((3 or 5 mod 8) and (2 or 3 mod 5))
+only if MORE_CLASSES is definied) or are ((1 or 7 mod 8) and (1 or 4 mod 5)) or ((3 or 5 mod 8) and (2 or 3 mod 5))
 Derivation:
 Similar to Mersenne factors we find for repunits that Legendre(10,p)===1 (10 is a quadratic residue mod p)
 Legendre(10,p) = Legendre(2,p)*Legendre(5,p)
