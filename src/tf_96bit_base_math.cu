@@ -258,23 +258,23 @@ extern "C" __host__ void mul96(int192 *res, int192 a, int b)
   res->d1 = (unsigned int)(full>>32);
 
   full = (unsigned long long int)a.d1*(unsigned long long int)b;
-  full += (((full & 0xFFFFFFFF) + (unsigned long long int)res->d1) >> 32) << 32;
+  full += ((full & 0xFFFFFFFF) + (unsigned long long int)res->d1) & 0xFFFFFFFF00000000;
   res->d1 += (unsigned int)full;
   res->d2  = (unsigned int)(full>>32);
 
   full = (unsigned long long int)a.d2*(unsigned long long int)b;
-  full += (((full & 0xFFFFFFFF) + (unsigned long long int)res->d2) >> 32) << 32;
+  full += ((full & 0xFFFFFFFF) + (unsigned long long int)res->d2) & 0xFFFFFFFF00000000;
   res->d2 += (unsigned int)full;
   res->d3  = (unsigned int)(full>>32);
 
   full = (unsigned long long int)a.d3*(unsigned long long int)b;
-  full += (((full & 0xFFFFFFFF) + (unsigned long long int)res->d3) >> 32) << 32;
+  full += ((full & 0xFFFFFFFF) + (unsigned long long int)res->d3) & 0xFFFFFFFF00000000;
   res->d3 += (unsigned int)full;
   res->d4  = (unsigned int)(full>>32);
 
   full = (unsigned long long int)a.d4*(unsigned long long int)b;
   #if !defined(SHORTCUT_75BIT) && !defined(SHORTCUT_64BIT)
-  full += (((full & 0xFFFFFFFF) + (unsigned long long int)res->d4) >> 32) << 32;
+  full += ((full & 0xFFFFFFFF) + (unsigned long long int)res->d4) & 0xFFFFFFFF00000000;
   #endif
   res->d4 += (unsigned int)full;
   #if !defined(SHORTCUT_75BIT) && !defined(SHORTCUT_64BIT)
