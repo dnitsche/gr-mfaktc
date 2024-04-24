@@ -50,6 +50,7 @@ __device__ static void mul96_uint_192(int192 *res, int96 a, unsigned int b)
 #endif
 }
 
+// TODO: check if we can skip more here
 #ifndef DEBUG_GPU_MATH
 __device__ static void mod_128_96(int96 *res, int192 q, int96 n, float nf)
 #else
