@@ -40,7 +40,7 @@ clean :
 %.obj : %.c
 	$(CC) $(CFLAGS) /c /Tp $<
 
-tf_64bit.o : tf_96bit.cu
+tf_64bit.obj : tf_96bit.cu
 	nvcc -O2 -c $< -o $@ $(CUFLAGS) -DSHORTCUT_64BIT
 
 tf_75bit.obj : tf_96bit.cu
