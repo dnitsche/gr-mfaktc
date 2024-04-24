@@ -118,25 +118,7 @@ inline int no_small_factor(unsigned int exp, unsigned long long int k_min_plus_c
 /*
 checks whether the class c must be processed or can be ignored at all because
 all factor candidates within the class c are a multiple of 3, 5, 7 or 11 (11
-only if MORE_CLASSES is definied) or are ((1 or 7 mod 8) and (1 or 4 mod 5)) or ((3 or 5 mod 8) and (2 or 3 mod 5))
-Derivation:
-Similar to Mersenne factors we find for base 10 repunits that Legendre(10,p)===1 (10 is a quadratic residue mod p)
-Legendre(10,p) = Legendre(2,p)*Legendre(5,p)
-                                   / +1 if p = 1 or 7 mod 8
-Legendre(2,p) = (-1)^((p^2-1)/8) = |
-                                   \ -1 if p = 3 or 5 mod 8
-
-                                      / +1 if p = 1 or 4 mod 5
-Legendre(5,p) = (-1)^Floor((p+2)/5) = |
-                                      \ -1 if p = 2 or 3 mod 5
-
-Product must be +1, so either both products of (-1)(-1) and (+1)(+1) are possible.
-Filtering the possible values mod 40 gives the following allowed values:
-{1,3,9,13,27,31,37,39} or {±1, ±3, ±9, ±13} for 2kp+1.
-Thus allowed values for 2kp are: {0,2,8,12,26,30,36,38}
-See also: https://math.stackexchange.com/questions/1767306/find-all-prime-p-such-that-legendre-symbol-of-left-frac10p-right-1
-
-For other bases this is similarly derived.
+only if MORE_CLASSES is definied) or are in the allowed remainder classes for current base.
 
 k_min *MUST* be aligned in that way that k_min is in class 0!
 */
