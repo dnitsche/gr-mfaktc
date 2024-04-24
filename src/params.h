@@ -40,7 +40,7 @@ This starts to become usefull on my system for e.g. TF M66xxxxxx from 2^66 to
 2^67.
 */
 
-#define MORE_CLASSES
+//#define MORE_CLASSES
 
 
 /******************
