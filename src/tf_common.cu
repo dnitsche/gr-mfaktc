@@ -36,7 +36,7 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
   unsigned long long int twait = 0;
   int96 factor,k_base;
   int192 b_preinit;
-  int shiftcount, ln2b, maxln2b, count = 0;
+  int shiftcount, logb, maxlogb, count = 0;
   unsigned long long int k_diff;
   char string[50];
   int factorsfound = 0;
@@ -60,32 +60,36 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
   for(i=0; i<mystuff->cpu_streams; i++)k_min_grid[i] = 0;
   h_ktab_index = 0;
 
+  // FIXME for non base 10
   shiftcount=0;
   while((1ULL<<shiftcount) < (unsigned long long int)mystuff->exponent)shiftcount++;
 //  printf("\n\nshiftcount = %d\n",shiftcount);
-  shiftcount-=1;ln2b=1;
-  maxln2b = shiftcount-3;
+  shiftcount-=1;logb=1;
+  maxlogb = shiftcount-3;
   // TODO: find maximum working numbers
 #if defined (SHORTCUT_75BIT) || defined (SHORTCUT_64BIT)
-  if (maxln2b>16) maxln2b=16; // maximum preprocessing which is possible for 64 bit
+  if (maxlogb>16) maxlogb=16; // maximum preprocessing which is possible for 64 bit
 #else
-  if (maxln2b>20) maxln2b=20; // maximum preprocessing which is possible
+  if (maxlogb>20) maxlogb=20; // maximum preprocessing which is possible
 #endif
-  while(ln2b<maxln2b || 10*ln2b<mystuff->bit_min*3)	// how much preprocessing is possible
+  if (mystuff->base<=10)
   {
-    shiftcount--;
-    ln2b<<=1;
-    if(mystuff->exponent&(1<<(shiftcount)))ln2b++;
+    while(logb<maxlogb || 10*logb<mystuff->bit_min*3)	// how much preprocessing is possible
+    {
+      shiftcount--;
+      logb<<=1;
+      if(mystuff->exponent&(1<<(shiftcount)))logb++;
+    }
   }
 //  printf("shiftcount = %d\n",shiftcount);
-//  printf("ln2b = %d\n",ln2b);
+//  printf("logb = %d\n",logb);
   b_preinit.d5=0;b_preinit.d4=0;b_preinit.d3=0;b_preinit.d2=0;b_preinit.d1=0;b_preinit.d0=1;
 #ifdef SHORTCUT_64BIT
-  for(i=0; i<ln2b; i++) mul64(&b_preinit, b_preinit, mystuff->base);
+  for(i=0; i<logb; i++) mul64(&b_preinit, b_preinit, mystuff->base);
 #elif defined (SHORTCUT_75BIT)
-  for(i=0; i<ln2b; i++) mul75(&b_preinit, b_preinit, mystuff->base);
+  for(i=0; i<logb; i++) mul75(&b_preinit, b_preinit, mystuff->base);
 #else
-  for(i=0; i<ln2b; i++) mul96(&b_preinit, b_preinit, mystuff->base);
+  for(i=0; i<logb; i++) mul96(&b_preinit, b_preinit, mystuff->base);
 #endif
 
 
