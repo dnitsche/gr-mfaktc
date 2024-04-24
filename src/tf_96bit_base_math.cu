@@ -47,7 +47,7 @@ __device__ static void shl_192(int192 *a)
   a->d2 = __addc_cc(a->d2, a->d2);
   a->d3 = __addc_cc(a->d3, a->d3);
   a->d4 = __addc_cc(a->d4, a->d4);
-#ifndef SHORTCUT_75BIT  
+#ifndef SHORTCUT_75BIT
   a->d5 = __addc   (a->d5, a->d5);
 #endif
 }
