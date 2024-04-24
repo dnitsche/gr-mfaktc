@@ -257,6 +257,7 @@ output
   if (linecopy != NULL)
     *endptr = *linecopy + (ptr_end - line);
 
+  assignment->base = proposed_base;
   assignment->exponent = proposed_exponent;
   assignment->bit_min = proposed_bit_min;
   assignment->bit_max = proposed_bit_max;
@@ -437,7 +438,7 @@ enum ASSIGNMENT_ERRORS clear_assignment(char *filename, unsigned int base, unsig
     }
     else	// assignment on the line, so we may need to print it..
     {
-      found =( (exponent == assignment.exponent) && (bit_min == assignment.bit_min) && (bit_max == assignment.bit_max) );
+      found =( (base == assignment.base) && (exponent == assignment.exponent) && (bit_min == assignment.bit_min) && (bit_max == assignment.bit_max) );
       if (!found)
       {
         fprintf(f_out,"%s",line);
@@ -449,7 +450,7 @@ enum ASSIGNMENT_ERRORS clear_assignment(char *filename, unsigned int base, unsig
           fprintf(f_out,"Factor=" );
           if (strlen(assignment.assignment_key) != 0)
             fprintf(f_out,"%s,", assignment.assignment_key);
-          fprintf(f_out,"%u,%u,%u",exponent, bit_min_new, bit_max);
+          fprintf(f_out,"R(%u)%u,%u,%u",base, exponent, bit_min_new, bit_max);
           if (tail != NULL)
             fprintf(f_out,"%s",tail);
         }
