@@ -37,9 +37,9 @@ LIBS = $(CUDA_DIR)\lib\x64\cudart_static.lib
 
 ############################################################################################################
 
-all : ..\mfaktc-win-64.exe
+all : ..\gr-mfaktc-win-64.exe
 
-..\mfaktc-win-64.exe : $(COBJS) $(CUOBJS)
+..\gr-mfaktc-win-64.exe : $(COBJS) $(CUOBJS)
 	$(LINK) $(LFLAGS) $^ $(LIBS) /out:$@
 
 clean :
