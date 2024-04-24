@@ -141,7 +141,7 @@ int class_needed(unsigned int exp, unsigned long long int k_min_plus_c, remainde
   if (rems) {
     unsigned int m = rems->modulo_value;
     unsigned int remainder = (2 * (exp % m) * (k_min_plus_c % m) + 1) % m;
-    return ((rems->bit_mask[remainder / 32] & (1<<(remainder % 32))) != 0) && no_small_factor(exp, k_min_plus_c);
+    return ((rems->bit_mask[remainder >> 5] & (1<<(remainder & 0x1F))) != 0) && no_small_factor(exp, k_min_plus_c);
   } else {
     return no_small_factor(exp, k_min_plus_c);
   }
