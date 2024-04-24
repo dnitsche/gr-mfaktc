@@ -489,13 +489,16 @@ return value
 RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
 */
 {
-  int i, j, tf_res, st_success=0, st_nofactor=0, st_wrongfactor=0, st_unknown=0;
+  int tf_res, st_success=0, st_nofactor=0, st_wrongfactor=0, st_unknown=0;
+  unsigned int i, j;
 
-  #define NUM_SELFTESTS_GENERALIZED 29
+  #define NUM_QUICK_SELFTESTS 27
+  #define NUM_SELFTESTS_GENERALIZED 4026
   #define NUM_SELFTESTS_2 2867
   #define NUM_SELFTESTS_10 3022
   #define NUM_SELFTESTS (NUM_SELFTESTS_GENERALIZED+NUM_SELFTESTS_2+NUM_SELFTESTS_10)
-  unsigned int exp[NUM_SELFTESTS], base[NUM_SELFTESTS], index[27];
+  unsigned int exp[NUM_SELFTESTS], index[NUM_QUICK_SELFTESTS];
+  int base[NUM_SELFTESTS];
   int num_selftests=0;
   int bit_min[NUM_SELFTESTS], f_class;
   unsigned long long int k[NUM_SELFTESTS];
@@ -520,7 +523,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
   {
     for(i = 0; i < NUM_SELFTESTS; i++)
     {
-      printf("########## testcase %d/%d ##########\n", i+1, NUM_SELFTESTS);
+      printf("########## testcase %u/%d ##########\n", i+1, NUM_SELFTESTS);
       f_class = (int)(k[i] % NUM_CLASSES);
 
       mystuff->base               = base[i];
@@ -558,15 +561,15 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
   {
     j = 0;
     int offset = 0;
-    index[j++]=offset+   2;
-    index[j++]=offset+   4;
-    index[j++]=offset+   6;
-    index[j++]=offset+   11;
-    index[j++]=offset+   14;
     index[j++]=offset+   15;
-    index[j++]=offset+   18;
-    index[j++]=offset+   20;
-    index[j++]=offset+   22;
+    index[j++]=offset+   600;
+    index[j++]=offset+   800;
+    index[j++]=offset+   1600;
+    index[j++]=offset+   1800;
+    index[j++]=offset+   2600;
+    index[j++]=offset+   2800;
+    index[j++]=offset+   3600;
+    index[j++]=offset+   3800;
     offset += NUM_SELFTESTS_GENERALIZED;
     index[j++]=offset+   2;
     index[j++]=offset+  25;
@@ -587,7 +590,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
     index[j++]=offset+1508;
     index[j++]=offset+1518;
     index[j++]=offset+1521; /* some factors below 2^95 (test 95 bit kernel) */
-    for(i = 0; i < 27; i++)
+    for(i = 0; i < NUM_QUICK_SELFTESTS; i++)
     {
       f_class = (int)(k[index[i]] % NUM_CLASSES);
 
