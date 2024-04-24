@@ -103,7 +103,7 @@ returns 1 if the assignment is within the supported bounds of mfaktc,
   else if(((double)(bit_max-1) - (log((double)exp) / log(2.0F))) > 63.9F) /* this leave enough room so k_min/k_max won't overflow in tf_XX() */
                               {ret = 0; if(verbosity >= 1)printf("WARNING: k_max > 2^63.9 is not supported!\n");}
 
-  if(verbosity >= 1 && ret == 0)printf("         Ignoring TF %s(%u)%u from 2^%d to 2^%d!\n", NAME_NUMBERS, base, exp, bit_min, bit_max);
+  if(verbosity >= 1 && ret == 0)printf("         Ignoring TF %s[%u]%u from 2^%d to 2^%d!\n", NAME_NUMBERS, base, exp, bit_min, bit_max);
 
   return ret;
 }

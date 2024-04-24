@@ -494,7 +494,7 @@ see benchmarks in src/kernel_benchmarks.txt */
   {
     if(mystuff->h_RES[0] == 0)
     {
-      printf("ERROR: selftest failed for %s(%u)%u\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
+      printf("ERROR: selftest failed for %s[%u]%u\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
       printf("  no factor found\n");
       retval = 1;
     }
@@ -530,7 +530,7 @@ k_max and k_min are used as 64bit temporary integers here...
       }
       if(k_min != 1) /* the factor should appear ONCE */
       {
-        printf("ERROR: selftest failed for %s(%u)%u!\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
+        printf("ERROR: selftest failed for %s[%u]%u!\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
         printf("  expected result: %08X %08X %08X\n", f_hi, f_med, f_low);
         for(i=0; ((unsigned int)i < mystuff->h_RES[0]) && (i < 10); i++)
         {
@@ -540,7 +540,7 @@ k_max and k_min are used as 64bit temporary integers here...
       }
       else
       {
-        if(mystuff->mode != MODE_SELFTEST_SHORT)printf("selftest for %s(%u)%u passed!\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
+        if(mystuff->mode != MODE_SELFTEST_SHORT)printf("selftest for %s[%u]%u passed!\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
       }
     }
   }
