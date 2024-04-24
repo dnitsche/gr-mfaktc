@@ -115,6 +115,13 @@ void print_timestamp(FILE *outfile)
   fprintf(outfile, "[%s]\n", ptr);
 }
 
+int max_classes_multiplier(unsigned int base) {
+  if (base > 12 || base == 4 || base == 9)
+  {
+    return 2;
+  }
+  return 1;
+}
 
 void print_status_line(mystuff_t *mystuff)
 {
@@ -131,9 +138,9 @@ void print_status_line(mystuff_t *mystuff)
   if(mystuff->mode == MODE_SELFTEST_SHORT) return; /* no output during short selftest */
 
 #ifdef MORE_CLASSES
-  max_class_number = 960;
+  max_class_number = 960 * max_classes_multiplier(mystuff->base);
 #else
-  max_class_number = 96;
+  max_class_number = 96 * max_classes_multiplier(mystuff->base);
 #endif
 
 
