@@ -1,5 +1,6 @@
 *.o
 mfaktc.exe
+*.ckp
 .cproject
 .project
 out.log
