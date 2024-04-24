@@ -1,4 +1,5 @@
 *.o
+*.obj
 mfaktc.exe
 *.ckp
 .cproject
