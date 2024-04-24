@@ -1380,7 +1380,7 @@ static	int	gpusieve_initialized = 0;
 	row = rowinfo;
 	loop_end = min (primes_per_thread, sieving64KCrossover);
 	for ( ; i < primesNotSieved + primesHandledWithSpecialCode + loop_end * threadsPerBlock; i += threadsPerBlock, pinfo += threadsPerBlock * 8) {
-		row[0] = (pinfo - saveptr);			// Offset to first pinfo byte in the row
+		row[0] = (uint32)(pinfo - saveptr);		// Offset to first pinfo byte in the row
 		row[MAX_PRIMES_PER_THREAD] = i;			// First pinfo entry is for the i-th prime number
 		row[MAX_PRIMES_PER_THREAD*2] = 1;		// Pinfo entries represent successive prime numbers
 		row[MAX_PRIMES_PER_THREAD*3] = 0xFFFF0000;	// Mask of bits to preserve when setting bit-to-clear
@@ -1394,7 +1394,7 @@ static	int	gpusieve_initialized = 0;
 	// In this section (primes both below and above 64K) we store bit-to-clr in 32 bits, pinv in 32 bits, and p in 32 bits.
 	loop_end = min (primes_per_thread, sieving64KCrossover + 1);
 	for ( ; i < primesNotSieved + primesHandledWithSpecialCode + loop_end * threadsPerBlock; i += threadsPerBlock, pinfo += threadsPerBlock * 12) {
-		row[0] = (pinfo - saveptr);			// Offset to first pinfo byte in the row
+		row[0] = (uint32)(pinfo - saveptr);		// Offset to first pinfo byte in the row
 		row[MAX_PRIMES_PER_THREAD] = i;			// First pinfo entry is for the i-th prime number
 		row[MAX_PRIMES_PER_THREAD*2] = 1;		// Pinfo entries represent successive prime numbers
 		row[MAX_PRIMES_PER_THREAD*3] = 0;		// Mask of bits to preserve when setting bit-to-clear
@@ -1409,7 +1409,7 @@ static	int	gpusieve_initialized = 0;
 	// In this section (transitioning to dense primes storage) we store bit-to-clr 32 bits, pinv in 32 bits, and p in 32 bits.
 	if (primes_per_thread > sieving64KCrossover + 1) {
 		loop_count = min (primes_per_thread, sieving128KCrossover + 1) - (sieving64KCrossover + 1);
-		row[0] = (pinfo - saveptr);			// Offset to first pinfo byte in the row
+		row[0] = (uint32)(pinfo - saveptr);		// Offset to first pinfo byte in the row
 		row[MAX_PRIMES_PER_THREAD] = i;			// First pinfo entry is for the i-th prime number
 		row[MAX_PRIMES_PER_THREAD*2] = loop_count;	// Pinfo entries skip loop_count prime numbers
 		row[MAX_PRIMES_PER_THREAD*3] = 0;		// Mask of bits to preserve when setting bit-to-clear
@@ -1425,7 +1425,7 @@ static	int	gpusieve_initialized = 0;
 	// In this section (primes from 64K through 128K) we store bit-to-clr 18 bits, (p diff) / 2 in 7 bits, and pinv diff in 7-bits.
 	if (primes_per_thread > sieving64KCrossover + 2) {
 		for (k = 1; k < loop_count; k++) {
-			row[0] = (pinfo - saveptr) + (k - 1) * threadsPerBlock * 4;	// Offset to first pinfo byte in the row
+			row[0] = (uint32)(pinfo - saveptr) + (k - 1) * threadsPerBlock * 4;	// Offset to first pinfo byte in the row
 			row[MAX_PRIMES_PER_THREAD] = i + k;		// First pinfo entry is for the i+k-th prime number
 			row[MAX_PRIMES_PER_THREAD*2] = loop_count;	// Pinfo entries skip loop_count prime numbers
 			row[MAX_PRIMES_PER_THREAD*3] = 0xFFFC0000;	// Mask of bits to preserve when setting bit-to-clear
@@ -1459,7 +1459,7 @@ static	int	gpusieve_initialized = 0;
 	// In this section (first complete row of primes above 128K) we store bit-to-clr 32 bits, pinv in 32 bits, and p in 32-bits.
 	if (primes_per_thread > sieving128KCrossover + 1) {
 		loop_count = min (primes_per_thread, sieving1MCrossover) - (sieving128KCrossover + 1);
-		row[0] = (pinfo - saveptr);			// Offset to first pinfo byte in the row
+		row[0] = (uint32)(pinfo - saveptr);		// Offset to first pinfo byte in the row
 		row[MAX_PRIMES_PER_THREAD] = i;			// First pinfo entry is for the i-th prime number
 		row[MAX_PRIMES_PER_THREAD*2] = loop_count;	// Pinfo entries skip loop_count prime numbers
 		row[MAX_PRIMES_PER_THREAD*3] = 0;		// Mask of bits to preserve when setting bit-to-clear
@@ -1475,7 +1475,7 @@ static	int	gpusieve_initialized = 0;
 	// In this section (primes from 128K to 1M) we store bit-to-clr 20 bits, (p diff) / 2 in 7 bits, and pinv diff in 5 bits.
 	if (primes_per_thread > sieving128KCrossover + 2) {
 		for (k = 1; k < loop_count; k++) {
-			row[0] = (pinfo - saveptr) + (k - 1) * threadsPerBlock * 4;	// Offset to first pinfo byte in the row
+			row[0] = (uint32)(pinfo - saveptr) + (k - 1) * threadsPerBlock * 4;	// Offset to first pinfo byte in the row
 			row[MAX_PRIMES_PER_THREAD] = i + k;		// First pinfo entry is for the i+k-th prime number
 			row[MAX_PRIMES_PER_THREAD*2] = loop_count;	// Pinfo entries skip loop_count prime numbers
 			row[MAX_PRIMES_PER_THREAD*3] = 0xFFF00000;	// Mask of bits to preserve when setting bit-to-clear
@@ -1515,7 +1515,7 @@ static	int	gpusieve_initialized = 0;
 	// In this section (primes both below and above 1M) we store bit-to-clr 32 bits, pinv in 32 bits, and p in 32-bits.
 	if (primes_per_thread > sieving1MCrossover) {
 		loop_count = primes_per_thread - sieving1MCrossover;
-		row[0] = (pinfo - saveptr);			// Offset to first pinfo byte in the row
+		row[0] = (uint32)(pinfo - saveptr);		// Offset to first pinfo byte in the row
 		row[MAX_PRIMES_PER_THREAD] = i;			// First pinfo entry is for the i-th prime number
 		row[MAX_PRIMES_PER_THREAD*2] = loop_count;	// Pinfo entries skip loop_count prime numbers
 		row[MAX_PRIMES_PER_THREAD*3] = 0;		// Mask of bits to preserve when setting bit-to-clear
@@ -1531,7 +1531,7 @@ static	int	gpusieve_initialized = 0;
 	// In this section (primes above 1M to 16M) we store bit-to-clr 24 bits, (p diff) / 2 in 7 bits, and pinv diff in 1 bit.
 	if (primes_per_thread > sieving1MCrossover + 1) {
 		for (k = 1; k < loop_count; k++) {
-			row[0] = (pinfo - saveptr) + (k - 1) * threadsPerBlock * 4;	// Offset to first pinfo byte in the row
+			row[0] = (uint32)(pinfo - saveptr) + (k - 1) * threadsPerBlock * 4;	// Offset to first pinfo byte in the row
 			row[MAX_PRIMES_PER_THREAD] = i + k;		// First pinfo entry is for the i+k-th prime number
 			row[MAX_PRIMES_PER_THREAD*2] = loop_count;	// Pinfo entries skip loop_count prime numbers
 			row[MAX_PRIMES_PER_THREAD*3] = 0xFF000000;	// Mask of bits to preserve when setting bit-to-clear
@@ -1567,7 +1567,7 @@ static	int	gpusieve_initialized = 0;
 		pinfo += (loop_count - 1) * threadsPerBlock * 4;
 		i += loop_count * threadsPerBlock;
 	}
-	pinfo_size = pinfo - saveptr;
+	pinfo_size = (uint32)(pinfo - saveptr);
 	pinfo = saveptr;
 
 	// Finally, also copy the primes to rowinfo to be used in later calculating bit-to-clear values
