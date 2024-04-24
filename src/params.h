@@ -175,4 +175,4 @@ The following lines define the min, default and max value.
 #define GPU_SIEVE_PROCESS_SIZE_MAX          32 /* Upper limit is 64K, since we store k values as "short". */
 
 
-#define NAME_NUMBERS "M"
+#define NAME_NUMBERS "R"
