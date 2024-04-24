@@ -222,7 +222,7 @@ For correct results a must be less than 2^64 (a.d2 == 0) */
       : "r"(a.d0), "r"(a.d1));
 #else
   asm("{\n\t"
-      ".reg .u32 a2, t1;\n\t"
+      ".reg .u32 t1;\n\t"
 
       "mul.lo.u32     %0, %5, %5;\n\t"     /* (a.d0 * a.d0).lo */
       "mul.lo.u32     %1, %5, %6;\n\t"     /* (a.d0 * a.d1).lo */
@@ -230,8 +230,7 @@ For correct results a must be less than 2^64 (a.d2 == 0) */
 
       "add.cc.u32     %1, %1, %1;\n\t"     /* 2 * (a.d0 * a.d1).lo */
       "addc.cc.u32    %2, %2, %2;\n\t"     /* 2 * (a.d0 * a.d1).hi */
-      "mul.hi.u32     t1, %5, a2;\n\t"     /* 2 * (a.d0 * a.d2).hi */
-      "addc.u32       %3, t1,  0;\n\t"     /* %3 (res.d3) has some space left because a2 is < 2^17 */
+      "addc.u32       %3, 0,  0;\n\t"      /* propagate carry */
 
       "mul.hi.u32     t1, %5, %5;\n\t"     /* (a.d0 * a.d0).hi */
       "add.cc.u32     %1, %1, t1;\n\t"
