@@ -676,7 +676,12 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
   }
   printf("\n");
 
-  if(st_success == num_selftests)
+  if(num_selftests == 0)
+  {
+    printf("No selftests were run!\n\n");
+    retval=VALID_SELFTEST_NOT_FOUND;
+  }
+  else if(st_success == num_selftests)
   {
     printf("selftest PASSED!\n\n");
     retval=0;
@@ -854,7 +859,11 @@ int main(int argc, char **argv)
         return 1;
       }
       tmp = strlen(argv[i]);
-      if (tmp == 0 || tmp > 50) {
+      if (tmp == 0) {
+        printf("ERROR: filename is empty.\n");
+        return 1;
+      }
+      if (tmp > 50) {
         printf("ERROR: filename is too long, only 50 characters are allowed.\n");
         return 1;
       }
