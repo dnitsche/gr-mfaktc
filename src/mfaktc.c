@@ -846,6 +846,21 @@ int main(int argc, char **argv)
 
       mystuff.verbosity = tmp;
     }
+    else if(!strcmp((char*)"--testfile", argv[i]))
+    {
+      if(i+1 >= argc)
+      {
+        printf("ERROR: no filename specified for option \"--testfile\"\n");
+        return 1;
+      }
+      tmp = strlen(argv[i]);
+      if (tmp == 0 || tmp > 50) {
+        printf("ERROR: filename is too long, only 50 characters are allowed.\n");
+        return 1;
+      }
+      i++;
+      strcpy(mystuff.selftestfile, argv[i]);
+    }
     i++;
   }
 
