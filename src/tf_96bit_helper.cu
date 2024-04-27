@@ -18,8 +18,16 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 
 
 __device__ static void check_factor96(int96 f, int96 a, bool negativeBase, unsigned int *RES)
-/* Check whether f is a factor or not. If f != 1 and a == 1 then f is a factor,
-in this case f is written into the RES array. */
+/* Check whether f is a factor or not.
+Positive bases: If f != 1 and a = 1 then f is a factor.
+Negative bases: If f != 1 and a = -1 then f is a factor. -1 = (f - 1) mod f
+In this case f is written into the RES array
+
+Derivation: p is an odd prime. We need R(b) = (b^p-1)/(b-1) = 0 mod f, for f to be a factor of R(b).
+Hence, b^p-1 = 0 mod f
+For b>0:  b^p = 1 mod f
+For b<0:  b^p = 1 mod f  <==>  -|b|^p = -1 mod f = f-1 mod f
+ */
 {
   unsigned int index;
   bool isFactor;
