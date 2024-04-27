@@ -256,7 +256,7 @@ void print_status_line(mystuff_t *mystuff)
       }
       else if(mystuff->stats.progressformat[i+1] == 'B')
       {
-        index += sprintf(buffer + index, "%-11d", mystuff->base);
+        index += sprintf(buffer + index, "%-11"PRId64, mystuff->base);
       }
       else if(mystuff->stats.progressformat[i+1] == 'M')
       {
@@ -329,16 +329,16 @@ void print_result_line(mystuff_t *mystuff, int factorsfound)
   {
     if((mystuff->mode == MODE_NORMAL) && (mystuff->stats.class_counter < mystuff->stats.max_classes_needed))
     {
-      sprintf(string, "found %d factor%s for %s[%d]%u from 2^%2d to 2^%2d (partially tested) [mfaktc %s %s]", factorsfound, (factorsfound > 1) ? "s" : "", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, MFAKTC_VERSION, mystuff->stats.kernelname);
+      sprintf(string, "found %d factor%s for %s[%"PRId64"]%u from 2^%2d to 2^%2d (partially tested) [mfaktc %s %s]", factorsfound, (factorsfound > 1) ? "s" : "", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, MFAKTC_VERSION, mystuff->stats.kernelname);
     }
     else
     {
-      sprintf(string, "found %d factor%s for %s[%d]%u from 2^%2d to 2^%2d [mfaktc %s %s]", factorsfound, (factorsfound > 1) ? "s" : "", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, MFAKTC_VERSION, mystuff->stats.kernelname);
+      sprintf(string, "found %d factor%s for %s[%"PRId64"]%u from 2^%2d to 2^%2d [mfaktc %s %s]", factorsfound, (factorsfound > 1) ? "s" : "", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, MFAKTC_VERSION, mystuff->stats.kernelname);
     }
   }
   else
   {
-    sprintf(string, "no factor for %s[%d]%u from 2^%d to 2^%d [mfaktc %s %s]", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, MFAKTC_VERSION, mystuff->stats.kernelname);
+    sprintf(string, "no factor for %s[%"PRId64"]%u from 2^%d to 2^%d [mfaktc %s %s]", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, MFAKTC_VERSION, mystuff->stats.kernelname);
   }
 
   if(mystuff->mode != MODE_SELFTEST_SHORT)
@@ -375,12 +375,12 @@ void print_factor(mystuff_t *mystuff, int factor_number, char *factor)
     if(mystuff->mode != MODE_SELFTEST_SHORT)
     {
       if(mystuff->printmode == 1 && factor_number == 0)printf("\n");
-      printf("%s[%d]%u has a factor: %s\n", NAME_NUMBERS, mystuff->base, mystuff->exponent, factor);
+      printf("%s[%"PRId64"]%u has a factor: %s\n", NAME_NUMBERS, mystuff->base, mystuff->exponent, factor);
     }
     if(mystuff->mode == MODE_NORMAL)
     {
       fprintf(
-        resultfile, "%s%s[%d]%u has a factor: %s [TF:%d:%d%s:mfaktc %s %s]\n",
+        resultfile, "%s%s[%"PRId64"]%u has a factor: %s [TF:%d:%d%s:mfaktc %s %s]\n",
         UID, NAME_NUMBERS, mystuff->base, mystuff->exponent, factor, mystuff->bit_min, mystuff->bit_max_stage,
         ((mystuff->stopafterfactor == 2) && (mystuff->stats.class_counter < mystuff->stats.max_classes_needed)) ? "*" : "" ,
         MFAKTC_VERSION, mystuff->stats.kernelname
@@ -389,8 +389,8 @@ void print_factor(mystuff_t *mystuff, int factor_number, char *factor)
   }
   else /* factor_number >= 10 */
   {
-    if(mystuff->mode != MODE_SELFTEST_SHORT)      printf("%s[%d]%u: %d additional factors not shown\n",      NAME_NUMBERS, mystuff->base, mystuff->exponent, factor_number-10);
-    if(mystuff->mode == MODE_NORMAL)fprintf(resultfile,"%s%s[%d]%u: %d additional factors not shown\n", UID, NAME_NUMBERS, mystuff->base, mystuff->exponent, factor_number-10);
+    if(mystuff->mode != MODE_SELFTEST_SHORT)      printf("%s[%"PRId64"]%u: %d additional factors not shown\n",      NAME_NUMBERS, mystuff->base, mystuff->exponent, factor_number-10);
+    if(mystuff->mode == MODE_NORMAL)fprintf(resultfile,"%s%s[%"PRId64"]%u: %d additional factors not shown\n", UID, NAME_NUMBERS, mystuff->base, mystuff->exponent, factor_number-10);
   }
 
   if(mystuff->mode == MODE_NORMAL)fclose(resultfile);

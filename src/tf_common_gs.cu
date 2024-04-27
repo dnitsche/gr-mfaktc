@@ -42,7 +42,8 @@ extern "C" __host__ int tf_class_95_gs(unsigned long long int k_min, unsigned lo
   char string[50];
   int shared_mem_required;
   int factorsfound = 0;
-  unsigned int abs_base = abs(mystuff->base);
+  bool is_base_negative = mystuff->base < 0;
+  unsigned int abs_base = is_base_negative ? (unsigned int) -mystuff->base : (unsigned int) mystuff->base;
 
   // If we've never initialized the GPU sieving code, do so now.
 //  gpusieve_init (mystuff); // moved to main() function!
@@ -151,7 +152,7 @@ extern "C" __host__ int tf_class_95_gs(unsigned long long int k_min, unsigned lo
     // Now let the GPU trial factor the candidates that survived the sieving
 
     MFAKTC_FUNC<<<numblocks, THREADS_PER_BLOCK, shared_mem_required>>>(
-      mystuff->exponent, mystuff->base, k_base, mystuff->d_bitarray,
+      mystuff->exponent, abs_base, is_base_negative, k_base, mystuff->d_bitarray,
       mystuff->gpu_sieve_processing_size, shiftcount,
       b_preinit, mystuff->d_RES
 #ifdef DEBUG_GPU_MATH

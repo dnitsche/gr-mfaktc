@@ -85,15 +85,16 @@ returns
 }
 
 
-int valid_assignment(int base, unsigned int exp, int bit_min, int bit_max, int verbosity)
+int valid_assignment(long long int base, unsigned int exp, int bit_min, int bit_max, int verbosity)
 /*
 returns 1 if the assignment is within the supported bounds of mfaktc,
 0 otherwise.
 */
 {
   int ret = 1;
+  unsigned int abs_base = base < 0 ? (unsigned int) -base : (unsigned int) base;
 
-  if(abs(base) < 2)           {ret = 0; if(verbosity >= 1)printf("WARNING: only |bases| >= 2 are supported!\n");}
+  if(abs_base < 2)            {ret = 0; if(verbosity >= 1)printf("WARNING: only |bases| >= 2 are supported!\n");}
   else if(exp < MIN_EXPONENT) {ret = 0; if(verbosity >= 1)printf("WARNING: exponents < %d are not supported!\n", MIN_EXPONENT);}
   else if(!isprime(exp))      {ret = 0; if(verbosity >= 1)printf("WARNING: exponent is not prime!\n");}
   else if(bit_min < 1 )       {ret = 0; if(verbosity >= 1)printf("WARNING: bit_min < 1 doesn't make sense!\n");}
@@ -103,7 +104,7 @@ returns 1 if the assignment is within the supported bounds of mfaktc,
   else if(((double)(bit_max-1) - (log((double)exp) / log(2.0F))) > 63.9F) /* this leave enough room so k_min/k_max won't overflow in tf_XX() */
                               {ret = 0; if(verbosity >= 1)printf("WARNING: k_max > 2^63.9 is not supported!\n");}
 
-  if(verbosity >= 1 && ret == 0)printf("         Ignoring TF %s[%d]%u from 2^%d to 2^%d!\n", NAME_NUMBERS, base, exp, bit_min, bit_max);
+  if(verbosity >= 1 && ret == 0)printf("         Ignoring TF %s[%"PRId64"]%u from 2^%d to 2^%d!\n", NAME_NUMBERS, base, exp, bit_min, bit_max);
 
   return ret;
 }
@@ -143,7 +144,7 @@ output
 
   enum PARSE_WARNINGS reason = NO_WARNING;
 
-  long proposed_base;
+  long long int proposed_base;
 
   unsigned long proposed_exponent, proposed_bit_min, proposed_bit_max;
 
@@ -306,7 +307,7 @@ output
  *     1 - get_next_assignment : cannot open file							    *
  *     2 - get_next_assignment : no valid assignment found						    *
  ************************************************************************************************************/
-enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, int *base, unsigned int *exponent, int *bit_min, int *bit_max, LINE_BUFFER *key, int verbosity)
+enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, long long int *base, unsigned int *exponent, int *bit_min, int *bit_max, LINE_BUFFER *key, int verbosity)
 {
   FILE *f_in;
   enum PARSE_WARNINGS value;
@@ -393,7 +394,7 @@ enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, int *base, unsigned i
  * If bit_min_new is zero then the specified assignment will be cleared. If bit_min_new is greater than     *
  * zero the specified assignment will be modified                                                           *
  ************************************************************************************************************/
-enum ASSIGNMENT_ERRORS clear_assignment(char *filename, int base, unsigned int exponent, int bit_min, int bit_max, int bit_min_new)
+enum ASSIGNMENT_ERRORS clear_assignment(char *filename, long long int base, unsigned int exponent, int bit_min, int bit_max, int bit_min_new)
 {
   int found = FALSE;
   FILE *f_in, *f_out;
@@ -477,7 +478,7 @@ enum ASSIGNMENT_ERRORS clear_assignment(char *filename, int base, unsigned int e
           fprintf(f_out,"Factor=" );
           if (strlen(assignment.assignment_key) != 0)
             fprintf(f_out,"%s,", assignment.assignment_key);
-          fprintf(f_out,"base=%d,%u,%u,%u", base, exponent, bit_min_new, bit_max);
+          fprintf(f_out,"base=%"PRId64",%u,%u,%u", base, exponent, bit_min_new, bit_max);
           if (tail != NULL)
             fprintf(f_out,"%s",tail);
         }
@@ -590,7 +591,7 @@ output
 
   enum PARSE_WARNINGS reason = NO_WARNING;
 
-  long proposed_base;
+  long long int proposed_base;
 
   unsigned long proposed_exponent, proposed_bit_min;
   unsigned long long proposed_k;
@@ -706,7 +707,7 @@ output
  *     INPUT  :                                                                                             *
  *    FILE* f_in                                                                                            *
  *    char *filename                                                                                        *
- *    int *base                                                                                             *
+ *    long long int *base                                                                                   *
  *    unsigned int *exponent                                                                                *
  *    int *bit_min                                                                                          *
  *    unsigned long long *k                                                                                 *
@@ -716,7 +717,7 @@ output
  *     1 - get_next_selftest : cannot open file                                                             *
  *     2 - get_next_selftest : no valid selftest found (EOF)                                                *
  ************************************************************************************************************/
-enum ASSIGNMENT_ERRORS get_next_selftest(FILE * f_in, char *filename, int *base, unsigned int *exponent, int *bit_min, unsigned long long *k, int verbosity)
+enum ASSIGNMENT_ERRORS get_next_selftest(FILE * f_in, char *filename, long long int *base, unsigned int *exponent, int *bit_min, unsigned long long *k, int verbosity)
 {
   enum PARSE_WARNINGS value;
   struct SELFTEST selftest;

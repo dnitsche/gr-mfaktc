@@ -527,7 +527,7 @@ one. Sometimes the result is a little bit bigger than n
 }
 
 
-__device__ static void test_FC96_mfaktc_95(int96 f, int192 b, unsigned int exp, unsigned int *RES, int shiftcount, int base_
+__device__ static void test_FC96_mfaktc_95(int96 f, int192 b, unsigned int exp, unsigned int *RES, int shiftcount, unsigned int abs_base, bool negativeBase
 #ifdef DEBUG_GPU_MATH
                                            , unsigned int *modbasecase_debug
 #endif
@@ -535,8 +535,6 @@ __device__ static void test_FC96_mfaktc_95(int96 f, int192 b, unsigned int exp, 
 {
   int96 a;
   float ff;
-  unsigned int abs_base = abs(base_);
-  bool negativeBase = base_ < 0;
 
 /*
 ff = f as float, needed in mod_192_96().
@@ -597,11 +595,11 @@ Precalculated here since it is the same for all steps in the following loop */
 
 __global__ void
 #ifdef SHORTCUT_64BIT
-__launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_64(unsigned int exp, int base, int96 k, unsigned int *k_tab, int shiftcount, int192 b, unsigned int *RES
+__launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_64(unsigned int exp, unsigned int base, bool negative_base, int96 k, unsigned int *k_tab, int shiftcount, int192 b, unsigned int *RES
 #elif defined(SHORTCUT_75BIT)
-__launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_75(unsigned int exp, int base, int96 k, unsigned int *k_tab, int shiftcount, int192 b, unsigned int *RES
+__launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_75(unsigned int exp, unsigned int base, bool negative_base, int96 k, unsigned int *k_tab, int shiftcount, int192 b, unsigned int *RES
 #else
-__launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_95(unsigned int exp, int base, int96 k, unsigned int *k_tab, int shiftcount, int192 b, unsigned int *RES
+__launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_95(unsigned int exp, unsigned int base, bool negative_base, int96 k, unsigned int *k_tab, int shiftcount, int192 b, unsigned int *RES
 #endif
 #ifdef DEBUG_GPU_MATH
                                                  , unsigned int *modbasecase_debug
@@ -617,7 +615,7 @@ a is precomputed on host ONCE. */
 
   create_FC96_mad(&f, exp, k, k_tab[index]);    // f = 2 * (k + k_tab[index]) * exp + 1
 
-  test_FC96_mfaktc_95(f, b, exp, RES, shiftcount, base
+  test_FC96_mfaktc_95(f, b, exp, RES, shiftcount, base, negative_base
 #ifdef DEBUG_GPU_MATH
                       , modbasecase_debug
 #endif
@@ -628,11 +626,11 @@ a is precomputed on host ONCE. */
 
 __global__ void
 #ifdef SHORTCUT_64BIT
-__launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_64_gs(unsigned int exp, int base, int96 k_base, unsigned int *bit_array, unsigned int bits_to_process, int shiftcount, int192 b, unsigned int *RES
+__launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_64_gs(unsigned int exp, unsigned int base, bool negative_base, int96 k_base, unsigned int *bit_array, unsigned int bits_to_process, int shiftcount, int192 b, unsigned int *RES
 #elif defined(SHORTCUT_75BIT)
-__launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_75_gs(unsigned int exp, int base, int96 k_base, unsigned int *bit_array, unsigned int bits_to_process, int shiftcount, int192 b, unsigned int *RES
+__launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_75_gs(unsigned int exp, unsigned int base, bool negative_base, int96 k_base, unsigned int *bit_array, unsigned int bits_to_process, int shiftcount, int192 b, unsigned int *RES
 #else
-__launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_95_gs(unsigned int exp, int base, int96 k_base, unsigned int *bit_array, unsigned int bits_to_process, int shiftcount, int192 b, unsigned int *RES
+__launch_bounds__(THREADS_PER_BLOCK,2) mfaktc_95_gs(unsigned int exp, unsigned int base, bool negative_base, int96 k_base, unsigned int *bit_array, unsigned int bits_to_process, int shiftcount, int192 b, unsigned int *RES
 #endif
 #ifdef DEBUG_GPU_MATH
                                                  , unsigned int *modbasecase_debug
@@ -662,7 +660,7 @@ a is precomputed on host ONCE. */
     f.d1 = __addc_cc(f_base.d1, __umul32hi(2 * k_delta * NUM_CLASSES, exp));
     f.d2 = __addc   (f_base.d2, 0);
 
-    test_FC96_mfaktc_95(f, b, exp, RES, shiftcount, base
+    test_FC96_mfaktc_95(f, b, exp, RES, shiftcount, base, negative_base
 #ifdef DEBUG_GPU_MATH
                         , modbasecase_debug
 #endif

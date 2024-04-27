@@ -61,7 +61,7 @@ typedef struct
   unsigned int *h_RES;
   unsigned int *d_RES;
 
-  int base;                            /* the repunit base we're currently working on */
+  long long int base;                  /* the repunit base we're currently working on */
   remainders_t remainders_pos[REMAINDERS_LUT_MAX+1]; /* allowed remainders bitmask for positive bases */
   remainders_t remainders_neg[REMAINDERS_LUT_MAX+1]; /* allowed remainders bitmask for negative bases */
   unsigned int exponent;               /* the exponent we're currently working on */

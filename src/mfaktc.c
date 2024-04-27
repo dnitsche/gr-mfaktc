@@ -170,7 +170,7 @@ other return value
 {
   int cur_class, max_class = NUM_CLASSES-1, i;
   unsigned long long int k_min, k_max, k_range, tmp, max_classes_needed = 0;
-  unsigned int f_hi, f_med, f_low;
+  unsigned int f_hi, f_med, f_low, abs_base;
   struct timeval timer, timer_last_checkpoint;
   static struct timeval timer_last_addfilecheck;
   remainders_t *remainders = NULL;
@@ -185,7 +185,7 @@ other return value
   mystuff->stats.output_counter = 0; /* reset output counter, needed for status headline */
   mystuff->stats.ghzdays = primenet_ghzdays(mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage);
 
-  if(mystuff->mode != MODE_SELFTEST_SHORT)printf("Starting trial factoring %s[%d]%u from 2^%d to 2^%d (%.2f GHz-days)\n", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, mystuff->stats.ghzdays);
+  if(mystuff->mode != MODE_SELFTEST_SHORT)printf("Starting trial factoring %s[%"PRId64"]%u from 2^%d to 2^%d (%.2f GHz-days)\n", NAME_NUMBERS, mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_stage, mystuff->stats.ghzdays);
   if((mystuff->mode != MODE_NORMAL) && (mystuff->mode != MODE_SELFTEST_SHORT) && (mystuff->mode != MODE_SELFTEST_FULL))
   {
     printf("ERROR, invalid mode for tf(): %d\n", mystuff->mode);
@@ -204,15 +204,16 @@ other return value
   k_min=calculate_k(mystuff->exponent, mystuff->bit_min);
   k_max=calculate_k(mystuff->exponent, mystuff->bit_max_stage);
 
-  if (abs(mystuff->base) <= REMAINDERS_LUT_MAX)
+  abs_base = mystuff->base < 0 ? (unsigned int) -mystuff->base : (unsigned int) mystuff->base;
+  if (abs_base <= REMAINDERS_LUT_MAX)
   {
-    remainders = mystuff->base > 0 ? &mystuff->remainders_pos[mystuff->base]
-                                   : &mystuff->remainders_neg[-mystuff->base];
+    remainders = mystuff->base > 0 ? &mystuff->remainders_pos[abs_base]
+                                   : &mystuff->remainders_neg[abs_base];
   }
 
   if(mystuff->mode != MODE_SELFTEST_SHORT && mystuff->verbosity >= 1) {
     if (remainders == NULL) {
-      printf("INFO: No known remainders for base %d, falling back to simple trial factoring.\n", mystuff->base);
+      printf("INFO: No known remainders for base %"PRId64", falling back to simple trial factoring.\n", mystuff->base);
     }
   }
   // Only for some bases the allowed remainders can be used together with the no_small_factor check.
@@ -230,7 +231,7 @@ other return value
           nsf_counter++;
         }
       }
-      printf("INFO: Remainder lookup table for base %d is incompatible to class count %d.\n", mystuff->base, NUM_CLASSES);
+      printf("INFO: Remainder lookup table for base %"PRId64" is incompatible to class count %d.\n", mystuff->base, NUM_CLASSES);
       printf("INFO: Falling back to simple trial factoring (%4.2f x slower).\n", (double)nsf_counter/(double)optimal_counter);
     }
     remainders = NULL;
@@ -420,7 +421,7 @@ see benchmarks in src/kernel_benchmarks.txt */
   {
     if(mystuff->h_RES[0] == 0)
     {
-      printf("ERROR: selftest failed for %s[%d]%u\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
+      printf("ERROR: selftest failed for %s[%"PRId64"]%u\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
       printf("  no factor found\n");
       retval = 1;
     }
@@ -456,7 +457,7 @@ k_max and k_min are used as 64bit temporary integers here...
       }
       if(k_min != 1) /* the factor should appear ONCE */
       {
-        printf("ERROR: selftest failed for %s[%d]%u!\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
+        printf("ERROR: selftest failed for %s[%"PRId64"]%u!\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
         printf("  expected result: %08X %08X %08X\n", f_hi, f_med, f_low);
         for(i=0; ((unsigned int)i < mystuff->h_RES[0]) && (i < 10); i++)
         {
@@ -466,7 +467,7 @@ k_max and k_min are used as 64bit temporary integers here...
       }
       else
       {
-        if(mystuff->mode != MODE_SELFTEST_SHORT)printf("selftest for %s[%d]%u passed!\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
+        if(mystuff->mode != MODE_SELFTEST_SHORT)printf("selftest for %s[%"PRId64"]%u passed!\n", NAME_NUMBERS, mystuff->base, mystuff->exponent);
       }
     }
   }
@@ -515,7 +516,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
 
   #define NUM_QUICK_SELFTESTS 27
   int parse_ret = -1;
-  int quicktest_base[NUM_QUICK_SELFTESTS], quicktest_bit_min[NUM_QUICK_SELFTESTS];
+  long long int quicktest_base[NUM_QUICK_SELFTESTS], quicktest_bit_min[NUM_QUICK_SELFTESTS];
   unsigned long long int quicktest_k[NUM_QUICK_SELFTESTS];
   unsigned int quicktest_exp[NUM_QUICK_SELFTESTS];
   int num_selftests=0;
@@ -550,7 +551,7 @@ RET_CUDA_ERROR we might have a serios problem (detected by cudaGetLastError())
       {
         mystuff->bit_max_assignment = mystuff->bit_min + 1;
         mystuff->bit_max_stage      = mystuff->bit_max_assignment;
-        if(mystuff->verbosity >= 1)printf("got selftest: base=%d exp=%u bit_min=%d bit_max=%d (%.2f GHz-days)\n", mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_assignment, primenet_ghzdays(mystuff->exponent, mystuff->bit_min, mystuff->bit_max_assignment));
+        if(mystuff->verbosity >= 1)printf("got selftest: base=%"PRId64" exp=%u bit_min=%d bit_max=%d (%.2f GHz-days)\n", mystuff->base, mystuff->exponent, mystuff->bit_min, mystuff->bit_max_assignment, primenet_ghzdays(mystuff->exponent, mystuff->bit_min, mystuff->bit_max_assignment));
 
         printf("########## testcase %u ##########\n", ++i);
         f_class = (int)(k % NUM_CLASSES);
@@ -710,7 +711,7 @@ void print_last_CUDA_error()
 
 int main(int argc, char **argv)
 {
-  int base = 1;
+  long long int base = 1;
   unsigned int exponent = 1;
   int bit_min = -1, bit_max = -1;
   int parse_ret = -1;
@@ -770,8 +771,8 @@ int main(int argc, char **argv)
         printf("ERROR: missing parameters for option \"-tf\"\n");
         return 1;
       }
-      base = (unsigned int)strtoul(argv[i+1], &ptr, 10);
-      if(*ptr || errno || (unsigned long)base != strtoul(argv[i+1],&ptr,10) )
+      base = strtol(argv[i+1], &ptr, 10);
+      if(*ptr || errno || base != strtol(argv[i+1],&ptr,10) )
       {
         printf("ERROR: can't parse parameter <base> for option \"-tf\"\n");
         return 1;
@@ -1114,7 +1115,7 @@ int main(int argc, char **argv)
       }
       if(parse_ret == OK)
       {
-        if(mystuff.verbosity >= 1)printf("got assignment: base=%d exp=%u bit_min=%d bit_max=%d (%.2f GHz-days)\n", mystuff.base, mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment, primenet_ghzdays(mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment));
+        if(mystuff.verbosity >= 1)printf("got assignment: base=%"PRId64" exp=%u bit_min=%d bit_max=%d (%.2f GHz-days)\n", mystuff.base, mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment, primenet_ghzdays(mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment));
         if(mystuff.gpu_sieving && mystuff.exponent < mystuff.gpu_sieve_min_exp)
         {
           printf("ERROR: GPU sieve requested but current settings don't allow exponents below\n");

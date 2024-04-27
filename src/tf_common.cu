@@ -40,7 +40,8 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
   unsigned long long int k_diff;
   char string[50];
   int factorsfound = 0;
-  unsigned int abs_base = abs(mystuff->base);
+  bool is_base_negative = mystuff->base < 0;
+  unsigned int abs_base = is_base_negative ? (unsigned int) -mystuff->base : (unsigned int) mystuff->base;
 
   int h_ktab_index = 0;
   int h_ktab_cpu[CPU_STREAMS_MAX];			// the set of h_ktab[N]s currently ownt by CPU
@@ -164,7 +165,7 @@ extern "C" __host__ int tf_class_95(unsigned long long int k_min, unsigned long 
         k_base.d1 =  k_min_grid[h_ktab_index] >> 32;
         k_base.d2 = 0;
 
-        MFAKTC_FUNC<<<blocksPerGrid, threadsPerBlock, 0, mystuff->stream[stream]>>>(mystuff->exponent, mystuff->base, k_base, mystuff->d_ktab[stream], shiftcount, b_preinit, mystuff->d_RES
+        MFAKTC_FUNC<<<blocksPerGrid, threadsPerBlock, 0, mystuff->stream[stream]>>>(mystuff->exponent, abs_base, is_base_negative, k_base, mystuff->d_ktab[stream], shiftcount, b_preinit, mystuff->d_RES
 #ifdef DEBUG_GPU_MATH
                                                                                     , mystuff->d_modbasecase_debug
 #endif
