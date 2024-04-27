@@ -744,7 +744,7 @@ int main(int argc, char **argv)
 
   while(i < argc)
   {
-    if(!strcmp((char*)"-h", argv[i]))
+    if(!strcmp((char*)"-h", argv[i]) || !strcmp((char*)"--help", argv[i]))
     {
       print_help(argv[0]);
       return 0;
