@@ -1,3 +1,8 @@
+version 0.21.2 generalized-repunit-edition (2024-04-28)
+- contributors: Danilo Nitsche (danilo.nitsche@gmx.de)
+  - new parameter '--testfile <testfile>' to allow testing any given file
+  - doubled the allowed range of bases to 33 bit (-4294967295 to 4294967295)
+
 version 0.21.1 generalized-repunit-edition (2024-04-23)
 - contributors: Danilo Nitsche (danilo.nitsche@gmx.de)
   - fixed brokens tests
