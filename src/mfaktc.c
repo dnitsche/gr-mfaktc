@@ -864,7 +864,7 @@ int main(int argc, char **argv)
 
       if(tmp < 0)
       {
-        printf("WARNING: minumum verbosity level is 0\n");
+        printf("WARNING: minimum verbosity level is 0\n");
         tmp = 0;
       }
 
