@@ -808,15 +808,28 @@ int main(int argc, char **argv)
       parse_ret = 0;
       i += 3;
     }
-    else if(!strcmp((char*)"-st", argv[i]))
+    else if(!strcmp((char*)"-st", argv[i]) || !strcmp((char*)"-st2", argv[i]))
     {
       mystuff.mode = MODE_SELFTEST_FULL;
-      mystuff.selftestsize = 1;
-    }
-    else if(!strcmp((char*)"-st2", argv[i]))
-    {
-      mystuff.mode = MODE_SELFTEST_FULL;
-      mystuff.selftestsize = 2;
+      mystuff.selftestsize = !strcmp((char*)"-st", argv[i]) ? 1 : 2;
+      if(i+1 >= argc)
+      {
+        // No file was given. Default file was already set, so do nothing
+      }
+      else
+      {
+        tmp = strlen(argv[i]);
+        if (tmp == 0) {
+          printf("ERROR: filename is empty.\n");
+          return 1;
+        }
+        if (tmp > 50) {
+          printf("ERROR: filename is too long, only 50 characters are allowed.\n");
+          return 1;
+        }
+        i++;
+        strcpy(mystuff.selftestfile, argv[i]);
+      }
     }
     else if(!strcmp((char*)"--timertest", argv[i]))
     {
@@ -856,25 +869,6 @@ int main(int argc, char **argv)
       }
 
       mystuff.verbosity = tmp;
-    }
-    else if(!strcmp((char*)"--testfile", argv[i]))
-    {
-      if(i+1 >= argc)
-      {
-        printf("ERROR: no filename specified for option \"--testfile\"\n");
-        return 1;
-      }
-      tmp = strlen(argv[i]);
-      if (tmp == 0) {
-        printf("ERROR: filename is empty.\n");
-        return 1;
-      }
-      if (tmp > 50) {
-        printf("ERROR: filename is too long, only 50 characters are allowed.\n");
-        return 1;
-      }
-      i++;
-      strcpy(mystuff.selftestfile, argv[i]);
     }
     i++;
   }

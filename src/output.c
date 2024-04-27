@@ -42,8 +42,8 @@ void print_help(char *string)
   printf("  -d <device number>     specify the device number used by this program\n");
   printf("  -tf <base> <exp> <min> <max>  trial factor %s(<base>)<exp> from 2^<min> to 2^<max> and exit\n", NAME_NUMBERS);
   printf("                         instead of parsing the worktodo file\n");
-  printf("  -st                    run builtin selftest and exit\n");
-  printf("  -st2                   same as -st but extended range for k_min/m_max\n");
+  printf("  -st [<file>]           run builtin selftest and exit, file is optional (default: testfile.txt)\n");
+  printf("  -st2 [<file>]          same as -st but extended range for k_min/m_max, file is optional (default: testfile.txt)\n");
   printf("  -v <number>            set verbosity (min = 0, default = 1, more = 2, max/debug = 3)\n");
   printf("\n");
   printf("options for debuging purposes\n");
