@@ -144,7 +144,7 @@ output
 
   enum PARSE_WARNINGS reason = NO_WARNING;
 
-  long long int proposed_base;
+  long long int proposed_base, max_base;
 
   unsigned long proposed_exponent, proposed_bit_min, proposed_bit_max;
 
@@ -194,6 +194,7 @@ output
       break;	// //comment delimiter
   }
   proposed_base = 10; // set default for base
+  max_base = (long long int)ULONG_MAX;
   // must have 2, 3 or 4 commas...
   if(2==number_of_commas)
   {// e.g.: Factor=3300019,1,64
@@ -208,7 +209,7 @@ output
       proposed_base = strtol(ptr_start, &ptr_end, 10);
       if (ptr_start == ptr_end)
         return INVALID_FORMAT;  // no conversion
-      if ((0!=errno) || (proposed_base > INT_MAX) || (proposed_base < INT_MIN))
+      if ((0!=errno) || (proposed_base > max_base) || (proposed_base < -max_base))
         return INVALID_DATA;  // for example, too many digits.
       assignment->assignment_key[0] = '\0';
       ptr = ptr_end;
@@ -234,7 +235,7 @@ output
     proposed_base = strtol(ptr_start, &ptr_end, 10);
     if (ptr_start == ptr_end)
       return INVALID_FORMAT;  // no conversion
-    if ((0!=errno) || (proposed_base > INT_MAX) || (proposed_base < INT_MIN))
+    if ((0!=errno) || (proposed_base > max_base) || (proposed_base < -max_base))
       return INVALID_DATA;  // for example, too many digits.
     ptr = ptr_end;
     ptr = 1 + strstr(ptr,",");
@@ -592,11 +593,14 @@ output
   enum PARSE_WARNINGS reason = NO_WARNING;
 
   long long int proposed_base;
+  long long int max_base = (long long int)ULONG_MAX;
 
   unsigned long proposed_exponent, proposed_bit_min;
   unsigned long long proposed_k;
 
   size_t len = MAX_LINE_LENGTH+1;
+  // to avoid compiler warning (maybe-uninitialized)
+  selftest->bit_min = 0;
 
   if(NULL==fgets(line, len, f_in))
   {
@@ -649,7 +653,7 @@ output
     proposed_base = strtol(ptr_start, &ptr_end, 10);
     if (ptr_start == ptr_end)
       return INVALID_FORMAT;  // no conversion
-    if ((0!=errno) || (proposed_base > INT_MAX) || (proposed_base < INT_MIN))
+    if ((0!=errno) || (proposed_base > max_base) || (proposed_base < -max_base))
       return INVALID_DATA;  // for example, too many digits.
     ptr = ptr_end;
     ptr = 1 + strstr(ptr,",");
