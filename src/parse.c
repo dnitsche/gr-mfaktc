@@ -119,6 +119,7 @@ enum PARSE_WARNINGS
   NO_BASE_EQUAL,
   INVALID_FORMAT,
   INVALID_DATA,
+  BASE_OUT_OF_RANGE,
   BLANK_LINE,
   NONBLANK_LINE
 };
@@ -144,7 +145,7 @@ output
 
   enum PARSE_WARNINGS reason = NO_WARNING;
 
-  long long int proposed_base, max_base;
+  long long int proposed_base;
 
   unsigned long proposed_exponent, proposed_bit_min, proposed_bit_max;
 
@@ -194,7 +195,6 @@ output
       break;	// //comment delimiter
   }
   proposed_base = 10; // set default for base
-  max_base = (long long int)ULONG_MAX;
   // must have 2, 3 or 4 commas...
   if(2==number_of_commas)
   {// e.g.: Factor=3300019,1,64
@@ -209,8 +209,10 @@ output
       proposed_base = strtol(ptr_start, &ptr_end, 10);
       if (ptr_start == ptr_end)
         return INVALID_FORMAT;  // no conversion
-      if ((0!=errno) || (proposed_base > max_base) || (proposed_base < -max_base))
+      if (0!=errno)
         return INVALID_DATA;  // for example, too many digits.
+      if ((proposed_base > MAX_BASE) || (proposed_base < MIN_BASE))
+        return BASE_OUT_OF_RANGE;
       assignment->assignment_key[0] = '\0';
       ptr = ptr_end;
       ptr = 1 + strstr(ptr,",");
@@ -235,8 +237,10 @@ output
     proposed_base = strtol(ptr_start, &ptr_end, 10);
     if (ptr_start == ptr_end)
       return INVALID_FORMAT;  // no conversion
-    if ((0!=errno) || (proposed_base > max_base) || (proposed_base < -max_base))
+    if (0!=errno)
       return INVALID_DATA;  // for example, too many digits.
+    if ((proposed_base > MAX_BASE) || (proposed_base < MIN_BASE))
+      return BASE_OUT_OF_RANGE;
     ptr = ptr_end;
     ptr = 1 + strstr(ptr,",");
   } else {
@@ -349,6 +353,7 @@ enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, long long int *base, 
         case NO_BASE_EQUAL:       printf("column doesn't begin with Base=\n");break;
         case INVALID_FORMAT:      printf("invalid format\n");break;
         case INVALID_DATA:        printf("invalid data\n");break;
+        case BASE_OUT_OF_RANGE:   printf("base out of range [%"PRId64",%"PRId64"]\n", MIN_BASE, MAX_BASE);break;
         default:                  printf("unknown error on >%s<",line); break;
       }
     }
@@ -593,7 +598,6 @@ output
   enum PARSE_WARNINGS reason = NO_WARNING;
 
   long long int proposed_base;
-  long long int max_base = (long long int)ULONG_MAX;
 
   unsigned long proposed_exponent, proposed_bit_min;
   unsigned long long proposed_k;
@@ -653,8 +657,10 @@ output
     proposed_base = strtol(ptr_start, &ptr_end, 10);
     if (ptr_start == ptr_end)
       return INVALID_FORMAT;  // no conversion
-    if ((0!=errno) || (proposed_base > max_base) || (proposed_base < -max_base))
+    if (0!=errno)
       return INVALID_DATA;  // for example, too many digits.
+    if ((proposed_base > MAX_BASE) || (proposed_base < MIN_BASE))
+      return BASE_OUT_OF_RANGE;
     ptr = ptr_end;
     ptr = 1 + strstr(ptr,",");
   } else {
@@ -751,6 +757,7 @@ enum ASSIGNMENT_ERRORS get_next_selftest(FILE * f_in, char *filename, long long 
         case LONG_LINE:           printf("line is too long\n"); break;
         case INVALID_FORMAT:      printf("invalid format\n");break;
         case INVALID_DATA:        printf("invalid data\n");break;
+        case BASE_OUT_OF_RANGE:   printf("base out of range [%"PRId64",%"PRId64"]\n", MIN_BASE, MAX_BASE);break;
         default:                  printf("unknown error on >%s<",line); break;
       }
     }

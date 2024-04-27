@@ -777,6 +777,11 @@ int main(int argc, char **argv)
         printf("ERROR: can't parse parameter <base> for option \"-tf\"\n");
         return 1;
       }
+      if ((base > MAX_BASE) || (base < MIN_BASE))
+      {
+        printf("ERROR: parameters <base> is out of range for option \"-tf\", allowed range [%"PRId64",%"PRId64"]\n", MIN_BASE, MAX_BASE);
+        return 1;
+      }
       exponent = (unsigned int)strtoul(argv[i+2], &ptr, 10);
       if(*ptr || errno || (unsigned long)exponent != strtoul(argv[i+2],&ptr,10) )
       {
