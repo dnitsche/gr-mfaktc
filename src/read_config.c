@@ -64,7 +64,9 @@ int my_read_string(char *inifile, char *name, char *string, unsigned int len)
       found = (len > found ? found : len) - 1;
       if (found)
       {
-        strncpy(string, buf + idx + 1, found);
+        // len=strlen(src); strncpy(dest,src,len+1); is equivalent to strcpy (dest,src);
+        // strncpy(string, buf + idx + 1, found); // old code
+        strcpy(string, buf + idx + 1);
         if(string[found - 1] == '\r') found--; //remove '\r' from string, this happens when reading a DOS/Windows formatted file on Linux
       }
       string[found] = '\0';
