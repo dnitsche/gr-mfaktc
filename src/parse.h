@@ -60,7 +60,7 @@ struct SELFTEST
 };
 
 int valid_assignment(long long int base, unsigned int exp, int bit_min, int bit_max, int verbosity);	// nonzero if assignment is valid
-enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, long long int *base, unsigned int *exponent, int *bit_min, int *bit_max, LINE_BUFFER *assignment_key, int verbosity);
-enum ASSIGNMENT_ERRORS clear_assignment(char *filename, long long int base, unsigned int exponent, int bit_min, int bit_max, int bit_min_new);
+enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, long long int *base, unsigned int *exponent, int *bit_min, int *bit_max, LINE_BUFFER *assignment_key, long long int default_base, int verbosity);
+enum ASSIGNMENT_ERRORS clear_assignment(char *filename, long long int base, unsigned int exponent, int bit_min, int bit_max, int bit_min_new, long long int default_base);
 int process_add_file(char *workfile, char *addfile, int *addfilesstatus, int verbosity);
 enum ASSIGNMENT_ERRORS get_next_selftest(FILE* f_in, char *filename, long long int *base, unsigned int *exponent, int *bit_min, unsigned long long *k, int verbosity);

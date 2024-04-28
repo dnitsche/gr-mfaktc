@@ -127,7 +127,7 @@ enum PARSE_WARNINGS
 
 // note:  parse_worktodo_line() is a function that
 //	returns the text of the line, the assignment data structure, and a success code.
-enum PARSE_WARNINGS parse_worktodo_line(FILE *f_in, struct ASSIGNMENT *assignment, LINE_BUFFER *linecopy, char * *endptr)
+enum PARSE_WARNINGS parse_worktodo_line(FILE *f_in, struct ASSIGNMENT *assignment, LINE_BUFFER *linecopy, char * *endptr, long long int default_base)
 /*
 input
   f_in: an open file from where data is read
@@ -194,7 +194,7 @@ output
     if ((ptr[scanpos] == '/') && (ptr[scanpos+1] == '/'))
       break;	// //comment delimiter
   }
-  proposed_base = 10; // set default for base
+  proposed_base = default_base; // set default for base
   // must have 2, 3 or 4 commas...
   if(2==number_of_commas)
   {// e.g.: Factor=3300019,1,64
@@ -312,7 +312,7 @@ output
  *     1 - get_next_assignment : cannot open file							    *
  *     2 - get_next_assignment : no valid assignment found						    *
  ************************************************************************************************************/
-enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, long long int *base, unsigned int *exponent, int *bit_min, int *bit_max, LINE_BUFFER *key, int verbosity)
+enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, long long int *base, unsigned int *exponent, int *bit_min, int *bit_max, LINE_BUFFER *key, long long int default_base, int verbosity)
 {
   FILE *f_in;
   enum PARSE_WARNINGS value;
@@ -331,7 +331,7 @@ enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, long long int *base, 
   do
   {
     linecount++;
-    value = parse_worktodo_line(f_in,&assignment,&line,&tail);
+    value = parse_worktodo_line(f_in,&assignment,&line,&tail,default_base);
     if ((BLANK_LINE == value) || (NONBLANK_LINE == value))
       continue;
     if (NO_WARNING == value)
@@ -400,7 +400,7 @@ enum ASSIGNMENT_ERRORS get_next_assignment(char *filename, long long int *base, 
  * If bit_min_new is zero then the specified assignment will be cleared. If bit_min_new is greater than     *
  * zero the specified assignment will be modified                                                           *
  ************************************************************************************************************/
-enum ASSIGNMENT_ERRORS clear_assignment(char *filename, long long int base, unsigned int exponent, int bit_min, int bit_max, int bit_min_new)
+enum ASSIGNMENT_ERRORS clear_assignment(char *filename, long long int base, unsigned int exponent, int bit_min, int bit_max, int bit_min_new, long long int default_base)
 {
   int found = FALSE;
   FILE *f_in, *f_out;
@@ -427,7 +427,7 @@ enum ASSIGNMENT_ERRORS clear_assignment(char *filename, long long int base, unsi
   else
   {
     current_line =0;
-    while (END_OF_FILE != (value = parse_worktodo_line(f_in,&assignment,&line,&tail)) )
+    while (END_OF_FILE != (value = parse_worktodo_line(f_in,&assignment,&line,&tail,default_base)) )
     {
       current_line++;
       if (NO_WARNING == value)
@@ -462,7 +462,7 @@ enum ASSIGNMENT_ERRORS clear_assignment(char *filename, long long int base, unsi
 
   found = FALSE;
   current_line = 0;
-  while (END_OF_FILE != (value = parse_worktodo_line(f_in,&assignment,&line,&tail)) )
+  while (END_OF_FILE != (value = parse_worktodo_line(f_in,&assignment,&line,&tail,default_base)) )
   {
     current_line++;
     if ((NO_WARNING != value) || found)

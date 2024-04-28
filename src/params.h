@@ -28,10 +28,6 @@ on some other factors asweel, but you don't have to worry about.
 
 #define SIEVE_SIZE_LIMIT 32
 
-#define REMAINDERS_LUT_MAX 1000 /* DO NOT CHANGE! */
-#define MIN_BASE -4294967295LL  /* DO NOT CHANGE! */
-#define MAX_BASE 4294967295LL   /* DO NOT CHANGE! */
-
 /*
 If MORE_CLASSES is defined than the while TF process is split into 4620
 (4 * 3*5*7*11) classes. Otherwise it will be split into 420 (4 * 3*5*7)
@@ -81,10 +77,13 @@ code path */
 *******************************************************************************
 ******************************************************************************/
 
-#define MFAKTC_VERSION "0.21" /* DO NOT CHANGE! */
+#define MFAKTC_VERSION "0.21"      /* DO NOT CHANGE! */
 #define GR_MFAKTC_VERSION "0.21.1" /* DO NOT CHANGE! */
 
-
+#define BASE_DEFAULT 10LL       /* DO NOT CHANGE! */
+#define REMAINDERS_LUT_MAX 1000 /* DO NOT CHANGE! */
+#define MIN_BASE -4294967295LL  /* DO NOT CHANGE! */
+#define MAX_BASE 4294967295LL   /* DO NOT CHANGE! */
 
 /*
 THREADS_PER_BLOCK has a hardware limit, 512 on GPUs with compute capability

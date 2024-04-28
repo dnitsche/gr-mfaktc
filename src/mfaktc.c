@@ -1104,7 +1104,7 @@ int main(int argc, char **argv)
     if(!use_worktodo)mystuff.addfiledelay = 0; /* disable addfile if not using worktodo at all (-tf on command line) */
     do
     {
-      if(use_worktodo)parse_ret = get_next_assignment(mystuff.workfile, &((mystuff.base)), &((mystuff.exponent)), &((mystuff.bit_min)), &((mystuff.bit_max_assignment)), NULL, mystuff.verbosity);
+      if(use_worktodo)parse_ret = get_next_assignment(mystuff.workfile, &((mystuff.base)), &((mystuff.exponent)), &((mystuff.bit_min)), &((mystuff.bit_max_assignment)), NULL, mystuff.default_base, mystuff.verbosity);
       else /* got work from command */
       {
         mystuff.base               = base;
@@ -1151,8 +1151,8 @@ int main(int argc, char **argv)
 
             if(use_worktodo)
             {
-              if(mystuff.bit_max_stage == mystuff.bit_max_assignment)parse_ret = clear_assignment(mystuff.workfile, mystuff.base, mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment, 0);
-              else                                                   parse_ret = clear_assignment(mystuff.workfile, mystuff.base, mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment, mystuff.bit_max_stage);
+              if(mystuff.bit_max_stage == mystuff.bit_max_assignment)parse_ret = clear_assignment(mystuff.workfile, mystuff.base, mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment, 0, mystuff.default_base);
+              else                                                   parse_ret = clear_assignment(mystuff.workfile, mystuff.base, mystuff.exponent, mystuff.bit_min, mystuff.bit_max_assignment, mystuff.bit_max_stage, mystuff.default_base);
 
                    if(parse_ret == CANT_OPEN_WORKFILE)   printf("ERROR: clear_assignment() / modify_assignment(): can't open \"%s\"\n", mystuff.workfile);
               else if(parse_ret == CANT_OPEN_TEMPFILE)   printf("ERROR: clear_assignment() / modify_assignment(): can't open \"__worktodo__.tmp\"\n");

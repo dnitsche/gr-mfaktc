@@ -23,6 +23,7 @@ along with mfaktc.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "params.h"
 #include "my_types.h"
+#include "compatibility.h"
 
 int my_read_int(char *inifile, char *name, int *value)
 {
@@ -37,6 +38,26 @@ int my_read_int(char *inifile, char *name, int *value)
     if(!strncmp(buf,name,strlen(name)) && buf[strlen(name)]=='=')
     {
       if(sscanf(&(buf[strlen(name)+1]),"%d",value)==1)found=1;
+    }
+  }
+  fclose(in);
+  if(found)return 0;
+  return 1;
+}
+
+int my_read_long_long_int(char *inifile, char *name, long long int *value)
+{
+  FILE *in;
+  char buf[100];
+  int found=0;
+
+  in=fopen(inifile,"r");
+  if(!in)return 1;
+  while(fgets(buf,100,in) && !found)
+  {
+    if(!strncmp(buf,name,strlen(name)) && buf[strlen(name)]=='=')
+    {
+      if(sscanf(&(buf[strlen(name)+1]),"%"PRId64,value)==1)found=1;
     }
   }
   fclose(in);
@@ -81,7 +102,24 @@ int my_read_string(char *inifile, char *name, char *string, unsigned int len)
 int read_config(mystuff_t *mystuff)
 {
   int i;
+  long long int lli=0;
   if(mystuff->verbosity >= 1)printf("\nRuntime options\n");
+
+  if(my_read_long_long_int("mfaktc.ini", "DefaultBase", &lli))
+  {
+    printf("WARNING: Cannot read DefaultBase from mfaktc.ini, using default value (%"PRId64")\n",BASE_DEFAULT);
+    lli = BASE_DEFAULT;
+  }
+  else
+  {
+    if((lli > MAX_BASE) || (lli < MIN_BASE))
+    {
+      printf("WARNING: Read out-of-bounds DefaultBase=%"PRId64" from mfaktc.ini, using default value (%"PRId64")\n",lli,BASE_DEFAULT);
+      lli = BASE_DEFAULT;
+    }
+  }
+  if(mystuff->verbosity >= 1)printf("  DefaultBase               %"PRId64"\n",lli);
+  mystuff->default_base = lli;
 
   if(my_read_int("mfaktc.ini", "SievePrimes", &i))
   {
