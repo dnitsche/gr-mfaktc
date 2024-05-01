@@ -1,4 +1,4 @@
-version 0.21.2 generalized-repunit-edition (2024-04-28)
+version 0.21.2 generalized-repunit-edition (2024-05-01)
 - contributors: Danilo Nitsche (danilo.nitsche@gmx.de)
   - -st and -st2 can pass optional file to allow testing on any file
   - doubled the allowed range of bases from 32 to 33 bit (-4294967295 to 4294967295)

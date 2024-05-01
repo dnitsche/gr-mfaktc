@@ -13,9 +13,9 @@ Content
 # 0 What is gr-mfaktc #
 #######################
 
-gr-mfaktc (generalized-repunit-edition) is a program based on mfaktc (See README.txt).
-It allows factoring generalized repunits with abs(bases) >= 2 doing the work on a
-CUDA supported graphics card.
+gr-mfaktc (generalized-repunit-edition) is a program based on mfaktc (See README-MFAKTC.txt).
+It allows factoring generalized repunits with positive as well as negative bases in the range
+2 <= |base| < 2^32, doing the work on a CUDA supported graphics card.
 
 
 ###############################
