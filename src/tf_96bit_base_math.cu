@@ -252,11 +252,11 @@ For correct results a must be less than 2^64 (a.d2 == 0) */
 }
 
 #ifdef SHORTCUT_64BIT
-extern "C" __host__ void mul64(int192 *res, int192 a, int b)
+extern "C" __host__ void mul64(int192 *res, int192 a, unsigned int b)
 #elif defined (SHORTCUT_75BIT)
-extern "C" __host__ void mul75(int192 *res, int192 a, int b)
+extern "C" __host__ void mul75(int192 *res, int192 a, unsigned int b)
 #else
-extern "C" __host__ void mul96(int192 *res, int192 a, int b)
+extern "C" __host__ void mul96(int192 *res, int192 a, unsigned int b)
 #endif
 {
   unsigned long long int full;
