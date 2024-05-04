@@ -88,16 +88,18 @@ of exponents this isn't used here for now. */
   return ret;
 }
 
-unsigned int * create_bit_mask(unsigned int length, ...) {
+remainders_t * create_remainders(unsigned int mod, unsigned int length, ...) {
   va_list blocks;
-  unsigned int * bit_mask = (unsigned int *) malloc(length * sizeof(unsigned int));
+  remainders_t * remainders = (remainders_t *) malloc(sizeof(remainders_t));
+  remainders->modulo_value = mod;
+  remainders->bit_mask = (unsigned int *) malloc(length * sizeof(unsigned int));
   va_start(blocks, length);
   for (unsigned int i = 0; i < length; ++i)
   {
-    bit_mask[i] = va_arg(blocks, unsigned int);
+    remainders->bit_mask[i] = va_arg(blocks, unsigned int);
   }
   va_end(blocks);
-  return bit_mask;
+  return remainders;
 }
 
 inline int no_small_factor(unsigned int exp, unsigned long long int k_min_plus_c)
@@ -207,18 +209,25 @@ other return value
   abs_base = mystuff->base < 0 ? (unsigned int) -mystuff->base : (unsigned int) mystuff->base;
   if (abs_base <= REMAINDERS_LUT_MAX)
   {
-    remainders = mystuff->base > 0 ? &mystuff->remainders_pos[abs_base]
-                                   : &mystuff->remainders_neg[abs_base];
+    remainders = mystuff->base > 0 ? mystuff->remainders_pos[abs_base]
+                                   : mystuff->remainders_neg[abs_base];
   }
 
   if(mystuff->mode != MODE_SELFTEST_SHORT && mystuff->verbosity >= 1) {
     if (remainders == NULL) {
-      printf("INFO: No known remainders for base %"PRId64", falling back to simple trial factoring.\n", mystuff->base);
+      if (abs_base <= REMAINDERS_LUT_MAX) {
+        // The Mathematica code to generate allowed-remainders-data.c skips remainders lists which would be incompatible
+        // with the classes 420 and 4620 due to the current computation choices (k differences)
+        printf("INFO: No stored remainders for base %"PRId64" (known incompatibility), falling back to simple trial factoring.\n", mystuff->base);
+      } else {
+        printf("INFO: No known remainders for base %"PRId64", falling back to simple trial factoring.\n", mystuff->base);
+      }
     }
   }
   // Only for some bases the allowed remainders can be used together with the no_small_factor check.
   // So check if combining both is possible, otherwise default is the small factor test
-  // I could remove the unused cases from the data file, but they might be useful with a better design.
+  // Currently the unused cases are removed from the data file. To add them one has to adapt the Mathematica code.
+  // This could be useful later with a better design of the parallel computation.
   if (remainders && !both_tests_possible(remainders->modulo_value)) {
     if(mystuff->mode != MODE_SELFTEST_SHORT && mystuff->verbosity >= 1) {
       int optimal_counter = 0, nsf_counter = 0;
@@ -231,6 +240,8 @@ other return value
           nsf_counter++;
         }
       }
+      // We only store compatible remainder lists for the class count 420 and 4620. If we get here, this means
+      // that the current class count is not compatible with the modulo value.
       printf("INFO: Remainder lookup table for base %"PRId64" is incompatible to class count %d.\n", mystuff->base, NUM_CLASSES);
       printf("INFO: Falling back to simple trial factoring (%4.2f x slower).\n", (double)nsf_counter/(double)optimal_counter);
     }
@@ -721,8 +732,15 @@ int main(int argc, char **argv)
   int i, tmp = 0;
   char *ptr;
   int use_worktodo = 1;
-  remainders_t *remainders_pos = mystuff.remainders_pos;
-  remainders_t *remainders_neg = mystuff.remainders_neg;
+  remainders_t **remainders_pos = mystuff.remainders_pos;
+  remainders_t **remainders_neg = mystuff.remainders_neg;
+  // Initialize with null pointer
+  for (i = 0; i <= REMAINDERS_LUT_MAX; ++i)
+  {
+    remainders_pos[i] = NULL;
+    remainders_neg[i] = NULL;
+  }
+  // Fill compatible remainders (class count 420 or 4620)
   #include "allowed-remainders-data.c"
 
   i = 1;
@@ -1197,10 +1215,16 @@ int main(int argc, char **argv)
   cudaFree(mystuff.d_calc_bit_to_clear_info);
 
   // 0 and 1 are not used
-  for (i = 2; i <= REMAINDERS_LUT_MAX; ++i)
+  for (i = 0; i <= REMAINDERS_LUT_MAX; ++i)
   {
-    free(remainders_pos[i].bit_mask);
-    free(remainders_neg[i].bit_mask);
+    if (mystuff.remainders_pos[i]) {
+      free(mystuff.remainders_pos[i]->bit_mask);
+      free(mystuff.remainders_pos[i]);
+    }
+    if (mystuff.remainders_neg[i]) {
+      free(mystuff.remainders_neg[i]->bit_mask);
+      free(mystuff.remainders_neg[i]);
+    }
   }
 
   return 0;
