@@ -80,10 +80,10 @@ code path */
 #define MFAKTC_VERSION "0.21"      /* DO NOT CHANGE! */
 #define GR_MFAKTC_VERSION "0.21.1" /* DO NOT CHANGE! */
 
-#define BASE_DEFAULT 10LL       /* DO NOT CHANGE! */
-#define REMAINDERS_LUT_MAX 5000 /* DO NOT CHANGE! */
-#define MIN_BASE -4294967295LL  /* DO NOT CHANGE! */
-#define MAX_BASE 4294967295LL   /* DO NOT CHANGE! */
+#define BASE_DEFAULT 10LL        /* DO NOT CHANGE! */
+#define REMAINDERS_LUT_MAX 10000 /* DO NOT CHANGE! */
+#define MIN_BASE -4294967295LL   /* DO NOT CHANGE! */
+#define MAX_BASE 4294967295LL    /* DO NOT CHANGE! */
 
 /*
 THREADS_PER_BLOCK has a hardware limit, 512 on GPUs with compute capability
